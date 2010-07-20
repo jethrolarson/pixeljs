@@ -1,0 +1,19 @@
+@import url(_base.scss);
+
+body{
+  font:{
+    size:16px;
+    family: Arial,Helvetica,sans-serif;
+  }
+  line-height: 1.4;
+}
+h1{font-size: $bigger;}
+h2{font-size: $big;}
+h3{font-size: $normal;}
+h4{font-size: $small;}
+small{font-size: $small;}
+h1,h2,h3,h4,h5{margin: 0 0 break;}
+p, ol, ul{
+  margin: $break/2 0 $break;
+}
+ul>li{margin-left: $small;}

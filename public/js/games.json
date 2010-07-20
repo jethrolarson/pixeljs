@@ -1,0 +1,28 @@
+{
+  "House":[
+    "..X..",
+    ".XXX.",
+    "XXXXX",
+    "X.X.X",
+    "X.XXX"
+  ],
+  "Cat":[
+    ".X..X.X",
+    "X...XXX",
+    "XXXXXX.",
+    "XXXXX..",
+    "X..X...",
+    "X..X...",
+    "XX.XX.."
+  ],
+  "Boat":[
+    "....XXXXXX",
+    "...X.XXXXX",
+    "..X.X.X...",
+    "..X.X.X...",
+    ".XXXXXXXX.",
+    "XXX.XX.XXX",
+    ".XXXXXXXX.",
+    ".........."
+  ]
+}

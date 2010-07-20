@@ -1,0 +1,14 @@
+//sass -w sass:public/css
+@import url(_base.scss);
+@import url(_util.scss);
+@import url(_set.scss);
+@import url(_typo.scss);
+@import url(game_grid.scss);
+
+#page{
+  width: 800px;
+  margin: 0 auto;
+  padding: 1em;
+  background: #eee;
+  @include border-radius(1em);
+}

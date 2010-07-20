@@ -1,0 +1,11 @@
+@import url(_reset.scss);
+/* CSS SET */
+
+td,th{vertical-align:top}
+
+section, article, header, footer{
+  @include clearfix;
+}
+header, footer{
+  clear: both;
+}

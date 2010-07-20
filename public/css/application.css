@@ -1,0 +1,278 @@
+body {
+  background: #cccccc;
+  color: #444444; }
+
+body {
+  background: #cccccc;
+  color: #444444; }
+
+.win {
+  color: green; }
+
+.fail {
+  color: red; }
+
+html, body, div, span, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+abbr, address, cite, code,
+del, dfn, em, img, ins, kbd, q, samp,
+small, strong, sub, sup, var,
+b, i,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, dialog, figure, footer, header,
+hgroup, menu, nav, section, menu,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  font-size: 100%;
+  vertical-align: baseline;
+  background: transparent; }
+
+body {
+  line-height: 1; }
+
+article, aside, dialog, figure, footer, header,
+hgroup, nav, section {
+  display: block; }
+
+nav ul, menu ul {
+  list-style: none; }
+
+blockquote, q {
+  quotes: none; }
+
+blockquote:before, blockquote:after,
+q:before, q:after {
+  content: "";
+  content: none; }
+
+a {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  vertical-align: baseline;
+  background: transparent; }
+
+ins {
+  background-color: #ffff99;
+  color: black;
+  text-decoration: none; }
+
+mark {
+  background-color: #ffff99;
+  color: black;
+  font-style: italic;
+  font-weight: bold; }
+
+del {
+  text-decoration: line-through; }
+
+abbr[title], dfn[title] {
+  border-bottom: 1px dotted black;
+  cursor: help; }
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0; }
+
+hr {
+  display: block;
+  height: 1px;
+  border: 0;
+  border-top: 1px solid #cccccc;
+  margin: 1em 0;
+  padding: 0; }
+
+input, select {
+  vertical-align: middle; }
+
+/* CSS SET */
+td, th {
+  vertical-align: top; }
+
+section, article, header, footer {
+  zoom: 1; }
+  section:after, article:after, header:after, footer:after {
+    content: '.';
+    clear: both;
+    display: block;
+    visibility: hidden;
+    height: 0; }
+
+header, footer {
+  clear: both; }
+
+body {
+  background: #cccccc;
+  color: #444444; }
+
+body {
+  font-size: 16px;
+  font-family: Arial,Helvetica,sans-serif;
+  line-height: 1.4; }
+
+h1 {
+  font-size: 16px; }
+
+h2 {
+  font-size: 14px; }
+
+h3 {
+  font-size: 12px; }
+
+h4 {
+  font-size: 10px; }
+
+small {
+  font-size: 10px; }
+
+h1, h2, h3, h4, h5 {
+  margin: 0 0 break; }
+
+p, ol, ul {
+  margin: 6px 0 12px; }
+
+ul > li {
+  margin-left: 10px; }
+
+body {
+  background: #cccccc;
+  color: #444444; }
+
+body {
+  background: #cccccc;
+  color: #444444; }
+
+.win {
+  color: green; }
+
+.fail {
+  color: red; }
+
+#colHints {
+  zoom: 1;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: #444444; }
+  #colHints:after {
+    content: '.';
+    clear: both;
+    display: block;
+    visibility: hidden;
+    height: 0; }
+  #colHints li {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    color: #444444;
+    list-style: none; }
+  #colHints li {
+    float: left; }
+    #colHints li.done {
+      text-decoration: line-through; }
+    #colHints li div {
+      width: 40px;
+      text-align: center; }
+
+#rowHints {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: #444444; }
+  #rowHints li {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    color: #444444;
+    list-style: none; }
+  #rowHints li {
+    text-align: right; }
+    #rowHints li.done {
+      text-decoration: line-through; }
+    #rowHints li div {
+      display: inline-block;
+      width: 1em;
+      height: 41px;
+      line-height: 40px;
+      text-align: center; }
+
+#win,
+#lose {
+  position: absolute;
+  /*width/height set in js*/
+  display: none;
+  color: green;
+  background: rgba(0, 0, 0, 0.4);
+  text-align: center; }
+
+#lose {
+  color: red; }
+
+#grid {
+  float: left;
+  zoom: 1;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: #444444;
+  -moz-user-select: none;
+  cursor: move;
+  border: solid #aaaaaa;
+    border-width: 1px 0 0 1px; }
+  #grid:after {
+    content: '.';
+    clear: both;
+    display: block;
+    visibility: hidden;
+    height: 0; }
+  #grid li {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    color: #444444;
+    list-style: none; }
+  #grid.dragging {
+    cursor: -moz-grabbing; }
+  #grid li {
+    float: left;
+    text-align: center;
+    width: 40px;
+    height: 40px;
+    background: #fff;
+    border: solid #aaaaaa;
+      border-width: 0 1px 1px 0;
+    line-height: 40px; }
+    #grid li a {
+      text-decoration: none;
+      display: block;
+      text-align: center; }
+    #grid li:hover {
+      background: #cef; }
+    #grid li.show {
+      background: #ddd; }
+    #grid li.mark {
+      background: url(../images/flag_red.png) no-repeat center center; }
+    #grid li.on {
+      background: #8ad; }
+    #grid li.error {
+      background: pink url(../images/cross.png) no-repeat center center; }
+
+#lives {
+  color: green; }
+  #lives.fail {
+    color: red; }
+
+#page {
+  width: 800px;
+  margin: 0 auto;
+  padding: 1em;
+  background: #eee;
+  -webkit-border-radius: 1em;
+  -moz-border-radius: 1em;
+  border-radius: 1em; }
