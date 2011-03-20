@@ -1,127 +1,77 @@
-body {
-  background: #cccccc;
-  color: #444444; }
+/*
+Syntax error: Undefined mixin 'user-select'.
+        on line 9 of sass/game_grid.sass, in `user-select'
+        from line 9 of sass/game_grid.sass
 
-body {
-  background: #cccccc;
-  color: #444444; }
+4: 
+5: $cell-size: 40px
+6: $cell-border-width: 1px
+7: 
+8: #game
+9:   +user-select
+10: 
+11: #colHints
+12:   +clearfix
+13:   +reset-list
+14:   li
 
-.win {
-  color: green; }
-
-.fail {
-  color: red; }
-
-#colHints {
-  zoom: 1;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  color: #444444; }
-  #colHints:after {
-    content: '.';
-    clear: both;
-    display: block;
-    visibility: hidden;
-    height: 0; }
-  #colHints li {
-    margin: 0;
-    padding: 0;
-    border: 0;
-    color: #444444;
-    list-style: none; }
-  #colHints li {
-    float: left; }
-    #colHints li.done {
-      text-decoration: line-through; }
-    #colHints li div {
-      width: 40px;
-      text-align: center; }
-
-#rowHints {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  color: #444444; }
-  #rowHints li {
-    margin: 0;
-    padding: 0;
-    border: 0;
-    color: #444444;
-    list-style: none; }
-  #rowHints li {
-    text-align: right; }
-    #rowHints li.done {
-      text-decoration: line-through; }
-    #rowHints li div {
-      display: inline-block;
-      width: 1em;
-      height: 41px;
-      line-height: 40px;
-      text-align: center; }
-
-#win,
-#lose {
-  position: absolute;
-  /*width/height set in js*/
-  display: none;
-  color: green;
-  background: rgba(0, 0, 0, 0.4);
-  text-align: center; }
-
-#lose {
-  color: red; }
-
-#grid {
-  float: left;
-  zoom: 1;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  color: #444444;
-  -moz-user-select: none;
-  cursor: move;
-  border: solid #aaaaaa;
-    border-width: 1px 0 0 1px; }
-  #grid:after {
-    content: '.';
-    clear: both;
-    display: block;
-    visibility: hidden;
-    height: 0; }
-  #grid li {
-    margin: 0;
-    padding: 0;
-    border: 0;
-    color: #444444;
-    list-style: none; }
-  #grid.dragging {
-    cursor: -moz-grabbing; }
-  #grid li {
-    float: left;
-    text-align: center;
-    width: 40px;
-    height: 40px;
-    background: #fff;
-    border: solid #aaaaaa;
-      border-width: 0 1px 1px 0;
-    line-height: 40px; }
-    #grid li a {
-      text-decoration: none;
-      display: block;
-      text-align: center; }
-    #grid li:hover {
-      background: #cef; }
-    #grid li.show {
-      background: #ddd; }
-    #grid li.mark {
-      background: url(../images/flag_red.png) no-repeat center center; }
-    #grid li.on {
-      background: #8ad; }
-    #grid li.error {
-      background: pink url(../images/cross.png) no-repeat center center; }
-
-#lives {
-  color: green; }
-  #lives.fail {
-    color: red; }
+Backtrace:
+sass/game_grid.sass:9:in `user-select'
+sass/game_grid.sass:9
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/bin/../lib/sass/tree/mixin_node.rb:62:in `perform!'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/bin/../lib/sass/tree/node.rb:305:in `_perform'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/bin/../lib/sass/tree/node.rb:213:in `perform'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/bin/../lib/sass/tree/node.rb:327:in `perform_children'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/bin/../lib/sass/tree/node.rb:327:in `map'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/bin/../lib/sass/tree/node.rb:327:in `perform_children'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/bin/../lib/sass/tree/node.rb:317:in `perform!'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/bin/../lib/sass/tree/rule_node.rb:191:in `perform!'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/bin/../lib/sass/tree/node.rb:305:in `_perform'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/bin/../lib/sass/tree/node.rb:213:in `perform'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/bin/../lib/sass/tree/node.rb:327:in `perform_children'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/bin/../lib/sass/tree/node.rb:327:in `map'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/bin/../lib/sass/tree/node.rb:327:in `perform_children'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/bin/../lib/sass/tree/node.rb:317:in `perform!'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/bin/../lib/sass/tree/root_node.rb:59:in `perform!'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/bin/../lib/sass/tree/node.rb:305:in `_perform'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/bin/../lib/sass/tree/node.rb:213:in `perform'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/bin/../lib/sass/tree/root_node.rb:37:in `perform'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/bin/../lib/sass/tree/root_node.rb:29:in `render'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/bin/../lib/sass/plugin.rb:223:in `update_stylesheet'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/bin/../lib/sass/plugin.rb:88:in `update_stylesheets'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/bin/../lib/sass/plugin.rb:81:in `each'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/bin/../lib/sass/plugin.rb:81:in `update_stylesheets'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/bin/../lib/sass/plugin.rb:79:in `each'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/bin/../lib/sass/plugin.rb:79:in `update_stylesheets'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/bin/../lib/sass/plugin.rb:174:in `watch'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/vendor/fssm/lib/fssm/path.rb:71:in `call'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/vendor/fssm/lib/fssm/path.rb:71:in `run_callback'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/vendor/fssm/lib/fssm/path.rb:54:in `callback_action'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/vendor/fssm/lib/fssm/path.rb:34:in `update'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/vendor/fssm/lib/fssm/state/directory.rb:32:in `modified'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/vendor/fssm/lib/fssm/state/directory.rb:31:in `each'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/vendor/fssm/lib/fssm/state/directory.rb:31:in `modified'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/vendor/fssm/lib/fssm/state/directory.rb:16:in `refresh'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/vendor/fssm/lib/fssm/backends/fsevents.rb:15:in `add_handler'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/vendor/fssm/lib/fssm/backends/fsevents.rb:14:in `each'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/vendor/fssm/lib/fssm/backends/fsevents.rb:14:in `add_handler'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/vendor/fssm/lib/fssm/backends/rubycocoa/fsevents.rb:107:in `call'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/vendor/fssm/lib/fssm/backends/rubycocoa/fsevents.rb:107:in `initialize'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/vendor/fssm/lib/fssm/backends/fsevents.rb:27:in `call'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/vendor/fssm/lib/fssm/backends/fsevents.rb:27:in `CFRunLoopRun'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/vendor/fssm/lib/fssm/backends/fsevents.rb:27:in `run'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/vendor/fssm/lib/fssm/monitor.rb:24:in `run'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/vendor/fssm/lib/fssm.rb:17:in `monitor'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/bin/../lib/sass/plugin.rb:167:in `watch'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/bin/../lib/haml/exec.rb:457:in `watch_or_update'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/bin/../lib/haml/exec.rb:360:in `process_result'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/bin/../lib/haml/exec.rb:41:in `parse'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/bin/../lib/haml/exec.rb:21:in `parse!'
+/Library/Ruby/Gems/1.8/gems/haml-3.0.25/bin/sass:8
+/usr/bin/sass:19:in `load'
+/usr/bin/sass:19
+*/
+body:before {
+  white-space: pre;
+  font-family: monospace;
+  content: "Syntax error: Undefined mixin 'user-select'.\A         on line 9 of sass/game_grid.sass, in `user-select'\A         from line 9 of sass/game_grid.sass\A \A 4: \A 5: $cell-size: 40px\A 6: $cell-border-width: 1px\A 7: \A 8: #game\A 9:   +user-select\A 10: \A 11: #colHints\A 12:   +clearfix\A 13:   +reset-list\A 14:   li"; }
