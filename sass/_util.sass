@@ -1,0 +1,41 @@
+@import url(_base.scss)
+
+=clearfix
+  zoom: 1
+  &:after
+    content: '.'
+    clear: both
+    display: block
+    visibility: hidden
+    height: 0
+
+=debug
+  a[href='']
+    outline: red
+
+=border-radius($radius)
+  -webkit-border-radius: $radius
+  -moz-border-radius: $radius
+  border-radius: $radius
+
+=user-select($val=none)
+  -webkit-user-select: none
+  -moz-user-select: none
+  cursor: default
+=reset
+  margin: 0
+  padding: 0
+  border: 0
+  color: $body-text-color
+
+=reset-list
+  +reset
+  & li
+    +reset
+    list-style: none
+
+.win
+  color: $win-color
+
+.fail
+  color: $fail-color

@@ -81,7 +81,7 @@
         cell = row[i];
         if (cell === 'X') {
           hint += 1;
-          if (i === (row.length - 1)) {
+          if (i === row.length - 1) {
             pushHint();
           }
         } else {
@@ -155,7 +155,8 @@
     },
     loadGame: function(key) {
       var cell, gridHeight, gridWidth, html, row, _i, _j, _len, _len2, _ref;
-      this.grid = this.data[key];
+      this.level = this.data[key];
+      this.grid = this.level.grid;
       this.title = key;
       this.lives = this.LIVES;
       $("#title").text(this.title);
@@ -173,6 +174,9 @@
       gridWidth = (this.COLWIDTH + this.BORDERWIDTH) * this.cols;
       gridHeight = (this.COLWIDTH + this.BORDERWIDTH) * this.rows;
       this.$grid.html(html).width(gridWidth);
+      if (this.level.bg) {
+        this.$grid.css('background-color', this.level.bg);
+      }
       this.renderHints();
       this.$win.add(this.$lose).hide().width(gridWidth).height(gridHeight).css("line-height", gridHeight + "px");
       this.$cells = this.$grid.find("li");
@@ -253,6 +257,9 @@
       coord = this.getCoord(el);
       if (this.grid[coord.y][coord.x] === "X") {
         $el.addClass("on");
+        if (this.level.fg) {
+          $el.css('background-color', this.level.fg);
+        }
         this.isLineComplete(this.getRow(coord.y)) && $("#rowHints li").eq(coord.y).addClass("done");
         this.isLineComplete(this.getCol(coord.x)) && $("#colHints li").eq(coord.x).addClass("done");
         if (this.isGameComplete()) {

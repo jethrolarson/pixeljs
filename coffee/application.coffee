@@ -1,4 +1,4 @@
-#compile and watch command: coffee -w -c coffee/* -o public/js/
+#compile and watch command: coffee -o public/js/ -w -c coffee/
 
 Game = {
   dragMode: "paint"
@@ -112,7 +112,8 @@ Game = {
     
   loadGame: (key)->
     #TODO make sure key exists in ob
-    @grid= @data[key]
+    @level= @data[key]
+    @grid= @level.grid
     @title= key
     @lives= @LIVES
     $("#title").text(@title)
@@ -125,6 +126,7 @@ Game = {
     gridWidth= (@COLWIDTH + @BORDERWIDTH) * @cols
     gridHeight= (@COLWIDTH + @BORDERWIDTH) * @rows
     @$grid.html(html).width(gridWidth)
+    if @level.bg then @$grid.css 'background-color', @level.bg
     @renderHints()
     @$win.add(@$lose).hide().width(gridWidth).height(gridHeight).css("line-height", gridHeight+"px")
     @$cells= @$grid.find("li")
@@ -194,6 +196,7 @@ Game = {
     coord= @getCoord(el) 
     if @grid[coord.y][coord.x] is "X"
       $el.addClass("on")
+      if @level.fg then $el.css('background-color',@level.fg)
       @isLineComplete(@getRow(coord.y)) and $("#rowHints li").eq(coord.y).addClass("done")
       @isLineComplete(@getCol(coord.x)) and $("#colHints li").eq(coord.x).addClass("done")
       if @isGameComplete()

@@ -1,0 +1,85 @@
+@import _base
+
+@import _util
+
+$cell-size: 40px
+$cell-border-width: 1px
+
+#game
+  +user-select
+
+#colHints
+  +clearfix
+  +reset-list
+  li
+    float: left
+    &.done
+      text-decoration: line-through
+    div
+      width: $cell-size
+      text-align: center
+
+#rowHints
+  +reset-list
+  li
+    text-align: right
+    &.done
+      text-decoration: line-through
+    div
+      display: inline-block
+      width: 1em
+      height: $cell-size + $cell-border-width
+      line-height: $cell-size
+      text-align: center
+
+#win,
+#lose
+  position: absolute
+  /*width/height set in js
+  display: none
+  color: green
+  background: rgba(0, 0, 0, 0.4)
+  text-align: center
+
+#lose
+  color: red
+
+#grid
+  float: left
+  +clearfix
+  +reset-list
+  // set in js: width: $cols * ($cell-size + $cell-border-width);
+  cursor: move
+  background: #fff
+  border: solid #aaaaaa
+    width: $cell-border-width 0 0 $cell-border-width
+  &.dragging
+    cursor: -moz-grabbing
+  li
+    float: left
+    text-align: center
+    width: $cell-size
+    height: $cell-size
+    border: solid #aaaaaa
+      width: 0 $cell-border-width $cell-border-width 0
+    line-height: $cell-size
+    a
+      text-decoration: none
+      display: block
+      text-align: center
+    &:hover
+      background: rgba(200,230,255,.3)
+    &.show
+      background: #ddd
+    &.mark
+      background: url(../images/flag_red.png) no-repeat center center
+    &.on
+      -webkit-transition: background-color .25s linear
+      background: #8ad
+    &.error
+      background: pink url(../images/cross.png) no-repeat center center
+
+#lives
+  color: $win-color
+  &.fail
+    color: $fail-color

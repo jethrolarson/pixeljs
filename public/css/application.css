@@ -56,8 +56,17 @@ p, ol, ul {
 ul > li {
   margin-left: 10px; }
 
+body {
+  background: #cccccc;
+  color: #444444; }
+
 @import url(_base.scss);
-@import url(_util.scss);
+.win {
+  color: green; }
+
+.fail {
+  color: red; }
+
 #game {
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -131,6 +140,7 @@ ul > li {
   border: 0;
   color: #444444;
   cursor: move;
+  background: white;
   border: solid #aaaaaa;
     border-width: 1px 0 0 1px; }
   #grid:after {
@@ -152,7 +162,6 @@ ul > li {
     text-align: center;
     width: 40px;
     height: 40px;
-    background: white;
     border: solid #aaaaaa;
       border-width: 0 1px 1px 0;
     line-height: 40px; }
@@ -161,7 +170,7 @@ ul > li {
       display: block;
       text-align: center; }
     #grid li:hover {
-      background: #cceeff; }
+      background: rgba(200, 230, 255, 0.3); }
     #grid li.show {
       background: #dddddd; }
     #grid li.mark {
