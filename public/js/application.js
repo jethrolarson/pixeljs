@@ -55,7 +55,7 @@
     getColHints: function() {
       var col, hints, i, row, _i, _len, _ref, _ref2;
       hints = [];
-      for (i = 0, _ref = this.cols; (0 <= _ref ? i < _ref : i > _ref); (0 <= _ref ? i += 1 : i -= 1)) {
+      for (i = 0, _ref = this.cols; 0 <= _ref ? i < _ref : i > _ref; 0 <= _ref ? i++ : i--) {
         col = [];
         _ref2 = this.grid;
         for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
@@ -95,7 +95,7 @@
     },
     isGameComplete: function() {
       var i, _ref;
-      for (i = 0, _ref = this.rows; (0 <= _ref ? i < _ref : i > _ref); (0 <= _ref ? i += 1 : i -= 1)) {
+      for (i = 0, _ref = this.rows; 0 <= _ref ? i < _ref : i > _ref; 0 <= _ref ? i++ : i--) {
         if (!this.isLineComplete(this.getRow(i))) {
           return false;
         }
@@ -104,7 +104,7 @@
     },
     isLineComplete: function($line) {
       var cell, coord, i, _ref;
-      for (i = 0, _ref = $line.length; (0 <= _ref ? i < _ref : i > _ref); (0 <= _ref ? i += 1 : i -= 1)) {
+      for (i = 0, _ref = $line.length; 0 <= _ref ? i < _ref : i > _ref; 0 <= _ref ? i++ : i--) {
         cell = $line[i];
         coord = this.getCoord(cell);
         if (this.grid[coord.y][coord.x] === "X" && !$(cell).hasClass("on")) {
@@ -120,7 +120,7 @@
       if (this.lives < 1) {
         this.$el.trigger("lose");
       } else {
-        for (life = 0, _ref = this.lives; (0 <= _ref ? life < _ref : life > _ref); (0 <= _ref ? life += 1 : life -= 1)) {
+        for (life = 0, _ref = this.lives; 0 <= _ref ? life < _ref : life > _ref; 0 <= _ref ? life++ : life--) {
           html += "[^_^] ";
         }
       }

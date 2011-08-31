@@ -1,0 +1,9 @@
+{% extends "../master.html" %}
+{% block body %}
+<ul>
+for level in levelSet
+  <li> a(href="level/[levelid]") [level hint]</li>
+endfor
+</ul>
+{%endblock%}
+
