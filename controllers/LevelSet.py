@@ -9,8 +9,9 @@ class Index(webapp.RequestHandler):
     util.render(self,'levelSet/index.html',{})
 
 class Read(webapp.RequestHandler):
-  def get(self,lvl):
-    util.render(self,'levelSet/read.html',{})
+  def get(self,key):
+    levelSet = models.getLevelSetBykey(key)
+    util.render(self,'levelSet/read.html',{'levelSet':levelSet})
 
 class Create(webapp.RequestHandler):
   def get(self):
@@ -32,5 +33,19 @@ class Update(webapp.RequestHandler):
     pass
 
 class Delete(webapp.RequestHandler):
-  def post(self,key):
+  @util.login_required
+  def get(self,key):
+    levelSet = db.get(db.Key(key))
+    if levelSet:
+      if levelSet.owner.key() == models.getCurrentUser().key():
+        levelSet.delete()
+        logging.info("levelSet deleted")
+        self.redirect("/user/")
+      else:
+        util.error(self,404,"Level doesn't belong to you")
+    else:
+      util.error(self,404,'Level not found')
+
+class Random(webapp.RequestHandler):
+  def get(self):
     pass

@@ -14,7 +14,7 @@ handlers:
   static_dir: public/js/ui
 - url: /public/images
   static_dir: public/images
-- url: /statis/pages
-  static_dir: public/pages
+- url: /public/farbtastic
+  static_dir: public/farbtastic
 - url: /.*
   script: main.py

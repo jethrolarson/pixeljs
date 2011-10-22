@@ -1,31 +1,11 @@
 {% extends "../master.html" %}
 {% block body%}
 <script>
-var level = {{level}};
+var level = {{level|jsonify}};
 </script>
-<div id="game">
-  <table>
-    <tr>
-      <td></td>
-      <td>
-        <ul id="colHints"></ul>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <ul id="rowHints"></ul>
-      </td>
-      <td>
-        <div id="win">You Win! :)</div>
-        <div id="lose">You Lose :(</div>
-        <ul id="grid"></ul>
-      </td>
-    </tr>
-    <tr>
-      <td></td>
-      <td id="lives" class="win"></td>
-    </tr>
-  </table>
-  <ul id="games"></ul>
-</div>
+{% include '../partials/grid.html'%}
+<a href="/level/edit/{{level.key}}">Edit this level</a>
+{% endblock %}
+{%block scripts%}
+<script src="/public/js/play.js"></script>
 {%endblock%}

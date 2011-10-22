@@ -1,101 +1,117 @@
 (function() {
-  var Game, timer;
+  var Level;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
-  Game = {
-    dragMode: "paint",
+  Level = function(level) {
+    return $.extend({
+      getRow: function(y) {
+        return this.game.slice(this.x * y, this.x * y + this.x);
+      },
+      getCol: function(x) {
+        var ar, i, _ref;
+        ar = [];
+        for (i = 0, _ref = this.y; 0 <= _ref ? i < _ref : i > _ref; 0 <= _ref ? i++ : i--) {
+          ar.push(this.game[i * this.x + x]);
+        }
+        return ar;
+      },
+      getRowHints: function() {
+        var hints, row, _ref;
+        hints = [];
+        for (row = 0, _ref = this.y; 0 <= _ref ? row < _ref : row > _ref; 0 <= _ref ? row++ : row--) {
+          hints.push(this.getLineHints(this.getRow(row)));
+        }
+        return hints;
+      },
+      getColHints: function() {
+        var hints, i, _ref;
+        hints = [];
+        for (i = 0, _ref = this.x; 0 <= _ref ? i < _ref : i > _ref; 0 <= _ref ? i++ : i--) {
+          hints.push(this.getLineHints(this.getCol(i)));
+        }
+        return hints;
+      },
+      getLineHints: function(row) {
+        var cell, hint, hints, i, pushHint, _len;
+        hints = [];
+        hint = 0;
+        pushHint = function(force) {
+          force || (force = false);
+          if (hint > 0 || force) {
+            hints.push(hint);
+          }
+          return hint = 0;
+        };
+        for (i = 0, _len = row.length; i < _len; i++) {
+          cell = row[i];
+          if (+cell) {
+            hint += 1;
+            if (i === row.length - 1) {
+              pushHint();
+            }
+          } else {
+            pushHint();
+          }
+        }
+        if (hints.length === 0) {
+          pushHint(true);
+        }
+        return hints;
+      },
+      getAt: function(x, y) {
+        if (x >= this.x) {
+          throw 'Invalid X';
+        }
+        if (y >= this.y) {
+          throw 'Invalid Y';
+        }
+        return +this.game[(this.x * y) + x];
+      }
+    }, level);
+  };
+  window.Game = {
+    gameMode: 'play',
+    dragMode: 'break',
     isDragging: false,
     isErasing: false,
-    COLWIDTH: 40,
-    BORDERWIDTH: 1,
-    grid: [],
-    title: "",
-    data: {},
-    init: function($el) {
-      this.$el = $el;
-      this.$grid = this.$el.find("#grid");
-      this.$win = this.$el.find("#win");
-      this.$lose = this.$el.find("#lose");
-      this.$games = this.$el.find("#games");
-      this.$colHints = this.$el.find("#colHints");
-      this.$rowHints = this.$el.find("#rowHints");
-      this.$el.trigger("init");
+    colWidth: 40,
+    init: function($game) {
+      this.$game = $game;
+      this.$gridCell = this.$game.find('#gridCell');
+      this.$grid = this.$game.find('#grid').remove();
+      this.$win = this.$game.find('#win');
+      this.$lose = this.$game.find('#lose');
+      this.$games = this.$game.find('#games');
+      this.$colHints = this.$game.find('#colHints');
+      this.$rowHints = this.$game.find('#rowHints');
+      this.$game.trigger('init');
       this.bindEvents();
       return this;
     },
     start: function() {
-      return $.getJSON("/public/js/games.json", __bind(function(data) {
-        this.data = data;
-        return this.$el.trigger("gamesLoaded");
-      }, this));
+      return this.loadGame(window.level);
+    },
+    edit: function() {
+      this.gameMode = 'edit';
+      this.$grid.enableContext();
+      return this.start();
     },
     getCol: function(x) {
-      return this.$grid.find("li:nth-child(" + this.rows + "n+" + (x + 1) + ")");
+      return this.$grid.find("li:nth-child(" + this.level.y + "n+" + (x + 2) + ")");
     },
     getRow: function(y) {
-      return this.$grid.find("li").slice(y * this.cols, (y + 1) * this.cols);
+      return this.$grid.find('li').slice(y * this.level.x, (y + 1) * this.level.x);
     },
     getCoord: function(el) {
       var index;
-      index = $(el).parent().children().index(el);
+      index = $(el).parent().children('li').index(el);
       return {
-        x: index % this.cols,
-        y: Math.floor(index / this.cols)
+        x: index % this.level.x,
+        y: Math.floor(index / this.level.x)
       };
-    },
-    getRowHints: function() {
-      var hints, row, _i, _len, _ref;
-      hints = [];
-      _ref = this.grid;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        row = _ref[_i];
-        hints.push(this.getLineHints(row));
-      }
-      return hints;
-    },
-    getColHints: function() {
-      var col, hints, i, row, _i, _len, _ref, _ref2;
-      hints = [];
-      for (i = 0, _ref = this.cols; 0 <= _ref ? i < _ref : i > _ref; 0 <= _ref ? i++ : i--) {
-        col = [];
-        _ref2 = this.grid;
-        for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
-          row = _ref2[_i];
-          col.push(row[i]);
-        }
-        hints.push(this.getLineHints(col));
-      }
-      return hints;
-    },
-    getLineHints: function(row) {
-      var cell, hint, hints, i, pushHint, _len;
-      hints = [];
-      hint = 0;
-      pushHint = function(force) {
-        force || (force = false);
-        if (hint > 0 || force) {
-          hints.push(hint);
-        }
-        return hint = 0;
-      };
-      for (i = 0, _len = row.length; i < _len; i++) {
-        cell = row[i];
-        if (cell === 'X') {
-          hint += 1;
-          if (i === row.length - 1) {
-            pushHint();
-          }
-        } else {
-          pushHint();
-        }
-      }
-      if (hints.length === 0) {
-        pushHint(true);
-      }
-      return hints;
     },
     isGameComplete: function() {
       var i, _ref;
-      for (i = 0, _ref = this.rows; 0 <= _ref ? i < _ref : i > _ref; 0 <= _ref ? i++ : i--) {
+      for (i = 0, _ref = this.level.y; 0 <= _ref ? i < _ref : i > _ref; 0 <= _ref ? i++ : i--) {
         if (!this.isLineComplete(this.getRow(i))) {
           return false;
         }
@@ -103,11 +119,11 @@
       return true;
     },
     isLineComplete: function($line) {
-      var cell, coord, i, _ref;
-      for (i = 0, _ref = $line.length; 0 <= _ref ? i < _ref : i > _ref; 0 <= _ref ? i++ : i--) {
-        cell = $line[i];
+      var cell, coord, _i, _len;
+      for (_i = 0, _len = $line.length; _i < _len; _i++) {
+        cell = $line[_i];
         coord = this.getCoord(cell);
-        if (this.grid[coord.y][coord.x] === "X" && !$(cell).hasClass("on")) {
+        if (this.level.getAt(coord.x, coord.y) && !$(cell).hasClass('on')) {
           return false;
         }
       }
@@ -115,163 +131,170 @@
     },
     renderLives: function() {
       var html, life, _ref;
-      this.$lives.empty().removeClass("fail");
-      html = "";
+      this.$lives.empty().removeClass('fail');
+      html = '';
       if (this.lives < 1) {
-        this.$el.trigger("lose");
+        this.$game.trigger('lose');
       } else {
         for (life = 0, _ref = this.lives; 0 <= _ref ? life < _ref : life > _ref; 0 <= _ref ? life++ : life--) {
-          html += "[^_^] ";
+          html += '[^_^] ';
         }
       }
       return this.$lives.html(html);
     },
     renderHints: function() {
       var hint, hintGroup, html, _i, _j, _k, _l, _len, _len2, _len3, _len4, _ref, _ref2;
-      html = "";
-      _ref = this.getColHints();
+      html = '';
+      _ref = this.level.getColHints();
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         hintGroup = _ref[_i];
-        html += "<li>";
+        html += '<li>';
         for (_j = 0, _len2 = hintGroup.length; _j < _len2; _j++) {
           hint = hintGroup[_j];
-          html += "<div>" + hint + "</div>";
+          html += '<div>' + hint + '</div>';
         }
-        html += "</li>";
+        html += '</li>';
       }
       this.$colHints.html(html);
-      html = "";
-      _ref2 = this.getRowHints();
+      html = '';
+      _ref2 = this.level.getRowHints();
       for (_k = 0, _len3 = _ref2.length; _k < _len3; _k++) {
         hintGroup = _ref2[_k];
-        html += "<li>";
+        html += '<li>';
         for (_l = 0, _len4 = hintGroup.length; _l < _len4; _l++) {
           hint = hintGroup[_l];
-          html += "<div>" + hint + "</div>";
+          html += '<div>' + hint + '</div>';
         }
-        html += "</li>";
+        html += '</li>';
       }
       return this.$rowHints.html(html);
     },
-    loadGame: function(key) {
-      var cell, gridHeight, gridWidth, html, row, _i, _j, _len, _len2, _ref;
-      this.level = this.data[key];
-      this.grid = this.level.grid;
-      this.title = key;
-      this.lives = this.LIVES;
-      $("#title").text(this.title);
-      html = "";
-      this.cols = this.grid[0].length;
-      this.rows = this.grid.length;
-      _ref = this.grid;
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        row = _ref[_i];
-        for (_j = 0, _len2 = row.length; _j < _len2; _j++) {
-          cell = row[_j];
-          html += "<li> </li>";
+    loadGame: function(level) {
+      var cell, cells, html, i, _len, _ref;
+      this.level = Level(level);
+      $('#title').html("<a href=\"/levelSet/" + this.level.levelSet + "\">" + this.level.levelSetName + "</a> &gt; " + this.level.title);
+      html = '';
+      cells = level.x * level.y;
+      for (cell = 0; 0 <= cells ? cell < cells : cell > cells; 0 <= cells ? cell++ : cell--) {
+        html += '<li> </li>';
+      }
+      this.$grid.html(html);
+      this.$cells = this.$grid.find('li');
+      if (this.gameMode === 'play') {
+        this.renderHints();
+      } else {
+        _ref = this.$cells;
+        for (i = 0, _len = _ref.length; i < _len; i++) {
+          cell = _ref[i];
+          $(cell).toggleClass('paint', +this.level.game[i] === 1);
         }
       }
-      gridWidth = (this.COLWIDTH + this.BORDERWIDTH) * this.cols;
-      gridHeight = (this.COLWIDTH + this.BORDERWIDTH) * this.rows;
-      this.$grid.html(html).width(gridWidth);
-      if (this.level.bg) {
-        this.$grid.css('background-color', this.level.bg);
+      this.colWidth = Math.floor(this.$gridCell.width() / level.x);
+      this.$colorSheet = $(document.createElement('style')).prependTo(this.$grid);
+      this.updateStyles();
+      this.updateHints();
+      return this.$gridCell.append(this.$grid);
+    },
+    updateStyles: function() {
+      var css, gridHeight, gridWidth;
+      css = '';
+      gridWidth = this.colWidth * this.level.x;
+      gridHeight = this.colWidth * this.level.y;
+      css += "#grid li{\n	width: " + this.colWidth + "px;\n	height: " + this.colWidth + "px;\n}\n#grid{\n	width: " + gridWidth + "px;\n	height: " + gridHeight + "px;\n}\n#win,#lose{\n	width: " + gridWidth + "px;\n	height: " + gridHeight + "px;\n	line-height: " + gridHeight + "px;\n}\n\n#rowHints li div{\n	height: " + this.colWidth + "px;\n	line-height: " + this.colWidth + "px;\n}\n#colHints li div{\n	width: " + this.colWidth + "px;\n}";
+      if (this.level.fgcolor) {
+        css += "	#grid .paint, \n	#grid .on{\n		background-color:" + this.level.fgcolor + "\n}";
       }
-      this.renderHints();
-      this.$win.add(this.$lose).hide().width(gridWidth).height(gridHeight).css("line-height", gridHeight + "px");
-      this.$cells = this.$grid.find("li");
-      this.$el.find("[name='dragMode']:checked").triggerHandler("click");
-      return this.$el.trigger("gameStart");
+      if (this.level.bgcolor) {
+        css += "#grid{background-color:" + this.level.bgcolor + "}";
+      }
+      return this.$colorSheet.html(css);
     },
     timer: function() {
-      var that;
-      this.$timer = $("#timer");
+      this.$timer = $('#timer');
       this.time = 0;
       this.timerOn = false;
-      that = this;
-      return this.$el.bind({
-        "start": function() {
-          return that.$el.trigger("startTimer");
-        },
-        "die": function() {
-          return that.time += 2 * 60 * 1000;
-        },
-        "startTimer": function() {
-          that.timerOn = true;
-          return that.$el.trigger("updateTimer");
-        },
-        "updateTimer": function() {
+      return this.$game.bind({
+        start: __bind(function() {
+          return this.$game.trigger('startTimer');
+        }, this),
+        die: __bind(function() {
+          return this.score += 1;
+        }, this),
+        startTimer: __bind(function() {
+          this.timerOn = true;
+          return this.$game.trigger('updateTimer');
+        }, this),
+        updateTimer: __bind(function() {
           var interval;
-          if (!that.timerOn) {
+          if (!this.timerOn) {
             return;
           }
-          that.$timer.text(that.time);
-          that.time += 1000;
-          interval = function() {
-            return that.$el.trigger("updateTimer");
-          };
+          this.$timer.text(this.time);
+          this.time += 1000;
+          interval = __bind(function() {
+            return this.$game.trigger('updateTimer');
+          }, this);
           return setTimeout(interval, 1000);
-        },
-        "stopTimer": function() {
-          return that.timerOn;
-        }
-      }).bind("win lose", function() {
-        return that.$el.trigger("stopTimer");
-      });
+        }, this),
+        stopTimer: __bind(function() {
+          return this.timerOn;
+        }, this)
+      }, 'win lose', __bind(function() {
+        return this.$game.trigger('stopTimer');
+      }, this));
     },
     bindEvents: function() {
-      this.$grid.disableContext().delegate("li", "mouseover", this.eGridMouseover.bind(this)).delegate("li", "mousedown", this.eGridMousedown.bind(this)).mouseout(__bind(function() {
-        return this.$cells.removeClass("hilight");
+      this.$grid.disableContext().delegate('li', {
+        mouseover: $.proxy(this.eGridMouseover, this),
+        mousedown: $.proxy(this.eGridMousedown, this)
+      }).mouseout(__bind(function() {
+        return this.$cells.removeClass('hilight');
       }, this));
-      this.$el.bind({
-        "gamesLoaded": this.eGamesLoaded.bind(this),
-        "paint": this.ePaint.bind(this),
-        "mark": this.eMark.bind(this),
-        "lose": this.eLose.bind(this),
-        "win": this.eWin.bind(this)
+      this.$game.bind({
+        "break": $.proxy(this.eBreak, this),
+        mark: $.proxy(this.eMark, this),
+        lose: $.proxy(this.eLose, this),
+        win: $.proxy(this.eWin, this),
+        paint: $.proxy(this.ePaint, this),
+        erase: $.proxy(this.eErase, this)
       });
-      $(document).bind("mouseup", __bind(function() {
-        this.isDragging = false;
-        return this.$grid.removeClass("dragging");
-      }, this));
-      return this.$games.delegate("a", "click", __bind(function(e) {
-        return this.loadGame(e.target.hash.slice(1));
+      return $(document).bind('mouseup', __bind(function() {
+        return this.isDragging = false;
       }, this));
     },
-    eGamesLoaded: function(e) {
-      var html, index, key, won;
-      index = location.hash.length > 1 ? location.hash.slice(1) : "House";
-      this.loadGame(index);
-      html = "";
-      for (key in this.data) {
-        if (localStorage[this.title]) {
-          won = 'won';
-        }
-        html += "<li class=\"" + won + "\"><a href=\"#" + key + "\">" + key + "</li>";
-      }
-      return this.$games.html(html);
-    },
-    ePaint: function(e, el) {
+    eBreak: function(e, el) {
       var $el, coord;
       $el = $(el);
+      if (this.gameMode === 'edit' || $el.hasClass('mark')) {
+        return;
+      }
       coord = this.getCoord(el);
-      if (this.grid[coord.y][coord.x] === "X") {
-        $el.addClass("on");
-        if (this.level.fg) {
-          $el.css('background-color', this.level.fg);
-        }
-        this.isLineComplete(this.getRow(coord.y)) && $("#rowHints li").eq(coord.y).addClass("done");
-        this.isLineComplete(this.getCol(coord.x)) && $("#colHints li").eq(coord.x).addClass("done");
-        if (this.isGameComplete()) {
-          return this.$el.trigger("win");
-        }
-      } else if (!$el.hasClass("error")) {
-        $el.addClass("error");
-        return this.$el.trigger("die", el);
+      if (this.level.getAt(coord.x, coord.y)) {
+        $el.addClass('on');
+        this.updateHints();
+        return this.isGameComplete() && this.$game.trigger('win');
+      } else if (!$el.hasClass('error')) {
+        $el.addClass('error');
+        return this.$game.trigger('die', el);
+      }
+    },
+    updateHints: function() {
+      var x, y, _ref, _ref2;
+      for (y = 0, _ref = this.level.y; 0 <= _ref ? y < _ref : y > _ref; 0 <= _ref ? y++ : y--) {
+        this.isLineComplete(this.getRow(y)) && $('#rowHints li').eq(y).addClass('done');
+      }
+      for (x = 0, _ref2 = this.level.x; 0 <= _ref2 ? x < _ref2 : x > _ref2; 0 <= _ref2 ? x++ : x--) {
+        this.isLineComplete(this.getCol(x)) && $('#colHints li').eq(x).addClass('done');
       }
     },
     eMark: function(e, el) {
-      return $(el).toggleClass("mark", !this.isErasing);
+      if (this.gameMode !== 'play') {
+        return;
+      }
+      return $(el).toggleClass('mark', !this.isErasing);
+    },
+    ePaint: function(e, el) {
+      return $(el).toggleClass('paint', !this.isErasing);
     },
     eWin: function() {
       this.dragMode = null;
@@ -280,69 +303,35 @@
     },
     eLose: function() {
       this.dragMode = null;
-      this.$grid.addClass("lose");
+      this.$grid.addClass('lose');
       this.$lose.show();
-      return this.$lives.text("Game Over [X_X]").addClass('fail');
+      return this.$lives.text('Game Over [X_X]').addClass('fail');
     },
     eGridMouseover: function(e) {
       var $el, coord;
       $el = $(e.target);
       coord = this.getCoord(e.target);
       if (this.isDragging) {
-        return this.$el.trigger(this.dragMode, e.target);
+        return this.$game.trigger(this.dragMode, e.target);
       }
     },
     eGridMousedown: function(e) {
       var $el;
       $el = $(e.target);
-      this.isDragging = true;
-      this.$grid.addClass("dragging");
-      this.dragMode = e.which === 1 ? 'paint' : 'mark';
-      if (this.dragMode === "mark") {
-        this.isErasing = $el.hasClass("mark");
-      }
-      return this.$el.trigger(this.dragMode, e.target);
-    }
-  };
-  Game.achievements = {
-    list: {},
-    $achievements: void 0,
-    init: function() {
-      this.achievements = $("#achievements");
-      this.bindEvents();
-      return this;
-    },
-    bindEvents: function() {
-      var that;
-      that = this;
-      return this.$game.bind("achieve", function(e, name, Label, icon) {
-        var achievment;
-        if (that.list.hasOwnProperty(name)) {
-          return e.preventPropagation().preventDefault();
-        } else {
-          achievment = that.list[name] = {
-            "name": name,
-            "label": label,
-            "icon": icon
-          };
-          return that.$game.trigger("achieved", achievment);
+      if (this.gameMode === 'play') {
+        this.dragMode = e.which === 1 ? 'break' : 'mark';
+        if (this.dragMode === 'mark') {
+          this.isErasing = $el.hasClass('mark');
         }
-      });
+      } else {
+        if (e.which !== 1) {
+          return true;
+        }
+        this.dragMode = 'paint';
+        this.isErasing = $el.hasClass('paint');
+      }
+      this.isDragging = true;
+      return this.$game.trigger(this.dragMode, e.target);
     }
   };
-  timer = function(game) {
-    return this;
-  };
-  $.fn.pixeljs = function() {
-    return this.each(function() {
-      var $game, game;
-      $game = $(this);
-      game = Game.init($game);
-      $game.data("pixeljs", game);
-      return game.start();
-    });
-  };
-  $(function() {
-    return $("#game").pixeljs();
-  });
 }).call(this);

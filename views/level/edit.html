@@ -1,0 +1,44 @@
+{% extends "../master.html" %}
+{%block body%}
+<script>
+var level = {{level|jsonify}};
+</script>
+<form action="/level/edit" method="post">
+	<!-- in session: uid -->
+	<div class="field">
+		<input name="levelSetName" value="{{level.levelSetName}}" type="text"/><!-- TODO COMBOBOX -->
+	</div>
+	{% include '../partials/grid.html'%}
+	<input name="game" type="hidden" value="{{level.game}}"/>
+	<div class="field">
+		<label>Cols </label>
+		<input name="x" type="text" class="slider" min="0" max="32" step="1" value="{{level.x}}" />
+	</div>
+	<div class="field">
+		<label>Rows </label>
+		<input name="y" type="text" class="slider" min="0" max="32" step="1" value="{{level.y}}"/>
+	</div>
+	<div class="field">
+		<label>Title </label>
+		<input name="title" type="text" value="{{level.title}}"/>
+	</div>
+	<div class="field">
+		<label>Foreground Color</label>
+		<input name="fgcolor" type="color" value="{{level.fgcolor}}" style="background-color: {{level.fgcolor}}" />
+	</div><!-- TODO Use http://acko.net/dev/farbtastic -->
+	<div class="field">
+		<label>Background Color</label>
+		<input name="bgcolor" type="color" value="{{level.bgcolor}}" style="background-color: {{level.bgcolor}}" />
+	</div>
+	<div class="field">
+		<label>Par </label>
+		<input name="par" type="number" min="1" max="10" step="1" value="{{level.par}}"/>
+	</div>
+	<button type="submit">Save</button>
+</form>
+{%endblock%}
+{%block scripts%}
+<script src="/public/farbtastic/farbtastic.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+<script src="/public/js/create.js"></script>
+{%endblock%}

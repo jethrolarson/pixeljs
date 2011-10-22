@@ -3,6 +3,12 @@ unless Function.bind?
     context ||= this
     return -> fn.apply(context, arguments)
 
+window.multiplyString = (str,times)->
+	s = ''
+	for i in [0...times]
+		s+=str
+	s
+
 $(window).mousedown (e)->
   target = $ e.target
   if e.which is 1
@@ -16,3 +22,4 @@ $.fn.rightdown = (handler,disableContext)->
   @disableContext if disableContext
   @bind 'rightdown', handler
 $.fn.disableContext = -> @each -> @oncontextmenu = -> false
+$.fn.enableContext = -> @each -> @oncontextmenu = null

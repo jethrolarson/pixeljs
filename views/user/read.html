@@ -1,0 +1,11 @@
+{% extends '../master.html' %}
+{% block body %}
+	<h1>My Levels</h1>
+	<ul>
+		{% for set in levelSets %}
+		<li><a href="/levelSet/{{set.key}}">{{set.name}}</a> <a href="/levelSet/delete/{{set.key}}">Delete</a></li>
+		{% endfor %}
+	</ul>
+	
+	<a href="/level/edit">New Level</a>
+{% endblock %}

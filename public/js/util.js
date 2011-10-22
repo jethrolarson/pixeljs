@@ -7,6 +7,14 @@
       };
     };
   }
+  window.multiplyString = function(str, times) {
+    var i, s;
+    s = '';
+    for (i = 0; 0 <= times ? i < times : i > times; 0 <= times ? i++ : i--) {
+      s += str;
+    }
+    return s;
+  };
   $(window).mousedown(function(e) {
     var target;
     target = $(e.target);
@@ -30,6 +38,11 @@
       return this.oncontextmenu = function() {
         return false;
       };
+    });
+  };
+  $.fn.enableContext = function() {
+    return this.each(function() {
+      return this.oncontextmenu = null;
     });
   };
 }).call(this);

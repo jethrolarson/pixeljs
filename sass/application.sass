@@ -1,8 +1,25 @@
-//sass -w sass:public/css
-@import _base.scss, _util.sass, _set.scss, _typo.scss, game_grid.sass
+@import _base
+@import _util
+@import _set
+@import _typo
+@import game_grid
+@import _farbtastic
+body
+	color: #ddd
+	background-color: #333
 #page
-  width: 800px
-  margin: 0 auto
-  padding: 1em
-  background: #eee
-  +border-radius(1em)
+	width: 800px
+	margin: 0 auto
+	padding: 1em
+
+#picker
+	position: absolute
+	
+.slider
+	width: 2em
+.sliderWidget
+	margin: 4px 10px
+	vertical-align: bottom
+	
+	display: inline-block
+	width: 400px

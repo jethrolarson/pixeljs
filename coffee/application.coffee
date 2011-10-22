@@ -1,278 +1,299 @@
 #compile and watch command: coffee -o public/js/ -w -c coffee/
+Level = (level)->
+	return $.extend {
+		getRow: (y)-> 
+			return @game[(@x*y)...(@x*y + @x)]
+		getCol: (x)-> 
+			ar = []
+			for i in [0...@y]
+				ar.push @game[i*@x + x]
+			return ar
 
-Game = {
-  dragMode: "paint"
-  isDragging: false
-  isErasing: false
-  
-  #constants
-  COLWIDTH: 40
-  BORDERWIDTH:1
+		getRowHints: ->
+			hints = []
+			for row in [0...@y]
+				hints.push @getLineHints @getRow row
+			return hints
 
-  #set on loadGame
-  grid: []
-  title: ""
-  data: {}
-  
-  init: ($el)->
-    @$el= $el
-    @$grid=     @$el.find "#grid"
-    @$win=      @$el.find "#win"
-    @$lose=     @$el.find "#lose"
-    @$games=    @$el.find "#games"
-    @$colHints= @$el.find "#colHints"
-    @$rowHints= @$el.find "#rowHints"
-    @$el.trigger "init"
-    @bindEvents()
-    this
-  start: ->
-    #load game data
-    $.getJSON "/public/js/games.json", (data)=>
-      @data = data
-      @$el.trigger "gamesLoaded"
-  getCol: (x)-> @$grid.find "li:nth-child(" + @rows + "n+" + (x + 1) + ")"
-  getRow: (y)-> @$grid.find("li").slice(y * @cols, (y + 1) * @cols)
+		getColHints: ->
+			hints= []
+			for i in [0...@x]
+				hints.push @getLineHints @getCol i
+			return hints
 
-  getCoord: (el)->
-    index = $(el).parent().children().index(el)
-    x: (index) % @cols
-    y: Math.floor(index / @cols)
+		getLineHints: (row)->
+			hints= []
+			hint= 0
+			pushHint = (force)->
+				force ||= false
+				if hint > 0 or force
+					hints.push(hint)
+				hint= 0
+			for cell, i in row
+				if +cell
+					hint += 1
+					pushHint() if i is row.length - 1
+				else
+					pushHint()
+			pushHint(true) if hints.length is 0
+			return hints
+		getAt: (x,y)-> 
+			throw 'Invalid X' if x >= @x
+			throw 'Invalid Y' if y >= @y
+			return +@game[(@x*y)+x]
+		
+		addCols: (num)->
+			newGame = ''
+			for i in [0...@x]
+				newGame += @game.substring(@x*i, @x*(i+1)) + multiplyString('0',num)
+			@game = newGame
+		addRows: (num)->
+			@game += multiplyString('0',@x*num)
+		subtractCols: (num)->
+			newGame = ''
+			for i in [0...@x]
+				newGame += @game.substring(@x*i, (@x-num)*(i+1))
+			@game = newGame
+		subtractRows: (num)->
+			@game = @game.substring(0,x*(y-num))
+		title: 'untitled'
+		bgcolor: '#ddd'
+		fgcolor: '#00f'
+		x: 10
+		y: 10
+		game:'000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
+		levelSetName: 'My Levels'
+		par: 3
+	}, level
 
-  getRowHints: ->
-    hints = []
-    for row in @grid
-      hints.push @getLineHints row
-    return hints
 
-  getColHints: ->
-    hints= []
-    for i in [0...@cols]
-      col= []
-      for row in @grid
-        col.push row[i]
-      hints.push @getLineHints col
-    return hints
+window.Game = {
+	gameMode: 'play'
+	dragMode: 'break'
+	isDragging: false
+	isErasing:	false
+	
+	#constants
+	colWidth: 40
 
-  getLineHints: (row)->
-    hints= []
-    hint= 0
-    pushHint = (force)->
-      force ||= false
-      if hint > 0 or force
-        hints.push(hint)
-      hint= 0
-    for cell, i in row
-      if cell is 'X'
-        hint += 1
-        pushHint() if i is row.length - 1
-      else
-        pushHint()
-    pushHint(true) if hints.length is 0
-    return hints
+	init: ($game)->
+		@$game= $game
+		@$gridCell= @$game.find('#gridCell')
+		@$grid=     @$game.find('#grid').remove()
+		@$win=      @$game.find '#win'
+		@$lose=     @$game.find '#lose'
+		@$games=    @$game.find '#games'
+		@$colHints= @$game.find '#colHints'
+		@$rowHints= @$game.find '#rowHints'
+		@$game.trigger 'init'
+		@bindEvents()
+		this
+	start: ->
+		#load game data
+		@loadGame window.level
+	edit: ->
+		@gameMode = 'edit'
+		@$grid.enableContext()
+		@start()
+	getCol: (x)-> 
+		@$grid.find("li:nth-child(#{@level.y}n+#{x+2})") #isn't nth-child confusing?
+	getRow: (y)-> @$grid.find('li').slice(y * @level.x, (y + 1) * @level.x)
 
-  isGameComplete: ->
-    for i in [0...@rows]
-      if not @isLineComplete(@getRow(i))
-        return false
-    return true
+	getCoord: (el)->
+		index = $(el).parent().children('li').index(el)
+		return {
+			x: (index) % @level.x
+			y: Math.floor(index / @level.x)
+		}
 
-  isLineComplete: ($line)->
-    for i in [0...$line.length]
-      cell = $line[i]
-      coord = @getCoord(cell)
-      if @grid[coord.y][coord.x] is "X" and not $(cell).hasClass("on")
-        return false
-    return true
+	isGameComplete: ->
+		for i in [0...@level.y]
+			if not @isLineComplete(@getRow(i))
+				return false
+		return true
 
-  renderLives: ->
-    @$lives.empty().removeClass("fail")
-    html= ""
-    if @lives < 1
-      @$el.trigger("lose")
-    else
-      for life in [0...@lives]
-        html += "[^_^] "
-    @$lives.html(html)
-    
-  renderHints: ->
-    html= ""
-    for hintGroup in @getColHints()
-      html += "<li>"
-      for hint in hintGroup
-        html += "<div>"+hint+"</div>"
-      html += "</li>"
-    @$colHints.html(html)
-    html= ""
-    for hintGroup in @getRowHints()
-      html += "<li>"
-      for hint in hintGroup
-        html += "<div>"+hint+"</div>"
-      html += "</li>"
-    @$rowHints.html(html)
-    
-  loadGame: (key)->
-    #TODO make sure key exists in ob
-    @level= @data[key]
-    @grid= @level.grid
-    @title= key
-    @lives= @LIVES
-    $("#title").text(@title)
-    html= ""
-    @cols= @grid[0].length
-    @rows= @grid.length
-    for row in @grid
-      for cell in row
-        html += "<li> </li>"
-    gridWidth= (@COLWIDTH + @BORDERWIDTH) * @cols
-    gridHeight= (@COLWIDTH + @BORDERWIDTH) * @rows
-    @$grid.html(html).width(gridWidth)
-    if @level.bg then @$grid.css 'background-color', @level.bg
-    @renderHints()
-    @$win.add(@$lose).hide().width(gridWidth).height(gridHeight).css("line-height", gridHeight+"px")
-    @$cells= @$grid.find("li")
-    @$el.find("[name='dragMode']:checked").triggerHandler("click")
-    @$el.trigger("gameStart")
-    
-  timer: ->
-    @$timer= $("#timer")
-    @time= 0
-    @timerOn= false
-    that= this
-    @$el.bind({
-      "start": ->
-        that.$el.trigger("startTimer")
-      "die": ->
-        that.time += 2 * 60 * 1000 # 2 minutes
-      "startTimer": ->
-        that.timerOn = true
-        that.$el.trigger("updateTimer")
-      "updateTimer": ->
-        if not that.timerOn 
-          return
-        that.$timer.text(that.time)
-        that.time += 1000
-        interval= ->
-          that.$el.trigger("updateTimer")
-        setTimeout(interval, 1000)
-      "stopTimer": ->
-        that.timerOn
-    }).bind("win lose", -> that.$el.trigger("stopTimer"))
+	isLineComplete: ($line)->
+		for cell in $line
+			coord = @getCoord(cell)
+			if @level.getAt(coord.x,coord.y) and not $(cell).hasClass('on')
+				return false
+		return true
+	updateCols: (cols)->
+		delta = cols - @level.x
+		if delta > 0
+			@level.addCols delta
+		else if delta < 0
+			@level.subtractCols Math.abs delta
+		
+	renderHints: ->
+		html= ''
+		for hintGroup in @level.getColHints()
+			html += '<li>'
+			for hint in hintGroup
+				html += '<div>'+hint+'</div>'
+			html += '</li>'
+		@$colHints.html(html)
+		html= ''
+		for hintGroup in @level.getRowHints()
+			html += '<li>'
+			for hint in hintGroup
+				html += '<div>'+hint+'</div>'
+			html += '</li>'
+		@$rowHints.html(html)
+		
+	loadGame: (level)->
+		@level = Level level
+		@score = 0;
+		$('#title').html("""<a href="/levelSet/#{@level.levelSet}">#{@level.levelSetName}</a> &gt; #{@level.title}""")
 
-  # ======== #  
-  #  Events  #
-  # ======== #
-  bindEvents: ->
-    @$grid.disableContext().delegate("li", "mouseover", @eGridMouseover.bind(this)
-    ).delegate("li", "mousedown", @eGridMousedown.bind(this)
-    ).mouseout =>
-      @$cells.removeClass "hilight"
-    @$el.bind {
-      "gamesLoaded": @eGamesLoaded.bind(this)
-      "paint": @ePaint.bind(this)
-      "mark": @eMark.bind(this)
-      "lose": @eLose.bind(this)
-      "win": @eWin.bind(this)
-    }
-    $(document).bind "mouseup", => 
-      @isDragging= false
-      @$grid.removeClass("dragging")
-    @$games.delegate "a", "click", (e)=>
-      @loadGame(e.target.hash.slice(1))
+		# Build grid
+		html= ''
+		cells = level.x * level.y
+		for cell in [0...cells] 
+			html += '<li> </li>' 
+		
+		@$grid.html(html)
+		@$cells= @$grid.find('li')
+		if @gameMode is 'play'
+			@renderHints()
+		else
+			for cell,i in @$cells
+				$(cell).toggleClass('paint',+@level.game[i] is 1)
+		
+		@colWidth = Math.floor(@$gridCell.width() / level.x)
+		@$colorSheet = $(document.createElement 'style').prependTo(@$grid)
+		@updateStyles()
+		@updateHints()
+		@$gridCell.append(@$grid)
+		
+	updateStyles: ->
+		css = ''
+		gridWidth= @colWidth * @level.x
+		gridHeight= @colWidth * @level.y
+		css += """
+			#grid li{
+				width: #{@colWidth}px;
+				height: #{@colWidth}px;
+			}
+			#grid{
+				width: #{gridWidth}px;
+				height: #{gridHeight}px;
+			}
+			#win,#lose{
+				width: #{gridWidth}px;
+				height: #{gridHeight}px;
+				line-height: #{gridHeight}px;
+			}
+			
+			#rowHints li div{
+				height: #{@colWidth}px;
+				line-height: #{@colWidth}px;
+			}
+			#colHints li div{
+				width: #{@colWidth}px;
+			}
+		"""
+		if @level.fgcolor
+			css += """
+				#grid .paint, 
+				#grid .on{
+					background-color:#{@level.fgcolor}
+			}"""
+		if @level.bgcolor
+			css += "#grid{background-color:#{@level.bgcolor}}"
+		@$colorSheet.html(css)	
 
-  eGamesLoaded: (e)->
-    index= if location.hash.length>1 
-      location.hash.slice(1)
-    else
-      "House"
-    @loadGame(index)
-    html= ""
-    for key of @data
-      if localStorage[@title] then won= 'won'
-      html+= "<li class=\"#{won}\"><a href=\"##{key}\">#{key}</li>"
-    @$games.html(html)
+	timer: ->
+		@$timer= $ '#timer'
+		@time= 0
+		@timerOn= false
+		
+			startTimer: =>
+				@timerOn = true
+				@$game.trigger 'updateTimer'
+			updateTimer: =>
+				if not @timerOn 
+					return
+				@$timer.text @time
+				@time += 1000
+				interval= =>
+					@$game.trigger 'updateTimer'
+				setTimeout(interval, 1000)
+			stopTimer: =>
+				@timerOn
+			
 
-  ePaint: (e, el)->
-    $el= $(el)
-    coord= @getCoord(el) 
-    if @grid[coord.y][coord.x] is "X"
-      $el.addClass("on")
-      if @level.fg then $el.css('background-color',@level.fg)
-      @isLineComplete(@getRow(coord.y)) and $("#rowHints li").eq(coord.y).addClass("done")
-      @isLineComplete(@getCol(coord.x)) and $("#colHints li").eq(coord.x).addClass("done")
-      if @isGameComplete()
-        @$el.trigger("win")
-    else if not $el.hasClass("error")
-      $el.addClass("error")
-      @$el.trigger("die", el)
+	# ======== #	
+	#	 Events	 #
+	# ======== #
+	bindEvents: ->
+		@$grid.disableContext().delegate('li', {
+			mouseover: $.proxy(@eGridMouseover, this)
+			mousedown: $.proxy(@eGridMousedown, this)
+		}).mouseout =>
+			@$cells.removeClass 'hilight'
+			
+		@$game.bind
+			break: $.proxy(@eBreak, this)
+			mark: $.proxy(@eMark, this)
+			lose: $.proxy(@eLose, this)
+			win: $.proxy(@eWin, this)
+			paint: $.proxy(@ePaint, this)
+			erase: $.proxy(@eErase, this)
+			die: =>
+				@score += 1
+	
+		$(document).bind 'mouseup', => 
+			@isDragging= false
+			
+	eBreak: (e, el)->
+		$el= $(el)
+		return if @gameMode is 'edit' or $el.hasClass 'mark'
+		
+		coord= @getCoord(el)
+		if @level.getAt(coord.x,coord.y)
+			$el.addClass('on')
+			@updateHints()
+			@isGameComplete() and @$game.trigger('win')
+		else if not $el.hasClass('error')
+			$el.addClass('error')
+			@$game.trigger('die', el)
+	updateHints: ->
+		for y in [0...@level.y]
+			@isLineComplete(
+				@getRow(y)
+			) and $('#rowHints li').eq(y).addClass('done')
+		for x in [0...@level.x]
+			@isLineComplete(
+				@getCol(x)
+			) and $('#colHints li').eq(x).addClass('done')
+		return
+	eMark: (e,el)->
+		return unless @gameMode is 'play'
+		$(el).toggleClass('mark', not @isErasing)
+	ePaint: (e,el)->
+		$(el).toggleClass('paint', not @isErasing)
+	eWin: ->
+		@dragMode= null	
+		@$win.show()
+		localStorage[@title] = true
 
-  eMark: (e,el)-> 
-    $(el).toggleClass("mark", not @isErasing)
+	eGridMouseover: (e)->
+		$el= $ e.target
+		coord= @getCoord e.target
+		if @isDragging
+			@$game.trigger(@dragMode, e.target)
 
-  eWin: ->
-    @dragMode= null
-    @$win.show()
-    localStorage[@title] = true
-
-  eLose: ->
-    @dragMode= null
-    @$grid.addClass("lose")
-    @$lose.show()
-    @$lives.text("Game Over [X_X]").addClass('fail')
-
-  eGridMouseover: (e)->
-    $el= $(e.target)
-    coord= @getCoord(e.target)
-    if @isDragging
-      @$el.trigger(@dragMode, e.target)
-
-  eGridMousedown: (e)->
-    $el = $(e.target)
-    @isDragging = true
-    @$grid.addClass("dragging")
-    @dragMode = if e.which is 1 then 'paint' else 'mark'
-    @isErasing = $el.hasClass("mark") if @dragMode is "mark"
-    @$el.trigger @dragMode, e.target
+	eGridMousedown: (e)->
+		$el = $(e.target)
+		if @gameMode is 'play'
+			@dragMode = if e.which is 1 then 'break' else 'mark'
+			@isErasing = $el.hasClass('mark') if @dragMode is 'mark'
+		else
+			return true if e.which isnt 1
+			@dragMode = 'paint'
+			@isErasing = $el.hasClass('paint')
+		@isDragging = true
+		@$game.trigger @dragMode, e.target
 
 }# end game
-
-# Game extensions
-# ===============
-Game.achievements = {
-  list: {}
-  $achievements: undefined
-  init: ->
-    #createUI
-    @achievements= $("#achievements")
-    @bindEvents()
-    return this
-  bindEvents: ->
-    that= this
-    @$game.bind( "achieve", (e, name, Label, icon) ->
-      if that.list.hasOwnProperty(name)
-        e.preventPropagation().preventDefault();
-      else
-        achievment= that.list[name]= {
-          "name": name
-          "label": label
-          "icon": icon
-        }
-        that.$game.trigger("achieved", achievment)
-    )
-}
-#timer
-timer= (game)->
-  return this
-
-#Create game
-$.fn.pixeljs= ->
-  return @each( ->
-    $game= $(this)
-    game= Game.init($game);
-    $game.data("pixeljs", game)
-    game.start();
-  )
-
-$( ->
-  $("#game").pixeljs()
-)
-    

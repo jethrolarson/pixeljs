@@ -1,9 +1,11 @@
 {% extends "../master.html" %}
 {% block body %}
+<h1>{{levelSet.name}}
 <ul>
-for level in levelSet
-  <li> a(href="level/[levelid]") [level hint]</li>
-endfor
+{%for level in levelSet.levelSet%}
+  <li> <a href="/level/{{level.key}}">{{level.title}}</a> <a href="/level/delete/{{level.key}}">delete</a></li>
+{%endfor%}
+	<li><a href="/level/edit?levelSetName={{levelSet.name}}">New Level</a></li>
 </ul>
 {%endblock%}
 

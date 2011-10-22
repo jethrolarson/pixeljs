@@ -5,23 +5,27 @@
 	<title>{{title}}</title>
 	{% block meta %}{% endblock %}
 	<link rel="stylesheet" href="/public/css/application.css"/>
+	<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7/themes/smoothness/jquery-ui.css"/>
+	
 	<!--todo shiv-->
 	{% block head %}{% endblock %}
 </head>
 <body>
 	<div id="page">
 		<header id="header">
-			<h1 id="title">Picross JS</h1>
+			<h1 id="title"><a href="/">Picross JS</a></h1>
 		</header>
 		<div id="body">
 			{% block body %}
 			{% endblock %}
 		</div>
+		<a href="/user/read">My Levels</a>
 		<footer id="footer">&copy; 2010-present Jethro Larson</footer>
 	</div>
 	<script src="/public/js/jquery.min.js"></script>
 	<script src="/public/js/util.js"></script>
 	<script src="/public/js/application.js"></script>
+	
 	{% block scripts %}{% endblock %}
 </body>
 </html>
