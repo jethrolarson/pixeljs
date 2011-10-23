@@ -1,5 +1,5 @@
 $ ->
-	game = Game.init $('#game')
+	Game.init $('#game')
 	Game.edit()
 	
 	$('form').submit ->
@@ -22,12 +22,17 @@ $ ->
 		).show()
 	.blur ->
 		$picker.hide()
-		
-	$('.slider').change(->
-		if this.name is 'cols'
-			game.updateCols @value
+	.change ->
+		if this.name is 'fgcolor'
+			Game.level.fgcolor = this.value
 		else
-			game.updateRows @value
+			Game.level.bgcolor = this.value
+		Game.renderLevel()
+	$('.slider').change(->
+		if this.name is 'x'
+			Game.updateCols @value
+		else
+			Game.updateRows @value
 	).each ->
 		that = this
 		$that = $(this)

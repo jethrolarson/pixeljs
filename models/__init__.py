@@ -62,8 +62,8 @@ class Level(db.Model):
 def getDefaultGame():
   return {
     'title': 'untitled'
-    ,'bgcolor': '#ddd'
-    ,'fgcolor': 'blue'
+    ,'bgcolor': '#dddddd'
+    ,'fgcolor': '#0000ff'
     ,'x': 10
     ,'y': 10
     ,'game':'000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'

@@ -1,7 +1,7 @@
 (function() {
   $(function() {
-    var $picker, FARBTASTIC_WIDTH, fb, game;
-    game = Game.init($('#game'));
+    var $picker, FARBTASTIC_WIDTH, fb;
+    Game.init($('#game'));
     Game.edit();
     $('form').submit(function() {
       var gamebits;
@@ -25,12 +25,19 @@
       }).show();
     }).blur(function() {
       return $picker.hide();
+    }).change(function() {
+      if (this.name === 'fgcolor') {
+        Game.level.fgcolor = this.value;
+      } else {
+        Game.level.bgcolor = this.value;
+      }
+      return Game.renderLevel();
     });
     return $('.slider').change(function() {
-      if (this.name === 'cols') {
-        return game.updateCols(this.value);
+      if (this.name === 'x') {
+        return Game.updateCols(this.value);
       } else {
-        return game.updateRows(this.value);
+        return Game.updateRows(this.value);
       }
     }).each(function() {
       var $slider, $that, that;

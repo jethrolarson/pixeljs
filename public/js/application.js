@@ -1,73 +1,5 @@
 (function() {
-  var Level;
   var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
-  Level = function(level) {
-    return $.extend({
-      getRow: function(y) {
-        return this.game.slice(this.x * y, this.x * y + this.x);
-      },
-      getCol: function(x) {
-        var ar, i, _ref;
-        ar = [];
-        for (i = 0, _ref = this.y; 0 <= _ref ? i < _ref : i > _ref; 0 <= _ref ? i++ : i--) {
-          ar.push(this.game[i * this.x + x]);
-        }
-        return ar;
-      },
-      getRowHints: function() {
-        var hints, row, _ref;
-        hints = [];
-        for (row = 0, _ref = this.y; 0 <= _ref ? row < _ref : row > _ref; 0 <= _ref ? row++ : row--) {
-          hints.push(this.getLineHints(this.getRow(row)));
-        }
-        return hints;
-      },
-      getColHints: function() {
-        var hints, i, _ref;
-        hints = [];
-        for (i = 0, _ref = this.x; 0 <= _ref ? i < _ref : i > _ref; 0 <= _ref ? i++ : i--) {
-          hints.push(this.getLineHints(this.getCol(i)));
-        }
-        return hints;
-      },
-      getLineHints: function(row) {
-        var cell, hint, hints, i, pushHint, _len;
-        hints = [];
-        hint = 0;
-        pushHint = function(force) {
-          force || (force = false);
-          if (hint > 0 || force) {
-            hints.push(hint);
-          }
-          return hint = 0;
-        };
-        for (i = 0, _len = row.length; i < _len; i++) {
-          cell = row[i];
-          if (+cell) {
-            hint += 1;
-            if (i === row.length - 1) {
-              pushHint();
-            }
-          } else {
-            pushHint();
-          }
-        }
-        if (hints.length === 0) {
-          pushHint(true);
-        }
-        return hints;
-      },
-      getAt: function(x, y) {
-        if (x >= this.x) {
-          throw 'Invalid X';
-        }
-        if (y >= this.y) {
-          throw 'Invalid Y';
-        }
-        return +this.game[(this.x * y) + x];
-      }
-    }, level);
-  };
   window.Game = {
     gameMode: 'play',
     dragMode: 'break',
@@ -84,6 +16,7 @@
       this.$colHints = this.$game.find('#colHints');
       this.$rowHints = this.$game.find('#rowHints');
       this.$game.trigger('init');
+      this.loadAssets();
       this.bindEvents();
       return this;
     },
@@ -129,18 +62,25 @@
       }
       return true;
     },
-    renderLives: function() {
-      var html, life, _ref;
-      this.$lives.empty().removeClass('fail');
-      html = '';
-      if (this.lives < 1) {
-        this.$game.trigger('lose');
-      } else {
-        for (life = 0, _ref = this.lives; 0 <= _ref ? life < _ref : life > _ref; 0 <= _ref ? life++ : life--) {
-          html += '[^_^] ';
-        }
+    updateCols: function(cols) {
+      var delta;
+      delta = cols - this.level.x;
+      if (delta > 0) {
+        this.level.addCols(delta);
+      } else if (delta < 0) {
+        this.level.subtractCols(Math.abs(delta));
       }
-      return this.$lives.html(html);
+      return this.renderLevel();
+    },
+    updateRows: function(cols) {
+      var delta;
+      delta = cols - this.level.y;
+      if (delta > 0) {
+        this.level.addRows(delta);
+      } else if (delta < 0) {
+        this.level.subtractRows(Math.abs(delta));
+      }
+      return this.renderLevel();
     },
     renderHints: function() {
       var hint, hintGroup, html, _i, _j, _k, _l, _len, _len2, _len3, _len4, _ref, _ref2;
@@ -170,11 +110,15 @@
       return this.$rowHints.html(html);
     },
     loadGame: function(level) {
-      var cell, cells, html, i, _len, _ref;
       this.level = Level(level);
+      return this.renderLevel();
+    },
+    renderLevel: function() {
+      var cell, cells, html, i, _len, _ref;
+      this.score = 0;
       $('#title').html("<a href=\"/levelSet/" + this.level.levelSet + "\">" + this.level.levelSetName + "</a> &gt; " + this.level.title);
       html = '';
-      cells = level.x * level.y;
+      cells = this.level.x * this.level.y;
       for (cell = 0; 0 <= cells ? cell < cells : cell > cells; 0 <= cells ? cell++ : cell--) {
         html += '<li> </li>';
       }
@@ -189,7 +133,6 @@
           $(cell).toggleClass('paint', +this.level.game[i] === 1);
         }
       }
-      this.colWidth = Math.floor(this.$gridCell.width() / level.x);
       this.$colorSheet = $(document.createElement('style')).prependTo(this.$grid);
       this.updateStyles();
       this.updateHints();
@@ -198,9 +141,10 @@
     updateStyles: function() {
       var css, gridHeight, gridWidth;
       css = '';
+      this.colWidth = Math.floor(this.$gridCell.width() / this.level.x);
       gridWidth = this.colWidth * this.level.x;
       gridHeight = this.colWidth * this.level.y;
-      css += "#grid li{\n	width: " + this.colWidth + "px;\n	height: " + this.colWidth + "px;\n}\n#grid{\n	width: " + gridWidth + "px;\n	height: " + gridHeight + "px;\n}\n#win,#lose{\n	width: " + gridWidth + "px;\n	height: " + gridHeight + "px;\n	line-height: " + gridHeight + "px;\n}\n\n#rowHints li div{\n	height: " + this.colWidth + "px;\n	line-height: " + this.colWidth + "px;\n}\n#colHints li div{\n	width: " + this.colWidth + "px;\n}";
+      css += "#grid li{\n	width: " + this.colWidth + "px;\n	height: " + this.colWidth + "px;\n}\n#grid{\n	width: " + gridWidth + "px;\n}\n#win,#lose{\n	width: " + gridWidth + "px;\n	height: " + gridHeight + "px;\n	line-height: " + gridHeight + "px;\n}\n\n#rowHints li div{\n	height: " + this.colWidth + "px;\n	line-height: " + this.colWidth + "px;\n}\n#colHints li div{\n	width: " + this.colWidth + "px;\n}";
       if (this.level.fgcolor) {
         css += "	#grid .paint, \n	#grid .on{\n		background-color:" + this.level.fgcolor + "\n}";
       }
@@ -209,39 +153,14 @@
       }
       return this.$colorSheet.html(css);
     },
-    timer: function() {
-      this.$timer = $('#timer');
-      this.time = 0;
-      this.timerOn = false;
-      return this.$game.bind({
-        start: __bind(function() {
-          return this.$game.trigger('startTimer');
-        }, this),
-        die: __bind(function() {
-          return this.score += 1;
-        }, this),
-        startTimer: __bind(function() {
-          this.timerOn = true;
-          return this.$game.trigger('updateTimer');
-        }, this),
-        updateTimer: __bind(function() {
-          var interval;
-          if (!this.timerOn) {
-            return;
-          }
-          this.$timer.text(this.time);
-          this.time += 1000;
-          interval = __bind(function() {
-            return this.$game.trigger('updateTimer');
-          }, this);
-          return setTimeout(interval, 1000);
-        }, this),
-        stopTimer: __bind(function() {
-          return this.timerOn;
-        }, this)
-      }, 'win lose', __bind(function() {
-        return this.$game.trigger('stopTimer');
-      }, this));
+    loadAssets: function() {
+      return this.assets = {
+        hoverSound: new Audio('/public/audio/grid_hover.wav'),
+        boom: new Audio('/public/audio/boom.wav'),
+        bing: new Audio('/public/audio/bing.wav'),
+        mark: new Audio('/public/audio/mark.wav'),
+        win: new Audio('/public/audio/win.wav')
+      };
     },
     bindEvents: function() {
       this.$grid.disableContext().delegate('li', {
@@ -256,7 +175,15 @@
         lose: $.proxy(this.eLose, this),
         win: $.proxy(this.eWin, this),
         paint: $.proxy(this.ePaint, this),
-        erase: $.proxy(this.eErase, this)
+        erase: $.proxy(this.eErase, this),
+        die: __bind(function() {
+          this.score += 1;
+          this.$game.addClass('shake');
+          this.assets.boom.play();
+          return setTimeout(__bind(function() {
+            return this.$game.removeClass('shake');
+          }, this), 300);
+        }, this)
       });
       return $(document).bind('mouseup', __bind(function() {
         return this.isDragging = false;
@@ -272,7 +199,11 @@
       if (this.level.getAt(coord.x, coord.y)) {
         $el.addClass('on');
         this.updateHints();
-        return this.isGameComplete() && this.$game.trigger('win');
+        if (this.isGameComplete()) {
+          return this.$game.trigger('win');
+        } else {
+          return this.assets.bing.play();
+        }
       } else if (!$el.hasClass('error')) {
         $el.addClass('error');
         return this.$game.trigger('die', el);
@@ -291,29 +222,29 @@
       if (this.gameMode !== 'play') {
         return;
       }
+      this.assets.mark.play();
       return $(el).toggleClass('mark', !this.isErasing);
     },
     ePaint: function(e, el) {
+      var $el;
+      $el = $(el);
+      this.level.updateCell(this.$grid.find('li').index(el), this.isErasing ? '0' : '1');
       return $(el).toggleClass('paint', !this.isErasing);
     },
     eWin: function() {
       this.dragMode = null;
+      this.assets.win.play();
       this.$win.show();
       return localStorage[this.title] = true;
-    },
-    eLose: function() {
-      this.dragMode = null;
-      this.$grid.addClass('lose');
-      this.$lose.show();
-      return this.$lives.text('Game Over [X_X]').addClass('fail');
     },
     eGridMouseover: function(e) {
       var $el, coord;
       $el = $(e.target);
       coord = this.getCoord(e.target);
       if (this.isDragging) {
-        return this.$game.trigger(this.dragMode, e.target);
+        this.$game.trigger(this.dragMode, e.target);
       }
+      return this.assets.hoverSound.play();
     },
     eGridMousedown: function(e) {
       var $el;

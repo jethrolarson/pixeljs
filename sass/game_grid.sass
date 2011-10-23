@@ -1,9 +1,87 @@
 @import _base
-
 @import _util
 
 $cell-size: 40px
 $cell-border-width: 1px
+@-webkit-keyframes shake
+	0%
+		-webkit-transform: translate(2px, 1px)
+
+	10%
+		-webkit-transform: translate(-1px, -2px)
+
+	20%
+		-webkit-transform: translate(-3px, 0px)
+
+	30%
+		-webkit-transform: translate(0px, 2px)
+
+	40%
+		-webkit-transform: translate(1px, -1px)
+
+	50%
+		-webkit-transform: translate(-1px, 2px)
+
+	60%
+		-webkit-transform: translate(-3px, 1px)
+
+	70%
+		-webkit-transform: translate(2px, 1px)
+
+	80%
+		-webkit-transform: translate(-1px, -1px)
+
+	90%
+		-webkit-transform: translate(2px, 2px)
+
+	100%
+		-webkit-transform: translate(1px, -2px)
+		
+@-moz-keyframes shake
+	0%
+		-moz-transform: translate(2px, 1px)
+
+	10%
+		-moz-transform: translate(-1px, -2px)
+
+	20%
+		-moz-transform: translate(-3px, 0px)
+
+	30%
+		-moz-transform: translate(0px, 2px)
+
+	40%
+		-moz-transform: translate(1px, -1px)
+
+	50%
+		-moz-transform: translate(-1px, 2px)
+
+	60%
+		-moz-transform: translate(-3px, 1px)
+
+	70%
+		-moz-transform: translate(2px, 1px)
+
+	80%
+		-moz-transform: translate(-1px, -1px)
+
+	90%
+		-moz-transform: translate(2px, 2px)
+
+	100%
+		-moz-transform: translate(1px, -2px)
+
+.shake
+	-webkit-animation-name: shake
+	-webkit-animation-duration: 0.3s
+	-webkit-transform-origin: 50% 50%
+	-webkit-animation-iteration-count: infinite
+	-webkit-animation-timing-function: linear
+	-moz-animation-name: shake
+	-moz-animation-duration: 0.3s
+	-moz-transform-origin: 50% 50%
+	-moz-animation-iteration-count: infinite
+	-moz-animation-timing-function: linear
 
 #game
 	+user-select
@@ -11,13 +89,14 @@ $cell-border-width: 1px
 		width: 100%
 	#gridCell
 		width: 100%
+	
 #colHints
 	+reset-list
 	li
 		display: inline-block
 		&.done div
 			text-decoration: line-through
-			color: #aaa
+			color: #fff
 		div
 			text-align: center
 
@@ -28,7 +107,7 @@ $cell-border-width: 1px
 		text-align: right
 		&.done div
 			text-decoration: line-through
-			color: #aaa
+			color: #fff
 		div
 			display: inline-block
 			width: 1.5em
@@ -73,7 +152,8 @@ $cell-border-width: 1px
 			display: block
 			text-align: center
 		&:hover
-			opacity: .8
+			outline: 2px solid #ffa
+			border: 1px #999 solid
 	.show
 		background: #ddd
 	.mark

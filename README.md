@@ -1,7 +1,7 @@
 TODO
 ====
 - Combobox for sets
-+ Make sets match by name
+- Make sets match by name
 
 - Implement Golf Scoring Rules
 - Link levels together to create courses
@@ -12,6 +12,7 @@ TODO
 - Make flags less obtrusive
 - Resizing the game shouldn't fuck up the grid
 - Resizing should happen instantly on the client
+- Music
 
 Later
 ======

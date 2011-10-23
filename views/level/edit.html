@@ -6,9 +6,10 @@ var level = {{level|jsonify}};
 <form action="/level/edit" method="post">
 	<!-- in session: uid -->
 	<div class="field">
+		<label>World</label>
 		<input name="levelSetName" value="{{level.levelSetName}}" type="text"/><!-- TODO COMBOBOX -->
 	</div>
-	{% include '../partials/grid.html'%}
+	
 	<input name="game" type="hidden" value="{{level.game}}"/>
 	<div class="field">
 		<label>Cols </label>
@@ -34,7 +35,8 @@ var level = {{level|jsonify}};
 		<label>Par </label>
 		<input name="par" type="number" min="1" max="10" step="1" value="{{level.par}}"/>
 	</div>
-	<button type="submit">Save</button>
+	{% include '../partials/grid.html'%}
+	<button type="submit">Save</button> <a href="/level/{{level.key}}">Play</a>
 </form>
 {%endblock%}
 {%block scripts%}
