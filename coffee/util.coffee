@@ -33,17 +33,48 @@ Audio = (url)->
 	@audio.autobuffer = true
 	@audio.src = url
 	@audio.load()
+	@isPlaying = false
 	return this
 Audio::isLoaded = false
 Audio::play = ->
 	try
 		@audio.currentTime = 0
 	@audio.play()
+	@isPlaying = true
 Audio::stop = ->
 	@audio.currentTime = 0
+	@isPlaying = false
 	@audio.pause()
-	
+
 window.Audio = Audio
+
+SoundGroup = (url, channels)->
+	channels ||= 1
+	@url = url
+	@channels = []
+	for i in [0...channels]
+		@addChannel()
+	this
+SoundGroup::play = (channel)->
+	if typeof channel isnt 'undefined'
+		@channels[channel].play()
+	else
+		@getNotPlaying().play()
+SoundGroup::addChannel = ()->
+	newAudio = new Audio @url
+	@channels.push newAudio
+	return newAudio
+SoundGroup::stop = (channel)->
+	if typeof channel isnt 'undefined'
+		@channels[channel].stop()
+	else
+		@getNotPlaying().stop()
+SoundGroup::getNotPlaying = ->
+	for channel in @channels
+		return channel if currentTime = 0 || channel.audio.ended
+	return @addChannel()
+
+window.SoundGroup = SoundGroup
 
 _ = {}
 

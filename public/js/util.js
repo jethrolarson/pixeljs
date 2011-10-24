@@ -1,5 +1,5 @@
 (function() {
-  var Audio, limit, _;
+  var Audio, SoundGroup, limit, _;
   if (Function.bind == null) {
     Function.prototype.bind = function(fn, context) {
       context || (context = this);
@@ -55,6 +55,7 @@
     this.audio.autobuffer = true;
     this.audio.src = url;
     this.audio.load();
+    this.isPlaying = false;
     return this;
   };
   Audio.prototype.isLoaded = false;
@@ -62,13 +63,57 @@
     try {
       this.audio.currentTime = 0;
     } catch (_e) {}
-    return this.audio.play();
+    this.audio.play();
+    return this.isPlaying = true;
   };
   Audio.prototype.stop = function() {
     this.audio.currentTime = 0;
+    this.isPlaying = false;
     return this.audio.pause();
   };
   window.Audio = Audio;
+  SoundGroup = function(url, channels) {
+    var i;
+    channels || (channels = 1);
+    this.url = url;
+    this.channels = [];
+    for (i = 0; 0 <= channels ? i < channels : i > channels; 0 <= channels ? i++ : i--) {
+      this.addChannel();
+    }
+    return this;
+  };
+  SoundGroup.prototype.play = function(channel) {
+    if (typeof channel !== 'undefined') {
+      return this.channels[channel].play();
+    } else {
+      return this.getNotPlaying().play();
+    }
+  };
+  SoundGroup.prototype.addChannel = function() {
+    var newAudio;
+    newAudio = new Audio(this.url);
+    this.channels.push(newAudio);
+    return newAudio;
+  };
+  SoundGroup.prototype.stop = function(channel) {
+    if (typeof channel !== 'undefined') {
+      return this.channels[channel].stop();
+    } else {
+      return this.getNotPlaying().stop();
+    }
+  };
+  SoundGroup.prototype.getNotPlaying = function() {
+    var channel, currentTime, _i, _len, _ref;
+    _ref = this.channels;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      channel = _ref[_i];
+      if (currentTime = 0 || channel.audio.ended) {
+        return channel;
+      }
+    }
+    return this.addChannel();
+  };
+  window.SoundGroup = SoundGroup;
   _ = {};
   limit = function(func, wait, debounce) {
     var timeout;

@@ -96,7 +96,7 @@ $cell-border-width: 1px
 		display: inline-block
 		&.done div
 			text-decoration: line-through
-			color: #fff
+			color: #999
 		div
 			text-align: center
 
@@ -107,20 +107,22 @@ $cell-border-width: 1px
 		text-align: right
 		&.done div
 			text-decoration: line-through
-			color: #fff
+			color: #999
 		div
 			display: inline-block
 			width: 1.5em
 			text-align: center
 
-#win,
-#lose
+#score, #par
+	white-space: nowrap
+
+#win
 	position: absolute
 	/*width/height set in js
 	display: none
 	color: green
-	background: rgba(0, 0, 0, 0.4)
 	text-align: center
+	font-size: 60px
 
 #lose
 	color: red
@@ -164,9 +166,8 @@ $cell-border-width: 1px
 	.error
 		background-image: url(../images/cross.png)
 		opacity: .8
-		 
 
-#lives
-	color: $win-color
-	&.fail
-		color: $fail-color
+@media only screen and (max-device-width: 1024px), only screen and (max-device-width: 480px)
+	#grid li:hover		 
+		outline: 0
+		border: none

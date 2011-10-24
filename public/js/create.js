@@ -4,12 +4,7 @@
     Game.init($('#game'));
     Game.edit();
     $('form').submit(function() {
-      var gamebits;
-      gamebits = '';
-      $('#grid li').each(function() {
-        return gamebits += $(this).hasClass('paint') ? '1' : '0';
-      });
-      return this.game.value = gamebits;
+      return this.game.value = Game.level.game;
     });
     FARBTASTIC_WIDTH = 195;
     $('<div id="picker"></div>').appendTo('body');

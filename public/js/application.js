@@ -9,12 +9,14 @@
     init: function($game) {
       this.$game = $game;
       this.$gridCell = this.$game.find('#gridCell');
-      this.$grid = this.$game.find('#grid').remove();
+      this.$grid = this.$game.find('#grid');
       this.$win = this.$game.find('#win');
       this.$lose = this.$game.find('#lose');
+      this.$score = this.$game.find('#score');
       this.$games = this.$game.find('#games');
       this.$colHints = this.$game.find('#colHints');
       this.$rowHints = this.$game.find('#rowHints');
+      this.$grid.remove();
       this.$game.trigger('init');
       this.loadAssets();
       this.bindEvents();
@@ -26,10 +28,11 @@
     edit: function() {
       this.gameMode = 'edit';
       this.$grid.enableContext();
+      this.assets.paint = new SoundGroup('/public/audio/paint.wav');
       return this.start();
     },
     getCol: function(x) {
-      return this.$grid.find("li:nth-child(" + this.level.y + "n+" + (x + 2) + ")");
+      return this.$grid.find("li:nth-child(" + this.level.x + "n+" + (x + 2) + ")");
     },
     getRow: function(y) {
       return this.$grid.find('li').slice(y * this.level.x, (y + 1) * this.level.x);
@@ -111,12 +114,14 @@
     },
     loadGame: function(level) {
       this.level = Level(level);
-      return this.renderLevel();
+      this.renderLevel();
+      return this.updateScore();
     },
     renderLevel: function() {
       var cell, cells, html, i, _len, _ref;
       this.score = 0;
       $('#title').html("<a href=\"/levelSet/" + this.level.levelSet + "\">" + this.level.levelSetName + "</a> &gt; " + this.level.title);
+      $('#par').text("Par: " + this.level.par);
       html = '';
       cells = this.level.x * this.level.y;
       for (cell = 0; 0 <= cells ? cell < cells : cell > cells; 0 <= cells ? cell++ : cell--) {
@@ -155,17 +160,18 @@
     },
     loadAssets: function() {
       return this.assets = {
-        hoverSound: new Audio('/public/audio/grid_hover.wav'),
-        boom: new Audio('/public/audio/boom.wav'),
-        bing: new Audio('/public/audio/bing.wav'),
-        mark: new Audio('/public/audio/mark.wav'),
+        hoverSound: new SoundGroup('/public/audio/grid_hover.wav'),
+        boom: new SoundGroup('/public/audio/boom.wav'),
+        bing: new SoundGroup('/public/audio/bing.wav'),
+        mark: new SoundGroup('/public/audio/mark.wav'),
         win: new Audio('/public/audio/win.wav')
       };
     },
     bindEvents: function() {
       this.$grid.disableContext().delegate('li', {
-        mouseover: $.proxy(this.eGridMouseover, this),
-        mousedown: $.proxy(this.eGridMousedown, this)
+        'mouseover': $.proxy(this.eGridMouseover, this),
+        'touchmove': $.proxy(this.eGridTouchmove, this),
+        'mousedown touchstart': $.proxy(this.eGridMousedown, this)
       }).mouseout(__bind(function() {
         return this.$cells.removeClass('hilight');
       }, this));
@@ -180,6 +186,7 @@
           this.score += 1;
           this.$game.addClass('shake');
           this.assets.boom.play();
+          this.updateScore();
           return setTimeout(__bind(function() {
             return this.$game.removeClass('shake');
           }, this), 300);
@@ -188,6 +195,33 @@
       return $(document).bind('mouseup', __bind(function() {
         return this.isDragging = false;
       }, this));
+    },
+    getGolfScore: function() {
+      var label, par;
+      par = this.score - this.level.par;
+      label = '';
+      if (this.score === 0) {
+        return label = 'Ace!';
+      } else if (par <= -3) {
+        return label = 'Albatross!';
+      } else if (par === -2) {
+        return label = 'Eagle!';
+      } else if (par === -1) {
+        return label = 'Birdie';
+      } else if (par === 0) {
+        return label = 'Par';
+      } else if (par === 1) {
+        return label = "Bogey";
+      } else if (par === 2) {
+        return label = "Double Bogey";
+      } else if (par === 3) {
+        return label = "Tripple Bogey";
+      } else if (par > 3) {
+        return label = this.score + " over par";
+      }
+    },
+    updateScore: function() {
+      return this.$score.text("Faults: " + this.score);
     },
     eBreak: function(e, el) {
       var $el, coord;
@@ -234,13 +268,18 @@
     eWin: function() {
       this.dragMode = null;
       this.assets.win.play();
+      this.$win.text(this.getGolfScore());
       this.$win.show();
       return localStorage[this.title] = true;
     },
-    eGridMouseover: function(e) {
-      var $el, coord;
+    eGridTouchmove: function(e) {
+      var $el;
+      e.preventDefault();
       $el = $(e.target);
-      coord = this.getCoord(e.target);
+      this.$game.trigger(this.dragMode, e.target);
+      return this.assets.hoverSound.play();
+    },
+    eGridMouseover: function(e) {
       if (this.isDragging) {
         this.$game.trigger(this.dragMode, e.target);
       }
@@ -248,16 +287,14 @@
     },
     eGridMousedown: function(e) {
       var $el;
+      e.preventDefault();
       $el = $(e.target);
       if (this.gameMode === 'play') {
-        this.dragMode = e.which === 1 ? 'break' : 'mark';
+        this.dragMode = e.which !== 1 ? 'mark' : 'break';
         if (this.dragMode === 'mark') {
           this.isErasing = $el.hasClass('mark');
         }
       } else {
-        if (e.which !== 1) {
-          return true;
-        }
         this.dragMode = 'paint';
         this.isErasing = $el.hasClass('paint');
       }

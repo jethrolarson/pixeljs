@@ -11,13 +11,15 @@ window.Game = {
 
 	init: ($game)->
 		@$game= $game
-		@$gridCell= @$game.find('#gridCell')
-		@$grid=     @$game.find('#grid').remove()
+		@$gridCell= @$game.find '#gridCell'
+		@$grid=     @$game.find '#grid'
 		@$win=      @$game.find '#win'
 		@$lose=     @$game.find '#lose'
+		@$score=     @$game.find '#score'
 		@$games=    @$game.find '#games'
 		@$colHints= @$game.find '#colHints'
 		@$rowHints= @$game.find '#rowHints'
+		@$grid.remove()
 		@$game.trigger 'init'
 		@loadAssets()
 		@bindEvents()
@@ -28,10 +30,12 @@ window.Game = {
 	edit: ->
 		@gameMode = 'edit'
 		@$grid.enableContext()
+		@assets.paint = new SoundGroup '/public/audio/paint.wav'
 		@start()
 	getCol: (x)-> 
-		@$grid.find("li:nth-child(#{@level.y}n+#{x+2})") #isn't nth-child confusing?
-	getRow: (y)-> @$grid.find('li').slice(y * @level.x, (y + 1) * @level.x)
+		@$grid.find("li:nth-child(#{@level.x}n+#{x+2})") #isn't nth-child confusing?
+	getRow: (y)-> 
+		@$grid.find('li').slice(y * @level.x, (y + 1) * @level.x)
 
 	getCoord: (el)->
 		index = $(el).parent().children('li').index(el)
@@ -85,9 +89,11 @@ window.Game = {
 	loadGame: (level)->
 		@level = Level level
 		@renderLevel()
+		@updateScore()
 	renderLevel: ->
 		@score = 0;
 		$('#title').html("""<a href="/levelSet/#{@level.levelSet}">#{@level.levelSetName}</a> &gt; #{@level.title}""")
+		$('#par').text("Par: "+@level.par)
 
 		# Build grid
 		html= ''
@@ -146,10 +152,10 @@ window.Game = {
 			
 	loadAssets: ->
 		@assets = {
-			hoverSound: new Audio('/public/audio/grid_hover.wav')
-			boom: new Audio('/public/audio/boom.wav')
-			bing: new Audio('/public/audio/bing.wav')
-			mark: new Audio('/public/audio/mark.wav')
+			hoverSound: new SoundGroup '/public/audio/grid_hover.wav'
+			boom: new SoundGroup '/public/audio/boom.wav'
+			bing: new SoundGroup '/public/audio/bing.wav'
+			mark: new SoundGroup '/public/audio/mark.wav'
 			win: new Audio('/public/audio/win.wav')
 		}
 		
@@ -158,8 +164,9 @@ window.Game = {
 	# ======== #
 	bindEvents: ->
 		@$grid.disableContext().delegate('li', {
-			mouseover: $.proxy(@eGridMouseover, this)
-			mousedown: $.proxy(@eGridMousedown, this)
+			'mouseover': $.proxy(@eGridMouseover, this)
+			'touchmove': $.proxy(@eGridTouchmove, this)
+			'mousedown touchstart': $.proxy(@eGridMousedown, this)
 		}).mouseout =>
 			@$cells.removeClass 'hilight'
 			
@@ -174,13 +181,36 @@ window.Game = {
 				@score += 1
 				@$game.addClass('shake')
 				@assets.boom.play()
+				@updateScore()
 				setTimeout( =>
 					@$game.removeClass('shake')
 				, 300)
 	
 		$(document).bind 'mouseup', => 
 			@isDragging= false
-			
+	getGolfScore: ->
+		par =  @score - @level.par
+		label = ''
+		if @score is 0
+			label = 'Ace!'
+		else if par <= -3
+			label = 'Albatross!'
+		else if par is -2
+			label = 'Eagle!'
+		else if par is -1
+			label = 'Birdie'
+		else if par is 0
+			label = 'Par'
+		else if par is 1
+			label = "Bogey"
+		else if par is 2
+			label = "Double Bogey"
+		else if par is 3
+			label = "Tripple Bogey"
+		else if par > 3
+			label = @score+" over par"
+	updateScore: ->
+		@$score.text "Faults: " + @score
 	eBreak: (e, el)->
 		$el= $(el)
 		return if @gameMode is 'edit' or $el.hasClass 'mark'
@@ -217,23 +247,27 @@ window.Game = {
 	eWin: ->
 		@dragMode= null	
 		@assets.win.play()
+		@$win.text(@getGolfScore())
 		@$win.show()
 		localStorage[@title] = true
 
-	eGridMouseover: (e)->
+	eGridTouchmove: (e)->
+		e.preventDefault()
 		$el= $ e.target
-		coord= @getCoord e.target
+		@$game.trigger(@dragMode, e.target)
+		@assets.hoverSound.play()
+	eGridMouseover: (e)->
 		if @isDragging
 			@$game.trigger(@dragMode, e.target)
 		@assets.hoverSound.play()
 
 	eGridMousedown: (e)->
+		e.preventDefault()
 		$el = $(e.target)
 		if @gameMode is 'play'
-			@dragMode = if e.which is 1 then 'break' else 'mark'
+			@dragMode = if e.which isnt 1 then 'mark' else 'break'
 			@isErasing = $el.hasClass('mark') if @dragMode is 'mark'
 		else
-			return true if e.which isnt 1
 			@dragMode = 'paint'
 			@isErasing = $el.hasClass('paint')
 		@isDragging = true

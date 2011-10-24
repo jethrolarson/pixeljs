@@ -3,10 +3,7 @@ $ ->
 	Game.edit()
 	
 	$('form').submit ->
-		gamebits = ''
-		$('#grid li').each ->
-			gamebits += if $(this).hasClass('paint') then '1' else '0'
-		@game.value = gamebits
+		@game.value = Game.level.game
 
 	FARBTASTIC_WIDTH = 195
 	$('<div id="picker"></div>').appendTo 'body'

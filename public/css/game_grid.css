@@ -1,13 +1,13 @@
 /* line 18, ../../sass/_base.sass */
 body {
   background: #cccccc;
-  color: #888888;
+  color: #aaaaaa;
 }
 
 /* line 18, ../../sass/_base.sass */
 body {
   background: #cccccc;
-  color: #888888;
+  color: #aaaaaa;
 }
 
 /* line 37, ../../sass/_util.sass */
@@ -168,14 +168,14 @@ body {
   margin: 0;
   padding: 0;
   border: 0;
-  color: #888888;
+  color: #aaaaaa;
 }
 /* line 33, ../../sass/_util.sass */
 #colHints li {
   margin: 0;
   padding: 0;
   border: 0;
-  color: #888888;
+  color: #aaaaaa;
   list-style: none;
 }
 /* line 95, ../../sass/game_grid.sass */
@@ -185,7 +185,7 @@ body {
 /* line 97, ../../sass/game_grid.sass */
 #colHints li.done div {
   text-decoration: line-through;
-  color: white;
+  color: #999999;
 }
 /* line 100, ../../sass/game_grid.sass */
 #colHints li div {
@@ -197,14 +197,14 @@ body {
   margin: 0;
   padding: 0;
   border: 0;
-  color: #888888;
+  color: #aaaaaa;
 }
 /* line 33, ../../sass/_util.sass */
 #rowHints li {
   margin: 0;
   padding: 0;
   border: 0;
-  color: #888888;
+  color: #aaaaaa;
   list-style: none;
 }
 /* line 105, ../../sass/game_grid.sass */
@@ -215,7 +215,7 @@ body {
 /* line 108, ../../sass/game_grid.sass */
 #rowHints li.done div {
   text-decoration: line-through;
-  color: white;
+  color: #999999;
 }
 /* line 111, ../../sass/game_grid.sass */
 #rowHints li div {
@@ -225,29 +225,33 @@ body {
 }
 
 /* line 116, ../../sass/game_grid.sass */
-#win,
-#lose {
+#score, #par {
+  white-space: nowrap;
+}
+
+/* line 119, ../../sass/game_grid.sass */
+#win {
   position: absolute;
   /*width/height set in js */
   display: none;
   color: green;
-  background: rgba(0, 0, 0, 0.4);
   text-align: center;
+  font-size: 60px;
 }
 
-/* line 125, ../../sass/game_grid.sass */
+/* line 127, ../../sass/game_grid.sass */
 #lose {
   color: red;
 }
 
-/* line 128, ../../sass/game_grid.sass */
+/* line 130, ../../sass/game_grid.sass */
 #grid {
   float: left;
   zoom: 1;
   margin: 0;
   padding: 0;
   border: 0;
-  color: #888888;
+  color: #aaaaaa;
   cursor: move;
   background: #dddddd;
   border: 1px solid;
@@ -266,14 +270,14 @@ body {
   margin: 0;
   padding: 0;
   border: 0;
-  color: #888888;
+  color: #aaaaaa;
   list-style: none;
 }
-/* line 136, ../../sass/game_grid.sass */
+/* line 138, ../../sass/game_grid.sass */
 #grid.dragging {
   cursor: -moz-grabbing;
 }
-/* line 138, ../../sass/game_grid.sass */
+/* line 140, ../../sass/game_grid.sass */
 #grid li {
   float: left;
   text-align: center;
@@ -289,41 +293,40 @@ body {
   background-repeat: no-repeat;
   background-position: center center;
 }
-/* line 150, ../../sass/game_grid.sass */
+/* line 152, ../../sass/game_grid.sass */
 #grid li a {
   text-decoration: none;
   display: block;
   text-align: center;
 }
-/* line 154, ../../sass/game_grid.sass */
+/* line 156, ../../sass/game_grid.sass */
 #grid li:hover {
   outline: 2px solid #ffffaa;
   border: 1px #999999 solid;
 }
-/* line 157, ../../sass/game_grid.sass */
+/* line 159, ../../sass/game_grid.sass */
 #grid .show {
   background: #dddddd;
 }
-/* line 159, ../../sass/game_grid.sass */
+/* line 161, ../../sass/game_grid.sass */
 #grid .mark {
   background: url(../images/flag_red.png) no-repeat center center;
 }
-/* line 161, ../../sass/game_grid.sass */
+/* line 163, ../../sass/game_grid.sass */
 #grid .on, #grid.paint {
   -webkit-transition: background-color 0.25s linear;
   background: #88aadd;
 }
-/* line 164, ../../sass/game_grid.sass */
+/* line 166, ../../sass/game_grid.sass */
 #grid .error {
   background-image: url(../images/cross.png);
   opacity: 0.8;
 }
 
-/* line 169, ../../sass/game_grid.sass */
-#lives {
-  color: green;
-}
-/* line 171, ../../sass/game_grid.sass */
-#lives.fail {
-  color: red;
+@media only screen and (max-device-width: 1024px), only screen and (max-device-width: 480px) {
+  /* line 171, ../../sass/game_grid.sass */
+  #grid li:hover {
+    outline: 0;
+    border: none;
+  }
 }
