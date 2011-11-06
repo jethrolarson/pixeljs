@@ -45,7 +45,7 @@ class Edit(webapp.RequestHandler):
       level = db.get(db.Key(key))
       if not level:
         return util.error(self,404,'Level not found')
-      if level.owner != user:
+      if level.owner.key() != user.key():
         return util.error(self,500,"You don't own this level. Jethro needs to implement cloning so you can edit a copy")
     
     levelSetName = self.request.get('levelSetName')
@@ -67,7 +67,10 @@ class Edit(webapp.RequestHandler):
     level.fgcolor = self.request.get('fgcolor')
     level.bgcolor = self.request.get('bgcolor')
     level.put()
-    self.redirect("/level/edit/"+str(level.key()))
+    if self.request.get('play'):
+      self.redirect("/level/"+str(level.key()))
+    else:
+      self.redirect("/level/edit/"+str(level.key()))
     #except:
     #  logging.error(sys.exc_info())
     #  util.error(self,500,"Something went wrong on our end when creating the todo, please try again")

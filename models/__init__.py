@@ -6,7 +6,7 @@ class User(db.Model):
   created = db.DateTimeProperty(auto_now_add=True)
 
 def getCurrentUser():
-  user = User.all().filter("user = ", users.get_current_user()).get()
+  user = User.all().filter("user =", users.get_current_user()).get()
   if not user:
     user = User()
     user.put()
@@ -23,14 +23,12 @@ def getAllLevelSets():
 
 def getUserLevelSetByName(name):
   #FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME FIXME 
-  return LevelSet.all().filter('name=',name).filter('owner=',getCurrentUser()).get()
+  return LevelSet.all().filter('name =',name).filter('owner =',getCurrentUser()).get()
 
 def getLevelSetBykey(key):
   return db.get(db.Key(key))
 def getUserLevelSets():
-  logging.info(getCurrentUser().user)
-  logging.info(LevelSet.all().get().owner.user)
-  return LevelSet.all().filter('owner=',getCurrentUser()).fetch(100)
+  return LevelSet.all().filter('owner =',getCurrentUser()).fetch(100)
   
 class Level(db.Model):
   created = db.DateTimeProperty(auto_now_add=True)

@@ -28,7 +28,7 @@
     edit: function() {
       this.gameMode = 'edit';
       this.$grid.enableContext();
-      this.assets.paint = new SoundGroup('/public/audio/paint.wav');
+      this.assets.paint = new SoundGroup('paint.wav');
       return this.start();
     },
     getCol: function(x) {
@@ -160,11 +160,11 @@
     },
     loadAssets: function() {
       return this.assets = {
-        hoverSound: new SoundGroup('/public/audio/grid_hover.wav'),
-        boom: new SoundGroup('/public/audio/boom.wav'),
-        bing: new SoundGroup('/public/audio/bing.wav'),
-        mark: new SoundGroup('/public/audio/mark.wav'),
-        win: new Audio('/public/audio/win.wav')
+        hoverSound: new SoundGroup('grid_hover.wav'),
+        boom: new SoundGroup('boom.wav'),
+        bing: new SoundGroup('bing.wav'),
+        mark: new SoundGroup('mark.wav'),
+        win: new Audio('win.wav')
       };
     },
     bindEvents: function() {

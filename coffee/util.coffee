@@ -27,11 +27,12 @@ $.fn.rightdown = (handler,disableContext)->
 $.fn.disableContext = -> @each -> @oncontextmenu = -> false
 $.fn.enableContext = -> @each -> @oncontextmenu = null
 
-Audio = (url)->
-	@url = url
+AUDIOPATH = '/public/audio/'
+Audio = (filename)->
+	@filename = filename
 	@audio = document.createElement('audio')
 	@audio.autobuffer = true
-	@audio.src = url
+	@audio.src = AUDIOPATH+filename
 	@audio.load()
 	@isPlaying = false
 	return this
@@ -45,12 +46,12 @@ Audio::stop = ->
 	@audio.currentTime = 0
 	@isPlaying = false
 	@audio.pause()
-
 window.Audio = Audio
 
-SoundGroup = (url, channels)->
+
+SoundGroup = (filename, channels)->
 	channels ||= 1
-	@url = url
+	@filename = filename
 	@channels = []
 	for i in [0...channels]
 		@addChannel()
@@ -60,8 +61,8 @@ SoundGroup::play = (channel)->
 		@channels[channel].play()
 	else
 		@getNotPlaying().play()
-SoundGroup::addChannel = ()->
-	newAudio = new Audio @url
+SoundGroup::addChannel = ->
+	newAudio = new Audio @filename
 	@channels.push newAudio
 	return newAudio
 SoundGroup::stop = (channel)->
@@ -73,7 +74,6 @@ SoundGroup::getNotPlaying = ->
 	for channel in @channels
 		return channel if currentTime = 0 || channel.audio.ended
 	return @addChannel()
-
 window.SoundGroup = SoundGroup
 
 _ = {}
@@ -100,6 +100,5 @@ _.throttle = (func, wait)->
 # N milliseconds.
 _.debounce = (func, wait)->
 	return limit(func, wait, true)
-
 
 window._ = _

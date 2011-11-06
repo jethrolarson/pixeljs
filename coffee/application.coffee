@@ -30,7 +30,7 @@ window.Game = {
 	edit: ->
 		@gameMode = 'edit'
 		@$grid.enableContext()
-		@assets.paint = new SoundGroup '/public/audio/paint.wav'
+		@assets.paint = new SoundGroup 'paint.wav'
 		@start()
 	getCol: (x)-> 
 		@$grid.find("li:nth-child(#{@level.x}n+#{x+2})") #isn't nth-child confusing?
@@ -152,11 +152,11 @@ window.Game = {
 			
 	loadAssets: ->
 		@assets = {
-			hoverSound: new SoundGroup '/public/audio/grid_hover.wav'
-			boom: new SoundGroup '/public/audio/boom.wav'
-			bing: new SoundGroup '/public/audio/bing.wav'
-			mark: new SoundGroup '/public/audio/mark.wav'
-			win: new Audio('/public/audio/win.wav')
+			hoverSound: new SoundGroup 'grid_hover.wav'
+			boom: new SoundGroup 'boom.wav'
+			bing: new SoundGroup 'bing.wav'
+			mark: new SoundGroup 'mark.wav'
+			win: new Audio 'win.wav'
 		}
 		
 	# ======== #	

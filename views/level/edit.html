@@ -4,6 +4,7 @@
 var level = {{level|jsonify}};
 </script>
 <form action="/level/edit" method="post">
+	<input type="hidden" name="key" value="{{level.key}}">
 	<!-- in session: uid -->
 	<div class="field">
 		<label>World</label>
@@ -36,7 +37,7 @@ var level = {{level|jsonify}};
 		<input name="par" type="number" min="1" max="10" step="1" value="{{level.par}}"/>
 	</div>
 	{% include '../partials/grid.html'%}
-	<button type="submit">Save</button> <a href="/level/{{level.key}}">Play</a>
+	<button type="submit">Save</button> <button type="submit" name="play" value="1">Test</button>
 </form>
 {%endblock%}
 {%block scripts%}

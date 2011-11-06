@@ -1,21 +1,21 @@
-/* line 18, ../../sass/_base.sass */
+/* line 18, /Users/jlarson/gae/pixeljs/sass/_base.sass */
 body {
   background: #cccccc;
   color: #aaaaaa;
 }
 
-/* line 18, ../../sass/_base.sass */
+/* line 18, /Users/jlarson/gae/pixeljs/sass/_base.sass */
 body {
   background: #cccccc;
   color: #aaaaaa;
 }
 
-/* line 37, ../../sass/_util.sass */
+/* line 37, /Users/jlarson/gae/pixeljs/sass/_util.sass */
 .win {
   color: green;
 }
 
-/* line 40, ../../sass/_util.sass */
+/* line 40, /Users/jlarson/gae/pixeljs/sass/_util.sass */
 .fail {
   color: red;
 }
@@ -170,7 +170,7 @@ body {
   border: 0;
   color: #aaaaaa;
 }
-/* line 33, ../../sass/_util.sass */
+/* line 33, /Users/jlarson/gae/pixeljs/sass/_util.sass */
 #colHints li {
   margin: 0;
   padding: 0;
@@ -199,7 +199,7 @@ body {
   border: 0;
   color: #aaaaaa;
 }
-/* line 33, ../../sass/_util.sass */
+/* line 33, /Users/jlarson/gae/pixeljs/sass/_util.sass */
 #rowHints li {
   margin: 0;
   padding: 0;
@@ -257,7 +257,7 @@ body {
   border: 1px solid;
   border-color: white #888888 #888888 white;
 }
-/* line 5, ../../sass/_util.sass */
+/* line 5, /Users/jlarson/gae/pixeljs/sass/_util.sass */
 #grid:after {
   content: ".";
   clear: both;
@@ -265,7 +265,7 @@ body {
   visibility: hidden;
   height: 0;
 }
-/* line 33, ../../sass/_util.sass */
+/* line 33, /Users/jlarson/gae/pixeljs/sass/_util.sass */
 #grid li {
   margin: 0;
   padding: 0;

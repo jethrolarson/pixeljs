@@ -11,7 +11,7 @@ TODO
 
 ! touchmove doesn't track target
 - Enable drawMode switch
-
+- Omit faults and par info from edit mode
 Later
 ======
 Implement Stacking Puzzles

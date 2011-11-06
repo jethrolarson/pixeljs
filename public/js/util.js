@@ -1,5 +1,5 @@
 (function() {
-  var Audio, SoundGroup, limit, _;
+  var AUDIOPATH, Audio, SoundGroup, limit, _;
   if (Function.bind == null) {
     Function.prototype.bind = function(fn, context) {
       context || (context = this);
@@ -49,11 +49,12 @@
       return this.oncontextmenu = null;
     });
   };
-  Audio = function(url) {
-    this.url = url;
+  AUDIOPATH = '/public/audio/';
+  Audio = function(filename) {
+    this.filename = filename;
     this.audio = document.createElement('audio');
     this.audio.autobuffer = true;
-    this.audio.src = url;
+    this.audio.src = AUDIOPATH + filename;
     this.audio.load();
     this.isPlaying = false;
     return this;
@@ -72,10 +73,10 @@
     return this.audio.pause();
   };
   window.Audio = Audio;
-  SoundGroup = function(url, channels) {
+  SoundGroup = function(filename, channels) {
     var i;
     channels || (channels = 1);
-    this.url = url;
+    this.filename = filename;
     this.channels = [];
     for (i = 0; 0 <= channels ? i < channels : i > channels; 0 <= channels ? i++ : i--) {
       this.addChannel();
@@ -91,7 +92,7 @@
   };
   SoundGroup.prototype.addChannel = function() {
     var newAudio;
-    newAudio = new Audio(this.url);
+    newAudio = new Audio(this.filename);
     this.channels.push(newAudio);
     return newAudio;
   };
