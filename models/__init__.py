@@ -17,7 +17,17 @@ class LevelSet(db.Model):
   updated = db.DateTimeProperty(auto_now=True)
   name = db.StringProperty(default="untitled")
   owner = db.ReferenceProperty(User)
+  def getDict(self):
+    d = {
+      'name':self.name
+      ,'owner': str(self.owner.key())
+      ,'levels': []
+    }
+    
+    for level in self.levelSet:
+      d['levels'].append(level.getDict())
 
+    return d
 def getAllLevelSets():
   return LevelSet.all().fetch(100)
 
@@ -65,6 +75,6 @@ def getDefaultGame():
     ,'x': 10
     ,'y': 10
     ,'game':'000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
-    ,'levelSetName': 'My Levels'
+    ,'levelSetName': 'Untitled World'
     ,'par':3
   }

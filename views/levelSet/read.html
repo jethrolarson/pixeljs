@@ -1,11 +1,27 @@
 {% extends "../master.html" %}
 {% block body %}
-<h1>{{levelSet.name}}
-<ul>
-{%for level in levelSet.levelSet%}
-  <li> <a href="/level/{{level.key}}">{{level.title}}</a> <a href="/level/delete/{{level.key}}">delete</a></li>
-{%endfor%}
-	<li><a href="/level/edit?levelSetName={{levelSet.name}}">New Level</a></li>
-</ul>
+<h1>{{levelSet.name}}</h1>
+<div id='levelSet'>
+	
+</div>
+	
+
 {%endblock%}
+
+{% block scripts %}
+<script>
+	levelSet = {{d|jsonify}};
+	$(function(){
+		var html = '',level, c, ctx, imageData,j,jlen,idx,on,fg,bg;
+		for(var i=0,len=levelSet.levels.length;i<len;i++){
+			level = levelSet.levels[i];
+			dataURL = window.levelToDataURL(level);
+			html += '<li><img src="'+dataURL+'" width="32" height="32"> <a href="/level/'+level.key+'">'+level.title+'</a>'+(levelSet.owned?' <a href="/level/delete/'+level.key+'">Delete</a>':'')+'</li>';
+			
+		}
+		html = '<ul>'+html+'<li><a href="/level/edit?levelSetName='+levelSet.name+'">New Level</a></li></ul>';
+		$('#levelSet').html(html);
+	});
+</script>
+{% endblock %}
 

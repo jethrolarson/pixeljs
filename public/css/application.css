@@ -830,17 +830,18 @@ body {
 }
 /* line 111, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
 #rowHints li div {
+  vertical-align: bottom;
   display: inline-block;
   width: 1.5em;
   text-align: center;
 }
 
-/* line 116, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+/* line 117, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
 #score, #par {
   white-space: nowrap;
 }
 
-/* line 119, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+/* line 120, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
 #win {
   position: absolute;
   /*width/height set in js */
@@ -850,12 +851,12 @@ body {
   font-size: 60px;
 }
 
-/* line 127, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+/* line 128, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
 #lose {
   color: red;
 }
 
-/* line 130, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+/* line 131, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
 #grid {
   float: left;
   zoom: 1;
@@ -884,11 +885,11 @@ body {
   color: #aaaaaa;
   list-style: none;
 }
-/* line 138, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+/* line 139, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
 #grid.dragging {
   cursor: -moz-grabbing;
 }
-/* line 140, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+/* line 141, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
 #grid li {
   float: left;
   text-align: center;
@@ -904,38 +905,38 @@ body {
   background-repeat: no-repeat;
   background-position: center center;
 }
-/* line 152, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+/* line 153, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
 #grid li a {
   text-decoration: none;
   display: block;
   text-align: center;
 }
-/* line 156, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+/* line 157, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
 #grid li:hover {
   outline: 2px solid #ffffaa;
   border: 1px #999999 solid;
 }
-/* line 159, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+/* line 160, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
 #grid .show {
   background: #dddddd;
 }
-/* line 161, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+/* line 162, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
 #grid .mark {
   background: url(../images/flag_red.png) no-repeat center center;
 }
-/* line 163, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+/* line 164, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
 #grid .on, #grid.paint {
   -webkit-transition: background-color 0.25s linear;
   background: #88aadd;
 }
-/* line 166, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+/* line 167, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
 #grid .error {
   background-image: url(../images/cross.png);
   opacity: 0.8;
 }
 
 @media only screen and (max-device-width: 1024px), only screen and (max-device-width: 480px) {
-  /* line 171, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+  /* line 172, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
   #grid li:hover {
     outline: 0;
     border: none;

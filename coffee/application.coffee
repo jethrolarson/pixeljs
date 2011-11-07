@@ -5,7 +5,7 @@ window.Game = {
 	dragMode: 'break'
 	isDragging: false
 	isErasing:	false
-	
+	mute: false
 	#constants
 	colWidth: 40
 
@@ -118,6 +118,7 @@ window.Game = {
 		@colWidth = Math.floor(@$gridCell.width() / @level.x)
 		gridWidth= @colWidth * @level.x
 		gridHeight= @colWidth * @level.y
+		fontSize = Math.min(@colWidth * .7, 20)
 		css += """
 			#grid li{
 				width: #{@colWidth}px;
@@ -131,7 +132,11 @@ window.Game = {
 				height: #{gridHeight}px;
 				line-height: #{gridHeight}px;
 			}
-			
+			#rowHints,
+			#colHints{
+				font-size: #{fontSize}px;
+			}
+			#rowHints li,
 			#rowHints li div{
 				height: #{@colWidth}px;
 				line-height: #{@colWidth}px;
@@ -169,7 +174,6 @@ window.Game = {
 			'mousedown touchstart': $.proxy(@eGridMousedown, this)
 		}).mouseout =>
 			@$cells.removeClass 'hilight'
-			
 		@$game.bind
 			break: $.proxy(@eBreak, this)
 			mark: $.proxy(@eMark, this)
@@ -180,12 +184,15 @@ window.Game = {
 			die: =>
 				@score += 1
 				@$game.addClass('shake')
-				@assets.boom.play()
+				@assets.boom.play() unless @mute
 				@updateScore()
 				setTimeout( =>
 					@$game.removeClass('shake')
 				, 300)
-	
+		$('#mute').bind('change',(e)=>
+			@mute = e.target.checked
+			true
+		)
 		$(document).bind 'mouseup', => 
 			@isDragging= false
 	getGolfScore: ->
@@ -222,7 +229,7 @@ window.Game = {
 			if @isGameComplete() 
 				@$game.trigger('win')
 			else
-				@assets.bing.play()
+				@assets.bing.play() unless @mute
 		else if not $el.hasClass('error')
 			$el.addClass('error')
 			@$game.trigger('die', el)
@@ -238,7 +245,7 @@ window.Game = {
 		return
 	eMark: (e,el)->
 		return unless @gameMode is 'play'
-		@assets.mark.play()
+		@assets.mark.play() unless @mute
 		$(el).toggleClass('mark', not @isErasing)
 	ePaint: (e,el)->
 		$el = $(el)
@@ -246,7 +253,7 @@ window.Game = {
 		$(el).toggleClass('paint', not @isErasing)
 	eWin: ->
 		@dragMode= null	
-		@assets.win.play()
+		@assets.win.play() unless @mute
 		@$win.text(@getGolfScore())
 		@$win.show()
 		localStorage[@title] = true
@@ -259,7 +266,7 @@ window.Game = {
 	eGridMouseover: (e)->
 		if @isDragging
 			@$game.trigger(@dragMode, e.target)
-		@assets.hoverSound.play()
+		@assets.hoverSound.play() unless @mute
 
 	eGridMousedown: (e)->
 		e.preventDefault()
@@ -272,5 +279,4 @@ window.Game = {
 			@isErasing = $el.hasClass('paint')
 		@isDragging = true
 		@$game.trigger @dragMode, e.target
-
 }# end game

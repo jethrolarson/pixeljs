@@ -6,11 +6,40 @@ unless Function.bind?
 String.prototype.replaceAt = (index, char)->
 	return this.substr(0, index) + char + this.substr(index+char.length)
 
+window.color ={
+	hexToRGB: (hex)->
+		{
+			r: parseInt(hex.substr(1,2),16)
+			g: parseInt(hex.substr(3,2),16)
+			b: parseInt(hex.substr(5,2),16)
+		}
+}
+window.levelToDataURL = (level)->
+		fg = color.hexToRGB(level.fgcolor)
+		bg = color.hexToRGB(level.bgcolor)
+		c = document.createElement 'canvas'
+		c.width=level.x
+		c.height=level.y
+		ctx = c.getContext('2d')
+		imageData = ctx.createImageData(level.x, level.y)
+		size = level.x*level.y
+		for i in [0..size]
+			one = +level.game.charAt(i)
+			idx = i * 4
+			imageData.data[idx+0] = if one then fg.r else bg.r
+			imageData.data[idx+1] = if one then fg.g else bg.g
+			imageData.data[idx+2] = if one then fg.b else bg.b
+			imageData.data[idx+3] = 0xff;
+		ctx.putImageData(imageData, 0, 0)
+		return c.toDataURL()
+	
 window.multiplyString = (str,times)->
 	s = ''
 	for i in [0...times]
 		s+=str
 	s
+	
+window.
 
 $(window).mousedown (e)->
 	target = $ e.target

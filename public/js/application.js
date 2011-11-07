@@ -5,6 +5,7 @@
     dragMode: 'break',
     isDragging: false,
     isErasing: false,
+    mute: false,
     colWidth: 40,
     init: function($game) {
       this.$game = $game;
@@ -144,12 +145,13 @@
       return this.$gridCell.append(this.$grid);
     },
     updateStyles: function() {
-      var css, gridHeight, gridWidth;
+      var css, fontSize, gridHeight, gridWidth;
       css = '';
       this.colWidth = Math.floor(this.$gridCell.width() / this.level.x);
       gridWidth = this.colWidth * this.level.x;
       gridHeight = this.colWidth * this.level.y;
-      css += "#grid li{\n	width: " + this.colWidth + "px;\n	height: " + this.colWidth + "px;\n}\n#grid{\n	width: " + gridWidth + "px;\n}\n#win,#lose{\n	width: " + gridWidth + "px;\n	height: " + gridHeight + "px;\n	line-height: " + gridHeight + "px;\n}\n\n#rowHints li div{\n	height: " + this.colWidth + "px;\n	line-height: " + this.colWidth + "px;\n}\n#colHints li div{\n	width: " + this.colWidth + "px;\n}";
+      fontSize = Math.min(this.colWidth * .7, 20);
+      css += "#grid li{\n	width: " + this.colWidth + "px;\n	height: " + this.colWidth + "px;\n}\n#grid{\n	width: " + gridWidth + "px;\n}\n#win,#lose{\n	width: " + gridWidth + "px;\n	height: " + gridHeight + "px;\n	line-height: " + gridHeight + "px;\n}\n#rowHints,\n#colHints{\n	font-size: " + fontSize + "px;\n}\n#rowHints li,\n#rowHints li div{\n	height: " + this.colWidth + "px;\n	line-height: " + this.colWidth + "px;\n}\n#colHints li div{\n	width: " + this.colWidth + "px;\n}";
       if (this.level.fgcolor) {
         css += "	#grid .paint, \n	#grid .on{\n		background-color:" + this.level.fgcolor + "\n}";
       }
@@ -185,13 +187,19 @@
         die: __bind(function() {
           this.score += 1;
           this.$game.addClass('shake');
-          this.assets.boom.play();
+          if (!this.mute) {
+            this.assets.boom.play();
+          }
           this.updateScore();
           return setTimeout(__bind(function() {
             return this.$game.removeClass('shake');
           }, this), 300);
         }, this)
       });
+      $('#mute').bind('change', __bind(function(e) {
+        this.mute = e.target.checked;
+        return true;
+      }, this));
       return $(document).bind('mouseup', __bind(function() {
         return this.isDragging = false;
       }, this));
@@ -236,7 +244,9 @@
         if (this.isGameComplete()) {
           return this.$game.trigger('win');
         } else {
-          return this.assets.bing.play();
+          if (!this.mute) {
+            return this.assets.bing.play();
+          }
         }
       } else if (!$el.hasClass('error')) {
         $el.addClass('error');
@@ -256,7 +266,9 @@
       if (this.gameMode !== 'play') {
         return;
       }
-      this.assets.mark.play();
+      if (!this.mute) {
+        this.assets.mark.play();
+      }
       return $(el).toggleClass('mark', !this.isErasing);
     },
     ePaint: function(e, el) {
@@ -267,7 +279,9 @@
     },
     eWin: function() {
       this.dragMode = null;
-      this.assets.win.play();
+      if (!this.mute) {
+        this.assets.win.play();
+      }
       this.$win.text(this.getGolfScore());
       this.$win.show();
       return localStorage[this.title] = true;
@@ -283,7 +297,9 @@
       if (this.isDragging) {
         this.$game.trigger(this.dragMode, e.target);
       }
-      return this.assets.hoverSound.play();
+      if (!this.mute) {
+        return this.assets.hoverSound.play();
+      }
     },
     eGridMousedown: function(e) {
       var $el;
