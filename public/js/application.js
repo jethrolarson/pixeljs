@@ -119,10 +119,14 @@
       return this.updateScore();
     },
     renderLevel: function() {
-      var cell, cells, html, i, _len, _ref;
+      var cell, cells, html, i, title, _len, _ref;
       this.score = 0;
-      $('#title').html("<a href=\"/levelSet/" + this.level.levelSet + "\">" + this.level.levelSetName + "</a> &gt; " + this.level.title);
-      $('#par').text("Par: " + this.level.par);
+      if (this.gameMode === 'play') {
+        title = this.level.levelSet ? "<a href=\"/levelSet/" + this.level.levelSet + "\">" + this.level.levelSetName + "</a>" : "" + this.level.levelSetName;
+        title += " &gt; " + this.level.title;
+        $('#title').html(title);
+        $('#par').text("Par: " + this.level.par);
+      }
       html = '';
       cells = this.level.x * this.level.y;
       for (cell = 0; 0 <= cells ? cell < cells : cell > cells; 0 <= cells ? cell++ : cell--) {
@@ -229,7 +233,9 @@
       }
     },
     updateScore: function() {
-      return this.$score.text("Faults: " + this.score);
+      if (this.gameMode === 'play') {
+        return this.$score.text("Faults: " + this.score);
+      }
     },
     eBreak: function(e, el) {
       var $el, coord;

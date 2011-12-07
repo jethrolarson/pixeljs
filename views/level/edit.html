@@ -12,31 +12,21 @@ var level = {{level|jsonify}};
 	</div>
 	
 	<input name="game" type="hidden" value="{{level.game}}"/>
-	<div class="field">
-		<label>Cols </label>
-		<input name="x" type="text" class="slider" min="0" max="32" step="1" value="{{level.x}}" />
-	</div>
-	<div class="field">
-		<label>Rows </label>
-		<input name="y" type="text" class="slider" min="0" max="32" step="1" value="{{level.y}}"/>
-	</div>
+	<input name="x" type="text" id="x" class="slider" min="0" max="32" step="1" value="{{level.x}}" />
+	<input name="y" id="y" type="text" class="slider" min="0" max="32" step="1" value="{{level.y}}"/>
 	<div class="field">
 		<label>Title </label>
 		<input name="title" type="text" value="{{level.title}}"/>
 	</div>
 	<div class="field">
-		<label>Foreground Color</label>
-		<input name="fgcolor" type="color" value="{{level.fgcolor}}" style="background-color: {{level.fgcolor}}" />
-	</div><!-- TODO Use http://acko.net/dev/farbtastic -->
-	<div class="field">
-		<label>Background Color</label>
-		<input name="bgcolor" type="color" value="{{level.bgcolor}}" style="background-color: {{level.bgcolor}}" />
+		<label>Colors</label><br/>
+		<input name="fgcolor" type="color" value="{{level.fgcolor}}" style="background-color: {{level.fgcolor}}" /> <input name="bgcolor" type="color" value="{{level.bgcolor}}" style="background-color: {{level.bgcolor}}" />
 	</div>
+	{% include '../partials/grid.html'%}
 	<div class="field">
 		<label>Par </label>
 		<input name="par" type="number" min="1" max="10" step="1" value="{{level.par}}"/>
 	</div>
-	{% include '../partials/grid.html'%}
 	<button type="submit">Save</button> <button type="submit" name="play" value="1">Test</button>
 </form>
 {%endblock%}

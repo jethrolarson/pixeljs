@@ -25,20 +25,25 @@ $ ->
 		else
 			Game.level.bgcolor = this.value
 		Game.renderLevel()
-	$('.slider').change(->
-		if this.name is 'x'
-			Game.updateCols @value
-		else
-			Game.updateRows @value
-	).each ->
-		that = this
-		$that = $(this)
-		$slider = $('<div class="sliderWidget"/>').insertAfter(this)
-		$slider.slider
+	$('#x').appendTo('#colHints').each ->
+		$('<div class="sliderWidget" id="xSlider"/>').insertBefore(this).slider
 			step: 1
-			value: that.value
+			value: this.value
 			min: 1
 			max: 32
-			slide: (e, ui)->
-				that.value = ui.value
-				$that.change()
+			slide: (e, ui)=>
+				this.value = ui.value
+				Game.updateCols @value
+	$('#y').appendTo('#rowHints').each ->
+		max = 32
+		$('<div class="sliderWidget" id="ySlider" style="height:400px"/>').insertBefore(this).slider
+			orientation: 'vertical'
+			step: 1
+			value: max-this.value
+			min: 1
+			max: max
+			height: 400
+			slide: (e, ui)=>
+				this.value = max - ui.value
+				Game.updateRows @value
+	

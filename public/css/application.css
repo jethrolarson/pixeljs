@@ -1,21 +1,21 @@
-/* line 18, /Users/jlarson/gae/pixeljs/sass/_base.sass */
+/* line 18, ../../sass/_base.sass */
 body {
   background: #cccccc;
   color: #aaaaaa;
 }
 
-/* line 18, /Users/jlarson/gae/pixeljs/sass/_base.sass */
+/* line 18, ../../sass/_base.sass */
 body {
   background: #cccccc;
   color: #aaaaaa;
 }
 
-/* line 37, /Users/jlarson/gae/pixeljs/sass/_util.sass */
+/* line 37, ../../sass/_util.sass */
 .win {
   color: green;
 }
 
-/* line 40, /Users/jlarson/gae/pixeljs/sass/_util.sass */
+/* line 40, ../../sass/_util.sass */
 .fail {
   color: red;
 }
@@ -32,24 +32,24 @@ body {
 /* =============================================================================
  * HTML5 display definitions
  * ========================================================================== */
-/* line 16, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 16, ../../sass/_set.sass */
 article, aside, details, figcaption, figure, footer, header, hgroup, nav, section {
   display: block;
 }
 
-/* line 19, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 19, ../../sass/_set.sass */
 audio, canvas, video {
   display: inline-block;
   *display: inline;
   *zoom: 1;
 }
 
-/* line 24, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 24, ../../sass/_set.sass */
 audio:not([controls]) {
   display: none;
 }
 
-/* line 27, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 27, ../../sass/_set.sass */
 [hidden] {
   display: none;
 }
@@ -60,7 +60,7 @@ audio:not([controls]) {
 /* 1. Correct text resizing oddly in IE6/7 when body font-size is set using em units
  * 2. Force vertical scrollbar in non-IE
  * 3. Prevent iOS text size adjust on device orientation change, without disabling user zoom: h5bp.com/g */
-/* line 39, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 39, ../../sass/_set.sass */
 html {
   font-size: 100%;
   overflow-y: scroll;
@@ -68,14 +68,14 @@ html {
   -ms-text-size-adjust: 100%;
 }
 
-/* line 45, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 45, ../../sass/_set.sass */
 body {
   margin: 0;
   font-size: 13px;
   line-height: 1.231;
 }
 
-/* line 50, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 50, ../../sass/_set.sass */
 body, button, input, select, textarea {
   font-family: sans-serif;
   color: #222222;
@@ -84,14 +84,14 @@ body, button, input, select, textarea {
 /* Remove text-shadow in selection highlight: h5bp.com/i
  * These selection declarations have to be separate
  * Also: hot pink! (or customize the background color to match your design) */
-/* line 59, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 59, ../../sass/_set.sass */
 ::-moz-selection {
   background: #fe57a1;
   color: white;
   text-shadow: none;
 }
 
-/* line 64, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 64, ../../sass/_set.sass */
 ::selection {
   background: #fe57a1;
   color: white;
@@ -101,28 +101,28 @@ body, button, input, select, textarea {
 /* =============================================================================
  * Links
  * ========================================================================== */
-/* line 73, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 73, ../../sass/_set.sass */
 a {
-  color: #216de8;
-}
-
-/* line 76, /Users/jlarson/gae/pixeljs/sass/_set.sass */
-a:visited {
-  color: #1457c2;
-}
-
-/* line 79, /Users/jlarson/gae/pixeljs/sass/_set.sass */
-a:hover {
   color: #508ced;
 }
 
-/* line 82, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 76, ../../sass/_set.sass */
+a:visited {
+  color: #2b74e9;
+}
+
+/* line 79, ../../sass/_set.sass */
+a:hover {
+  color: #75a4f0;
+}
+
+/* line 82, ../../sass/_set.sass */
 a:focus {
   outline: thin dotted;
 }
 
 /* Improve readability when focused and hovered in all browsers: h5bp.com/h */
-/* line 86, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 86, ../../sass/_set.sass */
 a:hover, a:active {
   outline: 0;
 }
@@ -130,27 +130,27 @@ a:hover, a:active {
 /* =============================================================================
  * Typography
  * ========================================================================== */
-/* line 93, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 93, ../../sass/_set.sass */
 abbr[title] {
   border-bottom: 1px dotted;
 }
 
-/* line 96, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 96, ../../sass/_set.sass */
 b, strong {
   font-weight: bold;
 }
 
-/* line 99, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 99, ../../sass/_set.sass */
 blockquote {
   margin: 1em 40px;
 }
 
-/* line 102, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 102, ../../sass/_set.sass */
 dfn {
   font-style: italic;
 }
 
-/* line 105, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 105, ../../sass/_set.sass */
 hr {
   display: block;
   height: 1px;
@@ -160,14 +160,14 @@ hr {
   padding: 0;
 }
 
-/* line 113, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 113, ../../sass/_set.sass */
 ins {
   background: #ffff99;
   color: black;
   text-decoration: none;
 }
 
-/* line 118, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 118, ../../sass/_set.sass */
 mark {
   background: yellow;
   color: black;
@@ -176,7 +176,7 @@ mark {
 }
 
 /* Redeclare monospace font family: h5bp.com/j */
-/* line 125, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 125, ../../sass/_set.sass */
 pre, code, kbd, samp {
   font-family: monospace, serif;
   _font-family: "courier new", monospace;
@@ -184,31 +184,31 @@ pre, code, kbd, samp {
 }
 
 /* Improve readability of pre-formatted text in all browsers */
-/* line 131, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 131, ../../sass/_set.sass */
 pre {
   white-space: pre;
   white-space: pre-wrap;
   word-wrap: break-word;
 }
 
-/* line 136, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 136, ../../sass/_set.sass */
 q {
   quotes: none;
 }
 
-/* line 139, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 139, ../../sass/_set.sass */
 q:before, q:after {
   content: "";
   content: none;
 }
 
-/* line 143, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 143, ../../sass/_set.sass */
 small {
   font-size: 85%;
 }
 
 /* Position subscript and superscript content without affecting line-height: h5bp.com/k */
-/* line 147, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 147, ../../sass/_set.sass */
 sub, sup {
   font-size: 75%;
   line-height: 0;
@@ -216,12 +216,12 @@ sub, sup {
   vertical-align: baseline;
 }
 
-/* line 153, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 153, ../../sass/_set.sass */
 sup {
   top: -0.5em;
 }
 
-/* line 156, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 156, ../../sass/_set.sass */
 sub {
   bottom: -0.25em;
 }
@@ -229,18 +229,18 @@ sub {
 /* =============================================================================
  * Lists
  * ========================================================================== */
-/* line 163, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 163, ../../sass/_set.sass */
 ul, ol {
   margin: 1em 0;
   padding: 0 0 0 40px;
 }
 
-/* line 167, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 167, ../../sass/_set.sass */
 dd {
   margin: 0 0 0 40px;
 }
 
-/* line 170, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 170, ../../sass/_set.sass */
 nav ul, nav ol {
   list-style: none;
   list-style-image: none;
@@ -253,7 +253,7 @@ nav ul, nav ol {
  * ========================================================================== */
 /* 1. Improve image quality when scaled in IE7: h5bp.com/d
  * 2. Remove the gap between images and borders on image containers: h5bp.com/e */
-/* line 184, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 184, ../../sass/_set.sass */
 img {
   border: 0;
   -ms-interpolation-mode: bicubic;
@@ -261,7 +261,7 @@ img {
 }
 
 /* Correct overflow not hidden in IE9 */
-/* line 192, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 192, ../../sass/_set.sass */
 svg:not(:root) {
   overflow: hidden;
 }
@@ -269,7 +269,7 @@ svg:not(:root) {
 /* =============================================================================
  * Figures
  * ========================================================================== */
-/* line 199, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 199, ../../sass/_set.sass */
 figure {
   margin: 0;
 }
@@ -277,12 +277,12 @@ figure {
 /* =============================================================================
  * Forms
  * ========================================================================== */
-/* line 206, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 206, ../../sass/_set.sass */
 form {
   margin: 0;
 }
 
-/* line 209, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 209, ../../sass/_set.sass */
 fieldset {
   border: 0;
   margin: 0;
@@ -290,14 +290,14 @@ fieldset {
 }
 
 /* Indicate that 'label' will shift focus to the associated form element */
-/* line 215, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 215, ../../sass/_set.sass */
 label {
   cursor: pointer;
 }
 
 /* 1. Correct color not inheriting in IE6/7/8/9
  * 2. Correct alignment displayed oddly in IE6/7 */
-/* line 222, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 222, ../../sass/_set.sass */
 legend {
   border: 0;
   *margin-left: -7px;
@@ -307,7 +307,7 @@ legend {
 /* 1. Correct font-size not inheriting in all browsers
  * 2. Remove margins in FF3/4 S5 Chrome
  * 3. Define consistent vertical alignment display in all browsers */
-/* line 232, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 232, ../../sass/_set.sass */
 button, input, select, textarea {
   font-size: 100%;
   margin: 0;
@@ -316,7 +316,7 @@ button, input, select, textarea {
 }
 
 /* 1. Define line-height as normal to match FF3/4 (set using !important in the UA stylesheet) */
-/* line 241, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 241, ../../sass/_set.sass */
 button, input {
   line-height: normal;
 }
@@ -324,7 +324,7 @@ button, input {
 /* 1. Display hand cursor for clickable form elements
  * 2. Allow styling of clickable form elements in iOS
  * 3. Correct inner spacing displayed oddly in IE7 (doesn't effect IE6) */
-/* line 249, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 249, ../../sass/_set.sass */
 button, input[type="button"], input[type="reset"], input[type="submit"] {
   cursor: pointer;
   -webkit-appearance: button;
@@ -332,13 +332,13 @@ button, input[type="button"], input[type="reset"], input[type="submit"] {
 }
 
 /* Consistent box sizing and appearance */
-/* line 257, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 257, ../../sass/_set.sass */
 input[type="checkbox"], input[type="radio"] {
   box-sizing: border-box;
   padding: 0;
 }
 
-/* line 261, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 261, ../../sass/_set.sass */
 input[type="search"] {
   -webkit-appearance: textfield;
   -moz-box-sizing: content-box;
@@ -346,18 +346,18 @@ input[type="search"] {
   box-sizing: content-box;
 }
 
-/* line 267, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 267, ../../sass/_set.sass */
 input[type="search"]::-webkit-search-decoration {
   -webkit-appearance: none;
 }
 
-/* line 270, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 270, ../../sass/_set.sass */
 input[type=color] {
-  width: 8em;
+  width: 4.4em;
 }
 
 /* Remove inner padding and border in FF3/4: h5bp.com/l */
-/* line 276, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 276, ../../sass/_set.sass */
 button::-moz-focus-inner, input::-moz-focus-inner {
   border: 0;
   padding: 0;
@@ -365,7 +365,7 @@ button::-moz-focus-inner, input::-moz-focus-inner {
 
 /* 1. Remove default vertical scrollbar in IE6/7/8/9
  * 2. Allow only vertical resizing */
-/* line 284, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 284, ../../sass/_set.sass */
 textarea {
   overflow: auto;
   vertical-align: top;
@@ -373,7 +373,7 @@ textarea {
 }
 
 /* Colors for form validity */
-/* line 292, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 292, ../../sass/_set.sass */
 input:invalid, textarea:invalid {
   background-color: #f0dddd;
 }
@@ -381,13 +381,13 @@ input:invalid, textarea:invalid {
 /* =============================================================================
  * Tables
  * ========================================================================== */
-/* line 299, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 299, ../../sass/_set.sass */
 table {
   border-collapse: collapse;
   border-spacing: 0;
 }
 
-/* line 303, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 303, ../../sass/_set.sass */
 td {
   vertical-align: top;
 }
@@ -410,7 +410,7 @@ td {
  * Please define your styles before this section.
  * ========================================================================== */
 /* For image replacement */
-/* line 327, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 327, ../../sass/_set.sass */
 .ir {
   display: block;
   border: 0;
@@ -423,20 +423,20 @@ td {
   *line-height: 0;
 }
 
-/* line 338, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 338, ../../sass/_set.sass */
 .ir br {
   display: none;
 }
 
 /* Hide from both screenreaders and browsers: h5bp.com/u */
-/* line 342, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 342, ../../sass/_set.sass */
 .hidden {
   display: none !important;
   visibility: hidden;
 }
 
 /* Hide only visually, but have it available for screenreaders: h5bp.com/v */
-/* line 347, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 347, ../../sass/_set.sass */
 .visuallyhidden {
   border: 0;
   clip: rect(0 0 0 0);
@@ -449,7 +449,7 @@ td {
 }
 
 /* Extends the .visuallyhidden class to allow the element to be focusable when navigated to via the keyboard: h5bp.com/p */
-/* line 358, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 358, ../../sass/_set.sass */
 .visuallyhidden.focusable:active, .visuallyhidden.focusable:focus {
   clip: auto;
   height: auto;
@@ -460,24 +460,24 @@ td {
 }
 
 /* Hide visually and from screenreaders, but maintain layout */
-/* line 367, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 367, ../../sass/_set.sass */
 .invisible {
   visibility: hidden;
 }
 
 /* Contain floats: h5bp.com/q */
-/* line 371, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 371, ../../sass/_set.sass */
 .clearfix:before, .clearfix:after {
   content: "";
   display: table;
 }
 
-/* line 375, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 375, ../../sass/_set.sass */
 .clearfix:after {
   clear: both;
 }
 
-/* line 378, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+/* line 378, ../../sass/_set.sass */
 .clearfix {
   *zoom: 1;
 }
@@ -487,7 +487,7 @@ td {
  * Inlined to avoid required HTTP connection: h5bp.com/r
  * ========================================================================== */
 @media print {
-  /* line 387, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+  /* line 387, ../../sass/_set.sass */
   * {
     background: transparent !important;
     color: black !important;
@@ -498,45 +498,45 @@ td {
   }
 
   /* Black prints faster: h5bp.com/s */
-  /* line 395, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+  /* line 395, ../../sass/_set.sass */
   a, a:visited {
     text-decoration: underline;
   }
 
-  /* line 397, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+  /* line 397, ../../sass/_set.sass */
   a[href]:after {
     content: " (" attr(href) ")";
   }
 
-  /* line 399, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+  /* line 399, ../../sass/_set.sass */
   abbr[title]:after {
     content: " (" attr(title) ")";
   }
 
-  /* line 401, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+  /* line 401, ../../sass/_set.sass */
   .ir a:after, a[href^="javascript:"]:after, a[href^="#"]:after {
     content: "";
   }
 
   /* Don't show links for images, or javascript/internal links */
-  /* line 404, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+  /* line 404, ../../sass/_set.sass */
   pre, blockquote {
     border: 1px solid #999999;
     page-break-inside: avoid;
   }
 
-  /* line 407, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+  /* line 407, ../../sass/_set.sass */
   thead {
     display: table-header-group;
   }
 
   /* h5bp.com/t */
-  /* line 410, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+  /* line 410, ../../sass/_set.sass */
   tr, img {
     page-break-inside: avoid;
   }
 
-  /* line 412, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+  /* line 412, ../../sass/_set.sass */
   img {
     max-width: 100% !important;
   }
@@ -545,207 +545,207 @@ td {
     margin: 0.5cm;
 }
 
-  /* line 417, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+  /* line 417, ../../sass/_set.sass */
   p, h2, h3 {
     orphans: 3;
     widows: 3;
   }
 
-  /* line 420, /Users/jlarson/gae/pixeljs/sass/_set.sass */
+  /* line 420, ../../sass/_set.sass */
   h2, h3 {
     page-break-after: avoid;
   }
 }
-/* line 18, /Users/jlarson/gae/pixeljs/sass/_base.sass */
+/* line 18, ../../sass/_base.sass */
 body {
   background: #cccccc;
   color: #aaaaaa;
 }
 
-/* line 3, /Users/jlarson/gae/pixeljs/sass/_typo.sass */
+/* line 3, ../../sass/_typo.sass */
 body {
   font-size: 16px;
   font-family: Arial, Helvetica, sans-serif;
   line-height: 1.4;
 }
 
-/* line 9, /Users/jlarson/gae/pixeljs/sass/_typo.sass */
+/* line 9, ../../sass/_typo.sass */
 h1 {
   font-size: 16px;
 }
 
-/* line 12, /Users/jlarson/gae/pixeljs/sass/_typo.sass */
+/* line 12, ../../sass/_typo.sass */
 h2 {
   font-size: 14px;
 }
 
-/* line 15, /Users/jlarson/gae/pixeljs/sass/_typo.sass */
+/* line 15, ../../sass/_typo.sass */
 h3 {
   font-size: 12px;
 }
 
-/* line 18, /Users/jlarson/gae/pixeljs/sass/_typo.sass */
+/* line 18, ../../sass/_typo.sass */
 h4 {
   font-size: 10px;
 }
 
-/* line 21, /Users/jlarson/gae/pixeljs/sass/_typo.sass */
+/* line 21, ../../sass/_typo.sass */
 small {
   font-size: 10px;
 }
 
-/* line 24, /Users/jlarson/gae/pixeljs/sass/_typo.sass */
+/* line 24, ../../sass/_typo.sass */
 h1, h2, h3, h4, h5 {
   margin: 0 0 break;
 }
 
-/* line 27, /Users/jlarson/gae/pixeljs/sass/_typo.sass */
+/* line 27, ../../sass/_typo.sass */
 p, ol, ul {
   margin: 6px 0 12px;
 }
 
-/* line 30, /Users/jlarson/gae/pixeljs/sass/_typo.sass */
+/* line 30, ../../sass/_typo.sass */
 ul > li {
   margin-left: 10px;
 }
 
-/* line 18, /Users/jlarson/gae/pixeljs/sass/_base.sass */
+/* line 18, ../../sass/_base.sass */
 body {
   background: #cccccc;
   color: #aaaaaa;
 }
 
-/* line 18, /Users/jlarson/gae/pixeljs/sass/_base.sass */
+/* line 18, ../../sass/_base.sass */
 body {
   background: #cccccc;
   color: #aaaaaa;
 }
 
-/* line 37, /Users/jlarson/gae/pixeljs/sass/_util.sass */
+/* line 37, ../../sass/_util.sass */
 .win {
   color: green;
 }
 
-/* line 40, /Users/jlarson/gae/pixeljs/sass/_util.sass */
+/* line 40, ../../sass/_util.sass */
 .fail {
   color: red;
 }
 
 @-webkit-keyframes shake {
-  /* line 7, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+  /* line 7, ../../sass/game_grid.sass */
   0% {
     -webkit-transform: translate(2px, 1px);
   }
 
-  /* line 10, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+  /* line 10, ../../sass/game_grid.sass */
   10% {
     -webkit-transform: translate(-1px, -2px);
   }
 
-  /* line 13, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+  /* line 13, ../../sass/game_grid.sass */
   20% {
     -webkit-transform: translate(-3px, 0px);
   }
 
-  /* line 16, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+  /* line 16, ../../sass/game_grid.sass */
   30% {
     -webkit-transform: translate(0px, 2px);
   }
 
-  /* line 19, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+  /* line 19, ../../sass/game_grid.sass */
   40% {
     -webkit-transform: translate(1px, -1px);
   }
 
-  /* line 22, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+  /* line 22, ../../sass/game_grid.sass */
   50% {
     -webkit-transform: translate(-1px, 2px);
   }
 
-  /* line 25, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+  /* line 25, ../../sass/game_grid.sass */
   60% {
     -webkit-transform: translate(-3px, 1px);
   }
 
-  /* line 28, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+  /* line 28, ../../sass/game_grid.sass */
   70% {
     -webkit-transform: translate(2px, 1px);
   }
 
-  /* line 31, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+  /* line 31, ../../sass/game_grid.sass */
   80% {
     -webkit-transform: translate(-1px, -1px);
   }
 
-  /* line 34, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+  /* line 34, ../../sass/game_grid.sass */
   90% {
     -webkit-transform: translate(2px, 2px);
   }
 
-  /* line 37, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+  /* line 37, ../../sass/game_grid.sass */
   100% {
     -webkit-transform: translate(1px, -2px);
   }
 }
 
 @-moz-keyframes shake {
-  /* line 41, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+  /* line 41, ../../sass/game_grid.sass */
   0% {
     -moz-transform: translate(2px, 1px);
   }
 
-  /* line 44, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+  /* line 44, ../../sass/game_grid.sass */
   10% {
     -moz-transform: translate(-1px, -2px);
   }
 
-  /* line 47, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+  /* line 47, ../../sass/game_grid.sass */
   20% {
     -moz-transform: translate(-3px, 0px);
   }
 
-  /* line 50, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+  /* line 50, ../../sass/game_grid.sass */
   30% {
     -moz-transform: translate(0px, 2px);
   }
 
-  /* line 53, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+  /* line 53, ../../sass/game_grid.sass */
   40% {
     -moz-transform: translate(1px, -1px);
   }
 
-  /* line 56, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+  /* line 56, ../../sass/game_grid.sass */
   50% {
     -moz-transform: translate(-1px, 2px);
   }
 
-  /* line 59, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+  /* line 59, ../../sass/game_grid.sass */
   60% {
     -moz-transform: translate(-3px, 1px);
   }
 
-  /* line 62, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+  /* line 62, ../../sass/game_grid.sass */
   70% {
     -moz-transform: translate(2px, 1px);
   }
 
-  /* line 65, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+  /* line 65, ../../sass/game_grid.sass */
   80% {
     -moz-transform: translate(-1px, -1px);
   }
 
-  /* line 68, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+  /* line 68, ../../sass/game_grid.sass */
   90% {
     -moz-transform: translate(2px, 2px);
   }
 
-  /* line 71, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+  /* line 71, ../../sass/game_grid.sass */
   100% {
     -moz-transform: translate(1px, -2px);
   }
 }
 
-/* line 74, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+/* line 74, ../../sass/game_grid.sass */
 .shake {
   -webkit-animation-name: shake;
   -webkit-animation-duration: 0.3s;
@@ -759,29 +759,29 @@ body {
   -moz-animation-timing-function: linear;
 }
 
-/* line 86, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+/* line 86, ../../sass/game_grid.sass */
 #game {
   -webkit-user-select: none;
   -moz-user-select: none;
   cursor: default;
 }
-/* line 88, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+/* line 88, ../../sass/game_grid.sass */
 #game table {
   width: 100%;
 }
-/* line 90, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+/* line 90, ../../sass/game_grid.sass */
 #game #gridCell {
   width: 100%;
 }
 
-/* line 93, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+/* line 93, ../../sass/game_grid.sass */
 #colHints {
   margin: 0;
   padding: 0;
   border: 0;
   color: #aaaaaa;
 }
-/* line 33, /Users/jlarson/gae/pixeljs/sass/_util.sass */
+/* line 33, ../../sass/_util.sass */
 #colHints li {
   margin: 0;
   padding: 0;
@@ -789,28 +789,28 @@ body {
   color: #aaaaaa;
   list-style: none;
 }
-/* line 95, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+/* line 95, ../../sass/game_grid.sass */
 #colHints li {
   display: inline-block;
 }
-/* line 97, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+/* line 97, ../../sass/game_grid.sass */
 #colHints li.done div {
   text-decoration: line-through;
   color: #999999;
 }
-/* line 100, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+/* line 100, ../../sass/game_grid.sass */
 #colHints li div {
   text-align: center;
 }
 
-/* line 103, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+/* line 103, ../../sass/game_grid.sass */
 #rowHints {
   margin: 0;
   padding: 0;
   border: 0;
   color: #aaaaaa;
 }
-/* line 33, /Users/jlarson/gae/pixeljs/sass/_util.sass */
+/* line 33, ../../sass/_util.sass */
 #rowHints li {
   margin: 0;
   padding: 0;
@@ -818,17 +818,17 @@ body {
   color: #aaaaaa;
   list-style: none;
 }
-/* line 105, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+/* line 105, ../../sass/game_grid.sass */
 #rowHints li {
   white-space: nowrap;
   text-align: right;
 }
-/* line 108, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+/* line 108, ../../sass/game_grid.sass */
 #rowHints li.done div {
   text-decoration: line-through;
   color: #999999;
 }
-/* line 111, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+/* line 111, ../../sass/game_grid.sass */
 #rowHints li div {
   vertical-align: bottom;
   display: inline-block;
@@ -836,12 +836,12 @@ body {
   text-align: center;
 }
 
-/* line 117, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+/* line 117, ../../sass/game_grid.sass */
 #score, #par {
   white-space: nowrap;
 }
 
-/* line 120, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+/* line 120, ../../sass/game_grid.sass */
 #win {
   position: absolute;
   /*width/height set in js */
@@ -851,12 +851,12 @@ body {
   font-size: 60px;
 }
 
-/* line 128, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+/* line 128, ../../sass/game_grid.sass */
 #lose {
   color: red;
 }
 
-/* line 131, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+/* line 131, ../../sass/game_grid.sass */
 #grid {
   float: left;
   zoom: 1;
@@ -869,7 +869,7 @@ body {
   border: 1px solid;
   border-color: white #888888 #888888 white;
 }
-/* line 5, /Users/jlarson/gae/pixeljs/sass/_util.sass */
+/* line 5, ../../sass/_util.sass */
 #grid:after {
   content: ".";
   clear: both;
@@ -877,7 +877,7 @@ body {
   visibility: hidden;
   height: 0;
 }
-/* line 33, /Users/jlarson/gae/pixeljs/sass/_util.sass */
+/* line 33, ../../sass/_util.sass */
 #grid li {
   margin: 0;
   padding: 0;
@@ -885,11 +885,11 @@ body {
   color: #aaaaaa;
   list-style: none;
 }
-/* line 139, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+/* line 139, ../../sass/game_grid.sass */
 #grid.dragging {
   cursor: -moz-grabbing;
 }
-/* line 141, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+/* line 141, ../../sass/game_grid.sass */
 #grid li {
   float: left;
   text-align: center;
@@ -905,38 +905,38 @@ body {
   background-repeat: no-repeat;
   background-position: center center;
 }
-/* line 153, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+/* line 153, ../../sass/game_grid.sass */
 #grid li a {
   text-decoration: none;
   display: block;
   text-align: center;
 }
-/* line 157, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+/* line 157, ../../sass/game_grid.sass */
 #grid li:hover {
   outline: 2px solid #ffffaa;
   border: 1px #999999 solid;
 }
-/* line 160, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+/* line 160, ../../sass/game_grid.sass */
 #grid .show {
   background: #dddddd;
 }
-/* line 162, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+/* line 162, ../../sass/game_grid.sass */
 #grid .mark {
   background: url(../images/flag_red.png) no-repeat center center;
 }
-/* line 164, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+/* line 164, ../../sass/game_grid.sass */
 #grid .on, #grid.paint {
   -webkit-transition: background-color 0.25s linear;
   background: #88aadd;
 }
-/* line 167, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+/* line 167, ../../sass/game_grid.sass */
 #grid .error {
   background-image: url(../images/cross.png);
   opacity: 0.8;
 }
 
 @media only screen and (max-device-width: 1024px), only screen and (max-device-width: 480px) {
-  /* line 172, /Users/jlarson/gae/pixeljs/sass/game_grid.sass */
+  /* line 172, ../../sass/game_grid.sass */
   #grid li:hover {
     outline: 0;
     border: none;
@@ -960,22 +960,22 @@ body {
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
  */
-/* line 20, /Users/jlarson/gae/pixeljs/sass/_farbtastic.scss */
+/* line 20, ../../sass/_farbtastic.scss */
 .farbtastic {
   background-color: #000;
   position: relative;
 }
-/* line 23, /Users/jlarson/gae/pixeljs/sass/_farbtastic.scss */
+/* line 23, ../../sass/_farbtastic.scss */
 .farbtastic * {
   position: absolute;
   cursor: crosshair;
 }
-/* line 27, /Users/jlarson/gae/pixeljs/sass/_farbtastic.scss */
+/* line 27, ../../sass/_farbtastic.scss */
 .farbtastic, .farbtastic .wheel {
   width: 195px;
   height: 195px;
 }
-/* line 32, /Users/jlarson/gae/pixeljs/sass/_farbtastic.scss */
+/* line 32, ../../sass/_farbtastic.scss */
 .farbtastic .color,
 .farbtastic .overlay {
   top: 47px;
@@ -983,15 +983,15 @@ body {
   width: 101px;
   height: 101px;
 }
-/* line 38, /Users/jlarson/gae/pixeljs/sass/_farbtastic.scss */
+/* line 38, ../../sass/_farbtastic.scss */
 .farbtastic .wheel {
   background: url(../farbtastic/wheel.png) no-repeat;
 }
-/* line 41, /Users/jlarson/gae/pixeljs/sass/_farbtastic.scss */
+/* line 41, ../../sass/_farbtastic.scss */
 .farbtastic .overlay {
   background: url(../farbtastic/mask.png) no-repeat;
 }
-/* line 44, /Users/jlarson/gae/pixeljs/sass/_farbtastic.scss */
+/* line 44, ../../sass/_farbtastic.scss */
 .farbtastic .marker {
   width: 17px;
   height: 17px;
@@ -1000,30 +1000,56 @@ body {
   background: url(../farbtastic/marker.png) no-repeat;
 }
 
-/* line 7, ../../sass/application.sass */
+/* line 8, ../../sass/application.sass */
 body {
   color: #dddddd;
   background-color: #333333;
 }
 
-/* line 10, ../../sass/application.sass */
+/* line 11, ../../sass/application.sass */
 #page {
-  width: 800px;
-  margin: 0 auto;
+  margin: 38px auto;
   padding: 1em;
 }
 
 /* line 15, ../../sass/application.sass */
+#nav {
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  line-height: 32px;
+  border-bottom: 1px solid #666666;
+  background-color: rgba(51, 51, 51, 0.9);
+  z-index: 100;
+}
+/* line 24, ../../sass/application.sass */
+#nav a {
+  text-decoration: none;
+  padding: 0 0 0 10px;
+  float: left;
+}
+/* line 28, ../../sass/application.sass */
+#nav .pull-right {
+  float: right;
+}
+/* line 30, ../../sass/application.sass */
+#nav .pull-right a {
+  padding: 0 10px 0 0;
+}
+
+/* line 33, ../../sass/application.sass */
 #picker {
   position: absolute;
 }
 
-/* line 18, ../../sass/application.sass */
+/* line 36, ../../sass/application.sass */
 .slider {
-  width: 2em;
+  width: 1.3em;
+  text-align: center;
 }
 
-/* line 20, ../../sass/application.sass */
+/* line 39, ../../sass/application.sass */
 .sliderWidget {
   margin: 4px 10px;
   vertical-align: bottom;

@@ -1,4 +1,5 @@
 (function() {
+  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
   $(function() {
     var $picker, FARBTASTIC_WIDTH, fb;
     Game.init($('#game'));
@@ -28,26 +29,32 @@
       }
       return Game.renderLevel();
     });
-    return $('.slider').change(function() {
-      if (this.name === 'x') {
-        return Game.updateCols(this.value);
-      } else {
-        return Game.updateRows(this.value);
-      }
-    }).each(function() {
-      var $slider, $that, that;
-      that = this;
-      $that = $(this);
-      $slider = $('<div class="sliderWidget"/>').insertAfter(this);
-      return $slider.slider({
+    $('#x').appendTo('#colHints').each(function() {
+      return $('<div class="sliderWidget" id="xSlider"/>').insertBefore(this).slider({
         step: 1,
-        value: that.value,
+        value: this.value,
         min: 1,
         max: 32,
-        slide: function(e, ui) {
-          that.value = ui.value;
-          return $that.change();
-        }
+        slide: __bind(function(e, ui) {
+          this.value = ui.value;
+          return Game.updateCols(this.value);
+        }, this)
+      });
+    });
+    return $('#y').appendTo('#rowHints').each(function() {
+      var max;
+      max = 32;
+      return $('<div class="sliderWidget" id="ySlider" style="height:400px"/>').insertBefore(this).slider({
+        orientation: 'vertical',
+        step: 1,
+        value: max - this.value,
+        min: 1,
+        max: max,
+        height: 400,
+        slide: __bind(function(e, ui) {
+          this.value = max - ui.value;
+          return Game.updateRows(this.value);
+        }, this)
       });
     });
   });

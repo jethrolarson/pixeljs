@@ -4,19 +4,38 @@
 @import _typo
 @import game_grid
 @import _farbtastic
+$bgc: #333
 body
 	color: #ddd
-	background-color: #333
+	background-color: $bgc
 #page
-	width: 800px
-	margin: 0 auto
+	//width: 800px
+	margin: 38px auto
 	padding: 1em
+#nav
+	width: 100%
+	position: fixed
+	top: 0
+	left: 0
+	line-height: 32px
+	border-bottom: 1px solid hsl(0,0,40%)
+	background-color: transparentize($bgc,.1)
+	z-index: 100
+	a
+		text-decoration: none
+		padding: 0 0 0 10px
+		float: left
+	.pull-right
+		float: right
+		a
+			padding: 0 10px 0 0
 
 #picker
 	position: absolute
 	
 .slider
-	width: 2em
+	width: 1.3em
+	text-align: center
 .sliderWidget
 	margin: 4px 10px
 	vertical-align: bottom

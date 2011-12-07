@@ -92,8 +92,12 @@ window.Game = {
 		@updateScore()
 	renderLevel: ->
 		@score = 0;
-		$('#title').html("""<a href="/levelSet/#{@level.levelSet}">#{@level.levelSetName}</a> &gt; #{@level.title}""")
-		$('#par').text("Par: "+@level.par)
+		if @gameMode is 'play'
+			title = if @level.levelSet then """<a href="/levelSet/#{@level.levelSet}">#{@level.levelSetName}</a>""" else "#{@level.levelSetName}"
+			title += " &gt; #{@level.title}"
+			$('#title').html(title)
+		
+			$('#par').text("Par: "+@level.par)
 
 		# Build grid
 		html= ''
@@ -217,7 +221,8 @@ window.Game = {
 		else if par > 3
 			label = @score+" over par"
 	updateScore: ->
-		@$score.text "Faults: " + @score
+		if @gameMode is 'play'
+			@$score.text "Faults: " + @score
 	eBreak: (e, el)->
 		$el= $(el)
 		return if @gameMode is 'edit' or $el.hasClass 'mark'
