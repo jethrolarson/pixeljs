@@ -1,6 +1,6 @@
 # coffee -o public/js/ -w -c coffee/
 
-window.Game = {
+window.Game =
 	gameMode: 'play'
 	dragMode: 'break'
 	isDragging: false
@@ -8,18 +8,18 @@ window.Game = {
 	mute: false
 	#constants
 	colWidth: 40
-
+	MAX_CELL_WIDTH: 60
 	init: ($game)->
 		@$game= $game
 		@$gridCell= @$game.find '#gridCell'
-		@$grid=     @$game.find '#grid'
 		@$win=      @$game.find '#win'
 		@$lose=     @$game.find '#lose'
-		@$score=     @$game.find '#score'
+		@$score=    @$game.find '#score'
 		@$games=    @$game.find '#games'
 		@$colHints= @$game.find '#colHints'
 		@$rowHints= @$game.find '#rowHints'
-		@$grid.remove()
+		@$layers=   @$game.find '#layers'
+		@$colorSheet = $(document.createElement 'style').prependTo(@$game)
 		@$game.trigger 'init'
 		@loadAssets()
 		@bindEvents()
@@ -29,18 +29,18 @@ window.Game = {
 		@loadGame window.level
 	edit: ->
 		@gameMode = 'edit'
-		@$grid.enableContext()
+		@$gridCell.enableContext()
 		@assets.paint = new SoundGroup 'paint.wav'
 		@start()
 	getCol: (x)-> 
-		@$grid.find("li:nth-child(#{@level.x}n+#{x+2})") #isn't nth-child confusing?
+		@getGrid().find("li:nth-child(#{@level.x}n+#{x+2})") #isn't nth-child confusing?
 	getRow: (y)-> 
-		@$grid.find('li').slice(y * @level.x, (y + 1) * @level.x)
+		@getGrid().find('li').slice(y * @level.x, (y + 1) * @level.x)
 
 	getCoord: (el)->
 		index = $(el).parent().children('li').index(el)
 		return {
-			x: (index) % @level.x
+			x: index % @level.x
 			y: Math.floor(index / @level.x)
 		}
 
@@ -52,7 +52,7 @@ window.Game = {
 
 	isLineComplete: ($line)->
 		for cell in $line
-			coord = @getCoord(cell)
+			coord = @getCoord cell
 			if @level.getAt(coord.x,coord.y) and not $(cell).hasClass('on')
 				return false
 		return true
@@ -85,50 +85,63 @@ window.Game = {
 				html += '<div>'+hint+'</div>'
 			html += '</li>'
 		@$rowHints.html(html)
-		
+	renderLayerUI: ->
+		layerUI = ''
+		for layer,i in @level.layers
+			layerUI += """<div>
+				<a href="#layer#{i}" class="changeLayer layer#{i} #{if i is @level.currentLayer then 'on' else ''}">&nbsp;</a>
+				<input type="color" name="fgcolor#{i}" value="#{@level.getLayerColor(i)}" style="background-color:#{@level.getLayerColor(i)}"/> 
+				</div>
+			"""
+		if @gameMode isnt 'play'
+			layerUI += '<button id="addLayer" type="button">+</button>'
+		@$layers.html layerUI
 	loadGame: (level)->
 		@level = Level level
-		@renderLevel()
-		@updateScore()
-	renderLevel: ->
-		@score = 0;
-		if @gameMode is 'play'
-			title = if @level.levelSet then """<a href="/levelSet/#{@level.levelSet}">#{@level.levelSetName}</a>""" else "#{@level.levelSetName}"
-			title += " &gt; #{@level.title}"
-			$('#title').html(title)
 		
-			$('#par').text("Par: "+@level.par)
-
+		@renderLevel()
+		@renderLayerUI()
+		@updateScore()
+	getGrid: (layerIndex = @level.currentLayer)->
+		$('#layer_'+layerIndex)
+	renderLevel: ->
+		
 		# Build grid
 		html= ''
 		cells = @level.x * @level.y
-		for cell in [0...cells] 
-			html += '<li> </li>' 
+		for layer,i in @level.layers
+			layerhtml = ''
+			for cell in [0...cells]
+				if @gameMode isnt 'play' and +layer[cell]
+					paint = ' class="paint"'
+				else
+					paint = ''
+				layerhtml += "<li#{paint}> </li>"
+			isOn = if i is @level.currentLayer then 'on' else ''
+			html += "<ul id='layer_#{i}' class='#{isOn}'>#{layerhtml}</ul>"
+		@$gridCell.html html
 		
-		@$grid.html(html)
-		@$cells= @$grid.find('li')
 		if @gameMode is 'play'
+			@score = 0;
+			$('#title').html @level.title
+			$('#par').text("Par: "+@level.par)
 			@renderHints()
-		else
-			for cell,i in @$cells
-				$(cell).toggleClass('paint',+@level.game[i] is 1)
-		
-		@$colorSheet = $(document.createElement 'style').prependTo(@$grid)
+
 		@updateStyles()
 		@updateHints()
-		@$gridCell.append(@$grid)
+		@$gridCell.append(@getGrid())
 	updateStyles: ->
 		css = ''
-		@colWidth = Math.floor(@$gridCell.width() / @level.x)
+		@colWidth = Math.min(Math.floor(@$gridCell.width() / @level.x), this.MAX_CELL_WIDTH)
 		gridWidth= @colWidth * @level.x
 		gridHeight= @colWidth * @level.y
 		fontSize = Math.min(@colWidth * .7, 20)
 		css += """
-			#grid li{
+			#gridCell ul li{
 				width: #{@colWidth}px;
 				height: #{@colWidth}px;
 			}
-			#grid{
+			#gridCell ul{
 				width: #{gridWidth}px;
 			}
 			#win,#lose{
@@ -149,15 +162,16 @@ window.Game = {
 				width: #{@colWidth}px;
 			}
 		"""
-		if @level.fgcolor
+		for layer,i in @level.layers
 			css += """
-				#grid .paint, 
-				#grid .on{
-					background-color:#{@level.fgcolor}
+				#gridCell ul#layer_#{i} .paint, 
+				#gridCell ul#layer_#{i} .on,
+				#game .changeLayer.layer#{i}{
+					background-color:#{@level.getLayerColor(i)}
 			}"""
 		if @level.bgcolor
-			css += "#grid{background-color:#{@level.bgcolor}}"
-		@$colorSheet.html(css)
+			css += "#gridCell ul:first-child{background-color: #{@level.bgcolor}}"
+		@$colorSheet.html('').html(css)
 			
 	loadAssets: ->
 		@assets = {
@@ -167,22 +181,31 @@ window.Game = {
 			mark: new SoundGroup 'mark.wav'
 			win: new Audio 'win.wav'
 		}
+	addLayer: ->
+		@level.addLayer()
+		@renderLayerUI()
+		@renderLevel()
+	changeLayer: (layer)->
+		@level.currentLayer = layer
+		#hide layers ontop of the selected one
+		@$gridCell.find('ul').removeClass('on')
+		@getGrid().addClass('on')
 		
+
 	# ======== #	
 	#	 Events	 #
 	# ======== #
 	bindEvents: ->
-		@$grid.disableContext().delegate('li', {
+		@$gridCell.disableContext().delegate('li', {
 			'mouseover': $.proxy(@eGridMouseover, this)
 			'touchmove': $.proxy(@eGridTouchmove, this)
 			'mousedown touchstart': $.proxy(@eGridMousedown, this)
-		}).mouseout =>
-			@$cells.removeClass 'hilight'
+		})
 		@$game.bind
 			break: $.proxy(@eBreak, this)
-			mark: $.proxy(@eMark, this)
-			lose: $.proxy(@eLose, this)
-			win: $.proxy(@eWin, this)
+			mark:  $.proxy(@eMark, this)
+			lose:  $.proxy(@eLose, this)
+			win:   $.proxy(@eWin, this)
 			paint: $.proxy(@ePaint, this)
 			erase: $.proxy(@eErase, this)
 			die: =>
@@ -193,12 +216,20 @@ window.Game = {
 				setTimeout( =>
 					@$game.removeClass('shake')
 				, 300)
-		$('#mute').bind('change',(e)=>
+		$('#mute').bind 'change',(e)=>
 			@mute = e.target.checked
 			true
-		)
-		$(document).bind 'mouseup', => 
-			@isDragging= false
+	
+		$(document).bind 
+			mouseup: => 
+				@isDragging= false
+			#deal with layer switching
+		$(window).bind
+			hashchange: =>
+				layerRE = /^#layer(\d)+/.exec location.hash
+				if layerRE.length
+					@changeLayer +layerRE[1]
+
 	getGolfScore: ->
 		par =  @score - @level.par
 		label = ''
@@ -220,6 +251,7 @@ window.Game = {
 			label = "Tripple Bogey"
 		else if par > 3
 			label = @score+" over par"
+	
 	updateScore: ->
 		if @gameMode is 'play'
 			@$score.text "Faults: " + @score
@@ -254,7 +286,7 @@ window.Game = {
 		$(el).toggleClass('mark', not @isErasing)
 	ePaint: (e,el)->
 		$el = $(el)
-		@level.updateCell(@$grid.find('li').index(el), if @isErasing then '0' else '1')
+		@level.updateCell(@getGrid().find('li').index(el), if @isErasing then '0' else '1')
 		$(el).toggleClass('paint', not @isErasing)
 	eWin: ->
 		@dragMode= null	
@@ -284,4 +316,3 @@ window.Game = {
 			@isErasing = $el.hasClass('paint')
 		@isDragging = true
 		@$game.trigger @dragMode, e.target
-}# end game

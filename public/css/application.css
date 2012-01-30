@@ -1,12 +1,44 @@
 /* line 18, ../../sass/_base.sass */
+html, body {
+  height: 100%;
+}
+
+/* line 20, ../../sass/_base.sass */
+html {
+  background-attachment: fixed;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(2%, #000000), color-stop(4%, #333333), color-stop(40%, #333333), color-stop(100%, #1a1a1a));
+  background-image: -webkit-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
+  background-image: -moz-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
+  background-image: -o-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
+  background-image: -ms-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
+  background-image: linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
+  background-repeat: no-repeat;
+}
+
+/* line 24, ../../sass/_base.sass */
 body {
-  background: #cccccc;
   color: #aaaaaa;
 }
 
 /* line 18, ../../sass/_base.sass */
+html, body {
+  height: 100%;
+}
+
+/* line 20, ../../sass/_base.sass */
+html {
+  background-attachment: fixed;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(2%, #000000), color-stop(4%, #333333), color-stop(40%, #333333), color-stop(100%, #1a1a1a));
+  background-image: -webkit-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
+  background-image: -moz-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
+  background-image: -o-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
+  background-image: -ms-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
+  background-image: linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
+  background-repeat: no-repeat;
+}
+
+/* line 24, ../../sass/_base.sass */
 body {
-  background: #cccccc;
   color: #aaaaaa;
 }
 
@@ -81,17 +113,38 @@ body, button, input, select, textarea {
   color: #222222;
 }
 
+/* line 54, ../../sass/_set.sass */
+input[type=text],
+input[type=color],
+input[type=number] {
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  border-width: 1px;
+  border-color: #777777 #666666 #444444;
+  -moz-box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(179, 179, 179, 0.4);
+  -webkit-box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(179, 179, 179, 0.4);
+  -o-box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(179, 179, 179, 0.4);
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(179, 179, 179, 0.4);
+  padding: 3px 6px;
+}
+
+/* line 62, ../../sass/_set.sass */
+input[type=number] {
+  width: 30px;
+}
+
 /* Remove text-shadow in selection highlight: h5bp.com/i
  * These selection declarations have to be separate
  * Also: hot pink! (or customize the background color to match your design) */
-/* line 59, ../../sass/_set.sass */
+/* line 70, ../../sass/_set.sass */
 ::-moz-selection {
   background: #fe57a1;
   color: white;
   text-shadow: none;
 }
 
-/* line 64, ../../sass/_set.sass */
+/* line 75, ../../sass/_set.sass */
 ::selection {
   background: #fe57a1;
   color: white;
@@ -101,28 +154,28 @@ body, button, input, select, textarea {
 /* =============================================================================
  * Links
  * ========================================================================== */
-/* line 73, ../../sass/_set.sass */
+/* line 84, ../../sass/_set.sass */
 a {
   color: #508ced;
 }
 
-/* line 76, ../../sass/_set.sass */
+/* line 87, ../../sass/_set.sass */
 a:visited {
   color: #2b74e9;
 }
 
-/* line 79, ../../sass/_set.sass */
+/* line 90, ../../sass/_set.sass */
 a:hover {
   color: #75a4f0;
 }
 
-/* line 82, ../../sass/_set.sass */
+/* line 93, ../../sass/_set.sass */
 a:focus {
   outline: thin dotted;
 }
 
 /* Improve readability when focused and hovered in all browsers: h5bp.com/h */
-/* line 86, ../../sass/_set.sass */
+/* line 97, ../../sass/_set.sass */
 a:hover, a:active {
   outline: 0;
 }
@@ -130,27 +183,27 @@ a:hover, a:active {
 /* =============================================================================
  * Typography
  * ========================================================================== */
-/* line 93, ../../sass/_set.sass */
+/* line 104, ../../sass/_set.sass */
 abbr[title] {
   border-bottom: 1px dotted;
 }
 
-/* line 96, ../../sass/_set.sass */
+/* line 107, ../../sass/_set.sass */
 b, strong {
   font-weight: bold;
 }
 
-/* line 99, ../../sass/_set.sass */
+/* line 110, ../../sass/_set.sass */
 blockquote {
   margin: 1em 40px;
 }
 
-/* line 102, ../../sass/_set.sass */
+/* line 113, ../../sass/_set.sass */
 dfn {
   font-style: italic;
 }
 
-/* line 105, ../../sass/_set.sass */
+/* line 116, ../../sass/_set.sass */
 hr {
   display: block;
   height: 1px;
@@ -160,14 +213,14 @@ hr {
   padding: 0;
 }
 
-/* line 113, ../../sass/_set.sass */
+/* line 124, ../../sass/_set.sass */
 ins {
   background: #ffff99;
   color: black;
   text-decoration: none;
 }
 
-/* line 118, ../../sass/_set.sass */
+/* line 129, ../../sass/_set.sass */
 mark {
   background: yellow;
   color: black;
@@ -176,7 +229,7 @@ mark {
 }
 
 /* Redeclare monospace font family: h5bp.com/j */
-/* line 125, ../../sass/_set.sass */
+/* line 136, ../../sass/_set.sass */
 pre, code, kbd, samp {
   font-family: monospace, serif;
   _font-family: "courier new", monospace;
@@ -184,31 +237,31 @@ pre, code, kbd, samp {
 }
 
 /* Improve readability of pre-formatted text in all browsers */
-/* line 131, ../../sass/_set.sass */
+/* line 142, ../../sass/_set.sass */
 pre {
   white-space: pre;
   white-space: pre-wrap;
   word-wrap: break-word;
 }
 
-/* line 136, ../../sass/_set.sass */
+/* line 147, ../../sass/_set.sass */
 q {
   quotes: none;
 }
 
-/* line 139, ../../sass/_set.sass */
+/* line 150, ../../sass/_set.sass */
 q:before, q:after {
   content: "";
   content: none;
 }
 
-/* line 143, ../../sass/_set.sass */
+/* line 154, ../../sass/_set.sass */
 small {
   font-size: 85%;
 }
 
 /* Position subscript and superscript content without affecting line-height: h5bp.com/k */
-/* line 147, ../../sass/_set.sass */
+/* line 158, ../../sass/_set.sass */
 sub, sup {
   font-size: 75%;
   line-height: 0;
@@ -216,12 +269,12 @@ sub, sup {
   vertical-align: baseline;
 }
 
-/* line 153, ../../sass/_set.sass */
+/* line 164, ../../sass/_set.sass */
 sup {
   top: -0.5em;
 }
 
-/* line 156, ../../sass/_set.sass */
+/* line 167, ../../sass/_set.sass */
 sub {
   bottom: -0.25em;
 }
@@ -229,18 +282,18 @@ sub {
 /* =============================================================================
  * Lists
  * ========================================================================== */
-/* line 163, ../../sass/_set.sass */
+/* line 174, ../../sass/_set.sass */
 ul, ol {
   margin: 1em 0;
   padding: 0 0 0 40px;
 }
 
-/* line 167, ../../sass/_set.sass */
+/* line 178, ../../sass/_set.sass */
 dd {
   margin: 0 0 0 40px;
 }
 
-/* line 170, ../../sass/_set.sass */
+/* line 181, ../../sass/_set.sass */
 nav ul, nav ol {
   list-style: none;
   list-style-image: none;
@@ -253,7 +306,7 @@ nav ul, nav ol {
  * ========================================================================== */
 /* 1. Improve image quality when scaled in IE7: h5bp.com/d
  * 2. Remove the gap between images and borders on image containers: h5bp.com/e */
-/* line 184, ../../sass/_set.sass */
+/* line 195, ../../sass/_set.sass */
 img {
   border: 0;
   -ms-interpolation-mode: bicubic;
@@ -261,7 +314,7 @@ img {
 }
 
 /* Correct overflow not hidden in IE9 */
-/* line 192, ../../sass/_set.sass */
+/* line 203, ../../sass/_set.sass */
 svg:not(:root) {
   overflow: hidden;
 }
@@ -269,7 +322,7 @@ svg:not(:root) {
 /* =============================================================================
  * Figures
  * ========================================================================== */
-/* line 199, ../../sass/_set.sass */
+/* line 210, ../../sass/_set.sass */
 figure {
   margin: 0;
 }
@@ -277,12 +330,12 @@ figure {
 /* =============================================================================
  * Forms
  * ========================================================================== */
-/* line 206, ../../sass/_set.sass */
+/* line 217, ../../sass/_set.sass */
 form {
   margin: 0;
 }
 
-/* line 209, ../../sass/_set.sass */
+/* line 220, ../../sass/_set.sass */
 fieldset {
   border: 0;
   margin: 0;
@@ -290,14 +343,14 @@ fieldset {
 }
 
 /* Indicate that 'label' will shift focus to the associated form element */
-/* line 215, ../../sass/_set.sass */
+/* line 226, ../../sass/_set.sass */
 label {
   cursor: pointer;
 }
 
 /* 1. Correct color not inheriting in IE6/7/8/9
  * 2. Correct alignment displayed oddly in IE6/7 */
-/* line 222, ../../sass/_set.sass */
+/* line 233, ../../sass/_set.sass */
 legend {
   border: 0;
   *margin-left: -7px;
@@ -307,7 +360,7 @@ legend {
 /* 1. Correct font-size not inheriting in all browsers
  * 2. Remove margins in FF3/4 S5 Chrome
  * 3. Define consistent vertical alignment display in all browsers */
-/* line 232, ../../sass/_set.sass */
+/* line 243, ../../sass/_set.sass */
 button, input, select, textarea {
   font-size: 100%;
   margin: 0;
@@ -316,7 +369,7 @@ button, input, select, textarea {
 }
 
 /* 1. Define line-height as normal to match FF3/4 (set using !important in the UA stylesheet) */
-/* line 241, ../../sass/_set.sass */
+/* line 252, ../../sass/_set.sass */
 button, input {
   line-height: normal;
 }
@@ -324,7 +377,7 @@ button, input {
 /* 1. Display hand cursor for clickable form elements
  * 2. Allow styling of clickable form elements in iOS
  * 3. Correct inner spacing displayed oddly in IE7 (doesn't effect IE6) */
-/* line 249, ../../sass/_set.sass */
+/* line 260, ../../sass/_set.sass */
 button, input[type="button"], input[type="reset"], input[type="submit"] {
   cursor: pointer;
   -webkit-appearance: button;
@@ -332,13 +385,13 @@ button, input[type="button"], input[type="reset"], input[type="submit"] {
 }
 
 /* Consistent box sizing and appearance */
-/* line 257, ../../sass/_set.sass */
+/* line 268, ../../sass/_set.sass */
 input[type="checkbox"], input[type="radio"] {
   box-sizing: border-box;
   padding: 0;
 }
 
-/* line 261, ../../sass/_set.sass */
+/* line 272, ../../sass/_set.sass */
 input[type="search"] {
   -webkit-appearance: textfield;
   -moz-box-sizing: content-box;
@@ -346,18 +399,18 @@ input[type="search"] {
   box-sizing: content-box;
 }
 
-/* line 267, ../../sass/_set.sass */
+/* line 278, ../../sass/_set.sass */
 input[type="search"]::-webkit-search-decoration {
   -webkit-appearance: none;
 }
 
-/* line 270, ../../sass/_set.sass */
+/* line 281, ../../sass/_set.sass */
 input[type=color] {
   width: 4.4em;
 }
 
 /* Remove inner padding and border in FF3/4: h5bp.com/l */
-/* line 276, ../../sass/_set.sass */
+/* line 287, ../../sass/_set.sass */
 button::-moz-focus-inner, input::-moz-focus-inner {
   border: 0;
   padding: 0;
@@ -365,7 +418,7 @@ button::-moz-focus-inner, input::-moz-focus-inner {
 
 /* 1. Remove default vertical scrollbar in IE6/7/8/9
  * 2. Allow only vertical resizing */
-/* line 284, ../../sass/_set.sass */
+/* line 295, ../../sass/_set.sass */
 textarea {
   overflow: auto;
   vertical-align: top;
@@ -373,7 +426,7 @@ textarea {
 }
 
 /* Colors for form validity */
-/* line 292, ../../sass/_set.sass */
+/* line 303, ../../sass/_set.sass */
 input:invalid, textarea:invalid {
   background-color: #f0dddd;
 }
@@ -381,13 +434,13 @@ input:invalid, textarea:invalid {
 /* =============================================================================
  * Tables
  * ========================================================================== */
-/* line 299, ../../sass/_set.sass */
+/* line 310, ../../sass/_set.sass */
 table {
   border-collapse: collapse;
   border-spacing: 0;
 }
 
-/* line 303, ../../sass/_set.sass */
+/* line 314, ../../sass/_set.sass */
 td {
   vertical-align: top;
 }
@@ -410,7 +463,7 @@ td {
  * Please define your styles before this section.
  * ========================================================================== */
 /* For image replacement */
-/* line 327, ../../sass/_set.sass */
+/* line 338, ../../sass/_set.sass */
 .ir {
   display: block;
   border: 0;
@@ -423,20 +476,20 @@ td {
   *line-height: 0;
 }
 
-/* line 338, ../../sass/_set.sass */
+/* line 349, ../../sass/_set.sass */
 .ir br {
   display: none;
 }
 
 /* Hide from both screenreaders and browsers: h5bp.com/u */
-/* line 342, ../../sass/_set.sass */
+/* line 353, ../../sass/_set.sass */
 .hidden {
   display: none !important;
   visibility: hidden;
 }
 
 /* Hide only visually, but have it available for screenreaders: h5bp.com/v */
-/* line 347, ../../sass/_set.sass */
+/* line 358, ../../sass/_set.sass */
 .visuallyhidden {
   border: 0;
   clip: rect(0 0 0 0);
@@ -449,7 +502,7 @@ td {
 }
 
 /* Extends the .visuallyhidden class to allow the element to be focusable when navigated to via the keyboard: h5bp.com/p */
-/* line 358, ../../sass/_set.sass */
+/* line 369, ../../sass/_set.sass */
 .visuallyhidden.focusable:active, .visuallyhidden.focusable:focus {
   clip: auto;
   height: auto;
@@ -460,24 +513,24 @@ td {
 }
 
 /* Hide visually and from screenreaders, but maintain layout */
-/* line 367, ../../sass/_set.sass */
+/* line 378, ../../sass/_set.sass */
 .invisible {
   visibility: hidden;
 }
 
 /* Contain floats: h5bp.com/q */
-/* line 371, ../../sass/_set.sass */
+/* line 382, ../../sass/_set.sass */
 .clearfix:before, .clearfix:after {
   content: "";
   display: table;
 }
 
-/* line 375, ../../sass/_set.sass */
+/* line 386, ../../sass/_set.sass */
 .clearfix:after {
   clear: both;
 }
 
-/* line 378, ../../sass/_set.sass */
+/* line 389, ../../sass/_set.sass */
 .clearfix {
   *zoom: 1;
 }
@@ -487,7 +540,7 @@ td {
  * Inlined to avoid required HTTP connection: h5bp.com/r
  * ========================================================================== */
 @media print {
-  /* line 387, ../../sass/_set.sass */
+  /* line 398, ../../sass/_set.sass */
   * {
     background: transparent !important;
     color: black !important;
@@ -498,45 +551,45 @@ td {
   }
 
   /* Black prints faster: h5bp.com/s */
-  /* line 395, ../../sass/_set.sass */
+  /* line 406, ../../sass/_set.sass */
   a, a:visited {
     text-decoration: underline;
   }
 
-  /* line 397, ../../sass/_set.sass */
+  /* line 408, ../../sass/_set.sass */
   a[href]:after {
     content: " (" attr(href) ")";
   }
 
-  /* line 399, ../../sass/_set.sass */
+  /* line 410, ../../sass/_set.sass */
   abbr[title]:after {
     content: " (" attr(title) ")";
   }
 
-  /* line 401, ../../sass/_set.sass */
+  /* line 412, ../../sass/_set.sass */
   .ir a:after, a[href^="javascript:"]:after, a[href^="#"]:after {
     content: "";
   }
 
   /* Don't show links for images, or javascript/internal links */
-  /* line 404, ../../sass/_set.sass */
+  /* line 415, ../../sass/_set.sass */
   pre, blockquote {
     border: 1px solid #999999;
     page-break-inside: avoid;
   }
 
-  /* line 407, ../../sass/_set.sass */
+  /* line 418, ../../sass/_set.sass */
   thead {
     display: table-header-group;
   }
 
   /* h5bp.com/t */
-  /* line 410, ../../sass/_set.sass */
+  /* line 421, ../../sass/_set.sass */
   tr, img {
     page-break-inside: avoid;
   }
 
-  /* line 412, ../../sass/_set.sass */
+  /* line 423, ../../sass/_set.sass */
   img {
     max-width: 100% !important;
   }
@@ -545,20 +598,36 @@ td {
     margin: 0.5cm;
 }
 
-  /* line 417, ../../sass/_set.sass */
+  /* line 428, ../../sass/_set.sass */
   p, h2, h3 {
     orphans: 3;
     widows: 3;
   }
 
-  /* line 420, ../../sass/_set.sass */
+  /* line 431, ../../sass/_set.sass */
   h2, h3 {
     page-break-after: avoid;
   }
 }
 /* line 18, ../../sass/_base.sass */
+html, body {
+  height: 100%;
+}
+
+/* line 20, ../../sass/_base.sass */
+html {
+  background-attachment: fixed;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(2%, #000000), color-stop(4%, #333333), color-stop(40%, #333333), color-stop(100%, #1a1a1a));
+  background-image: -webkit-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
+  background-image: -moz-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
+  background-image: -o-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
+  background-image: -ms-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
+  background-image: linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
+  background-repeat: no-repeat;
+}
+
+/* line 24, ../../sass/_base.sass */
 body {
-  background: #cccccc;
   color: #aaaaaa;
 }
 
@@ -610,14 +679,46 @@ ul > li {
 }
 
 /* line 18, ../../sass/_base.sass */
+html, body {
+  height: 100%;
+}
+
+/* line 20, ../../sass/_base.sass */
+html {
+  background-attachment: fixed;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(2%, #000000), color-stop(4%, #333333), color-stop(40%, #333333), color-stop(100%, #1a1a1a));
+  background-image: -webkit-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
+  background-image: -moz-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
+  background-image: -o-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
+  background-image: -ms-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
+  background-image: linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
+  background-repeat: no-repeat;
+}
+
+/* line 24, ../../sass/_base.sass */
 body {
-  background: #cccccc;
   color: #aaaaaa;
 }
 
 /* line 18, ../../sass/_base.sass */
+html, body {
+  height: 100%;
+}
+
+/* line 20, ../../sass/_base.sass */
+html {
+  background-attachment: fixed;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(2%, #000000), color-stop(4%, #333333), color-stop(40%, #333333), color-stop(100%, #1a1a1a));
+  background-image: -webkit-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
+  background-image: -moz-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
+  background-image: -o-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
+  background-image: -ms-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
+  background-image: linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
+  background-repeat: no-repeat;
+}
+
+/* line 24, ../../sass/_base.sass */
 body {
-  background: #cccccc;
   color: #aaaaaa;
 }
 
@@ -856,8 +957,32 @@ body {
   color: red;
 }
 
-/* line 131, ../../sass/game_grid.sass */
-#grid {
+/* line 130, ../../sass/game_grid.sass */
+#layers {
+  white-space: nowrap;
+}
+/* line 132, ../../sass/game_grid.sass */
+#layers input {
+  width: 22px;
+}
+
+/* line 134, ../../sass/game_grid.sass */
+.changeLayer {
+  margin: 0 0 1px;
+  width: 22px;
+  height: 22px;
+  display: inline-block;
+  text-decoration: none;
+}
+/* line 140, ../../sass/game_grid.sass */
+.changeLayer.on {
+  outline: 1px solid yellow;
+}
+
+/* line 142, ../../sass/game_grid.sass */
+#gridCell ul {
+  pointer-events: none;
+  position: absolute;
   float: left;
   zoom: 1;
   margin: 0;
@@ -865,12 +990,19 @@ body {
   border: 0;
   color: #aaaaaa;
   cursor: move;
-  background: #dddddd;
   border: 1px solid;
   border-color: white #888888 #888888 white;
 }
+/* line 144, ../../sass/game_grid.sass */
+#gridCell ul.on {
+  pointer-events: auto;
+}
+/* line 146, ../../sass/game_grid.sass */
+#gridCell ul:first-child {
+  position: static;
+}
 /* line 5, ../../sass/_util.sass */
-#grid:after {
+#gridCell ul:after {
   content: ".";
   clear: both;
   display: block;
@@ -878,19 +1010,19 @@ body {
   height: 0;
 }
 /* line 33, ../../sass/_util.sass */
-#grid li {
+#gridCell ul li {
   margin: 0;
   padding: 0;
   border: 0;
   color: #aaaaaa;
   list-style: none;
 }
-/* line 139, ../../sass/game_grid.sass */
-#grid.dragging {
+/* line 156, ../../sass/game_grid.sass */
+#gridCell ul.dragging {
   cursor: -moz-grabbing;
 }
-/* line 141, ../../sass/game_grid.sass */
-#grid li {
+/* line 158, ../../sass/game_grid.sass */
+#gridCell ul li {
   float: left;
   text-align: center;
   width: 40px;
@@ -905,38 +1037,37 @@ body {
   background-repeat: no-repeat;
   background-position: center center;
 }
-/* line 153, ../../sass/game_grid.sass */
-#grid li a {
+/* line 170, ../../sass/game_grid.sass */
+#gridCell ul li a {
   text-decoration: none;
   display: block;
   text-align: center;
 }
-/* line 157, ../../sass/game_grid.sass */
-#grid li:hover {
+/* line 174, ../../sass/game_grid.sass */
+#gridCell ul li:hover {
   outline: 2px solid #ffffaa;
   border: 1px #999999 solid;
 }
-/* line 160, ../../sass/game_grid.sass */
-#grid .show {
+/* line 177, ../../sass/game_grid.sass */
+#gridCell ul .show {
   background: #dddddd;
 }
-/* line 162, ../../sass/game_grid.sass */
-#grid .mark {
+/* line 179, ../../sass/game_grid.sass */
+#gridCell ul .mark {
   background: url(../images/flag_red.png) no-repeat center center;
 }
-/* line 164, ../../sass/game_grid.sass */
-#grid .on, #grid.paint {
+/* line 181, ../../sass/game_grid.sass */
+#gridCell ul .on, #gridCell ul.paint {
   -webkit-transition: background-color 0.25s linear;
-  background: #88aadd;
 }
-/* line 167, ../../sass/game_grid.sass */
-#grid .error {
+/* line 183, ../../sass/game_grid.sass */
+#gridCell ul .error {
   background-image: url(../images/cross.png);
   opacity: 0.8;
 }
 
 @media only screen and (max-device-width: 1024px), only screen and (max-device-width: 480px) {
-  /* line 172, ../../sass/game_grid.sass */
+  /* line 188, ../../sass/game_grid.sass */
   #grid li:hover {
     outline: 0;
     border: none;
@@ -1000,59 +1131,67 @@ body {
   background: url(../farbtastic/marker.png) no-repeat;
 }
 
-/* line 8, ../../sass/application.sass */
-body {
-  color: #dddddd;
-  background-color: #333333;
-}
-
-/* line 11, ../../sass/application.sass */
+/* line 7, ../../sass/application.sass */
 #page {
   margin: 38px auto;
   padding: 1em;
 }
 
-/* line 15, ../../sass/application.sass */
+/* line 11, ../../sass/application.sass */
 #nav {
   width: 100%;
   position: fixed;
   top: 0;
   left: 0;
   line-height: 32px;
-  border-bottom: 1px solid #666666;
-  background-color: rgba(51, 51, 51, 0.9);
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #262626), color-stop(98%, #333333), color-stop(100%, #4d4d4d));
+  background-image: -webkit-linear-gradient(#262626 0%, #333333 98%, #4d4d4d 100%);
+  background-image: -moz-linear-gradient(#262626 0%, #333333 98%, #4d4d4d 100%);
+  background-image: -o-linear-gradient(#262626 0%, #333333 98%, #4d4d4d 100%);
+  background-image: -ms-linear-gradient(#262626 0%, #333333 98%, #4d4d4d 100%);
+  background-image: linear-gradient(#262626 0%, #333333 98%, #4d4d4d 100%);
+  -moz-box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+  -webkit-box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+  -o-box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
   z-index: 100;
 }
-/* line 24, ../../sass/application.sass */
+/* line 21, ../../sass/application.sass */
 #nav a {
   text-decoration: none;
   padding: 0 0 0 10px;
   float: left;
 }
-/* line 28, ../../sass/application.sass */
+/* line 25, ../../sass/application.sass */
 #nav .pull-right {
   float: right;
 }
-/* line 30, ../../sass/application.sass */
+/* line 27, ../../sass/application.sass */
 #nav .pull-right a {
   padding: 0 10px 0 0;
 }
 
-/* line 33, ../../sass/application.sass */
+/* line 30, ../../sass/application.sass */
 #picker {
   position: absolute;
 }
 
-/* line 36, ../../sass/application.sass */
+/* line 33, ../../sass/application.sass */
 .slider {
   width: 1.3em;
   text-align: center;
 }
 
-/* line 39, ../../sass/application.sass */
+/* line 36, ../../sass/application.sass */
 .sliderWidget {
   margin: 4px 10px;
   vertical-align: bottom;
   display: inline-block;
-  width: 400px;
+  width: 532px;
+}
+
+/* line 42, ../../sass/application.sass */
+.field {
+  padding: 4px 0;
 }

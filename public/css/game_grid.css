@@ -1,12 +1,44 @@
 /* line 18, ../../sass/_base.sass */
+html, body {
+  height: 100%;
+}
+
+/* line 20, ../../sass/_base.sass */
+html {
+  background-attachment: fixed;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(2%, #000000), color-stop(4%, #333333), color-stop(40%, #333333), color-stop(100%, #1a1a1a));
+  background-image: -webkit-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
+  background-image: -moz-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
+  background-image: -o-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
+  background-image: -ms-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
+  background-image: linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
+  background-repeat: no-repeat;
+}
+
+/* line 24, ../../sass/_base.sass */
 body {
-  background: #cccccc;
   color: #aaaaaa;
 }
 
 /* line 18, ../../sass/_base.sass */
+html, body {
+  height: 100%;
+}
+
+/* line 20, ../../sass/_base.sass */
+html {
+  background-attachment: fixed;
+  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(2%, #000000), color-stop(4%, #333333), color-stop(40%, #333333), color-stop(100%, #1a1a1a));
+  background-image: -webkit-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
+  background-image: -moz-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
+  background-image: -o-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
+  background-image: -ms-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
+  background-image: linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
+  background-repeat: no-repeat;
+}
+
+/* line 24, ../../sass/_base.sass */
 body {
-  background: #cccccc;
   color: #aaaaaa;
 }
 
@@ -245,8 +277,32 @@ body {
   color: red;
 }
 
-/* line 131, ../../sass/game_grid.sass */
-#grid {
+/* line 130, ../../sass/game_grid.sass */
+#layers {
+  white-space: nowrap;
+}
+/* line 132, ../../sass/game_grid.sass */
+#layers input {
+  width: 22px;
+}
+
+/* line 134, ../../sass/game_grid.sass */
+.changeLayer {
+  margin: 0 0 1px;
+  width: 22px;
+  height: 22px;
+  display: inline-block;
+  text-decoration: none;
+}
+/* line 140, ../../sass/game_grid.sass */
+.changeLayer.on {
+  outline: 1px solid yellow;
+}
+
+/* line 142, ../../sass/game_grid.sass */
+#gridCell ul {
+  pointer-events: none;
+  position: absolute;
   float: left;
   zoom: 1;
   margin: 0;
@@ -254,12 +310,19 @@ body {
   border: 0;
   color: #aaaaaa;
   cursor: move;
-  background: #dddddd;
   border: 1px solid;
   border-color: white #888888 #888888 white;
 }
+/* line 144, ../../sass/game_grid.sass */
+#gridCell ul.on {
+  pointer-events: auto;
+}
+/* line 146, ../../sass/game_grid.sass */
+#gridCell ul:first-child {
+  position: static;
+}
 /* line 5, ../../sass/_util.sass */
-#grid:after {
+#gridCell ul:after {
   content: ".";
   clear: both;
   display: block;
@@ -267,19 +330,19 @@ body {
   height: 0;
 }
 /* line 33, ../../sass/_util.sass */
-#grid li {
+#gridCell ul li {
   margin: 0;
   padding: 0;
   border: 0;
   color: #aaaaaa;
   list-style: none;
 }
-/* line 139, ../../sass/game_grid.sass */
-#grid.dragging {
+/* line 156, ../../sass/game_grid.sass */
+#gridCell ul.dragging {
   cursor: -moz-grabbing;
 }
-/* line 141, ../../sass/game_grid.sass */
-#grid li {
+/* line 158, ../../sass/game_grid.sass */
+#gridCell ul li {
   float: left;
   text-align: center;
   width: 40px;
@@ -294,38 +357,37 @@ body {
   background-repeat: no-repeat;
   background-position: center center;
 }
-/* line 153, ../../sass/game_grid.sass */
-#grid li a {
+/* line 170, ../../sass/game_grid.sass */
+#gridCell ul li a {
   text-decoration: none;
   display: block;
   text-align: center;
 }
-/* line 157, ../../sass/game_grid.sass */
-#grid li:hover {
+/* line 174, ../../sass/game_grid.sass */
+#gridCell ul li:hover {
   outline: 2px solid #ffffaa;
   border: 1px #999999 solid;
 }
-/* line 160, ../../sass/game_grid.sass */
-#grid .show {
+/* line 177, ../../sass/game_grid.sass */
+#gridCell ul .show {
   background: #dddddd;
 }
-/* line 162, ../../sass/game_grid.sass */
-#grid .mark {
+/* line 179, ../../sass/game_grid.sass */
+#gridCell ul .mark {
   background: url(../images/flag_red.png) no-repeat center center;
 }
-/* line 164, ../../sass/game_grid.sass */
-#grid .on, #grid.paint {
+/* line 181, ../../sass/game_grid.sass */
+#gridCell ul .on, #gridCell ul.paint {
   -webkit-transition: background-color 0.25s linear;
-  background: #88aadd;
 }
-/* line 167, ../../sass/game_grid.sass */
-#grid .error {
+/* line 183, ../../sass/game_grid.sass */
+#gridCell ul .error {
   background-image: url(../images/cross.png);
   opacity: 0.8;
 }
 
 @media only screen and (max-device-width: 1024px), only screen and (max-device-width: 480px) {
-  /* line 172, ../../sass/game_grid.sass */
+  /* line 188, ../../sass/game_grid.sass */
   #grid li:hover {
     outline: 0;
     border: none;

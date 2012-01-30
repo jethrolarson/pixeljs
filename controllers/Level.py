@@ -51,7 +51,8 @@ class Edit(webapp.RequestHandler):
     levelSetName = self.request.get('levelSetName')
     if levelSetName:
       levelSet = models.getUserLevelSetByName(levelSetName)
-
+    else:
+      levelSet = models.getmodels.getUserLevelSet()
     if not levelSet:
       levelSet = models.LevelSet(
         name = levelSetName

@@ -6,33 +6,32 @@ var level = {{level|jsonify}};
 <form action="/level/edit" method="post">
 	<input type="hidden" name="key" value="{{level.key}}">
 	<!-- in session: uid -->
-	<div class="field">
-		<label>World</label>
-		<input name="levelSetName" value="{{level.levelSetName}}" type="text"/><!-- TODO COMBOBOX -->
-	</div>
+	<input name="levelSetName" value="{{level.levelSetName}}" type="hidden"/>
 	
-	<input name="game" type="hidden" value="{{level.game}}"/>
+	<input name="game" id="gametxt" type="hidden" value="{{level.game}}"/>
 	<input name="x" type="text" id="x" class="slider" min="0" max="32" step="1" value="{{level.x}}" />
 	<input name="y" id="y" type="text" class="slider" min="0" max="32" step="1" value="{{level.y}}"/>
+	<input name="fgcolor" id="fgcolor" type="hidden" value="{{level.fgcolor}}" style="background-color: {{level.fgcolor}}" />
 	<div class="field">
 		<label>Title </label>
 		<input name="title" type="text" value="{{level.title}}"/>
 	</div>
 	<div class="field">
-		<label>Colors</label><br/>
-		<input name="fgcolor" type="color" value="{{level.fgcolor}}" style="background-color: {{level.fgcolor}}" /> <input name="bgcolor" type="color" value="{{level.bgcolor}}" style="background-color: {{level.bgcolor}}" />
+		<label>BG Color</label>
+		<input name="bgcolor" type="color" value="{{level.bgcolor}}" style="background-color: {{level.bgcolor}}" />
 	</div>
-	{% include '../partials/grid.html'%}
 	<div class="field">
 		<label>Par </label>
 		<input name="par" type="number" min="1" max="10" step="1" value="{{level.par}}"/>
 	</div>
+	{% include '../partials/grid.html'%}
+	
 	<button type="submit">Save</button> <button type="submit" name="play" value="1">Test</button>
 </form>
 {%endblock%}
 {%block scripts%}
 <script src="/public/farbtastic/farbtastic.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+<script src="/public/js/jquery-ui.min.js"></script>
 <script src="/public/js/level.js"></script>
 <script src="/public/js/application.js"></script>
 <script src="/public/js/create.js"></script>

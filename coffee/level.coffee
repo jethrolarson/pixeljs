@@ -1,11 +1,13 @@
 window.Level = (level)->
+	level.layers = level.game.split ','
+	level.currentLayer = level.layers.length - 1
 	return $.extend {
 		getRow: (y)-> 
-			return @game[(@x*y)...(@x*y + @x)]
+			return @layers[@currentLayer][(@x*y)...(@x*y + @x)]
 		getCol: (x)-> 
 			ar = []
 			for i in [0...@y]
-				ar.push @game[i*@x + x]
+				ar.push @layers[@currentLayer][i*@x + x]
 			return ar
 
 		getRowHints: ->
@@ -36,29 +38,44 @@ window.Level = (level)->
 					pushHint()
 			pushHint(true) if hints.length is 0
 			return hints
-		getAt: (x,y)->
-			return +@game[(@x*y)+x]
+		getAt: (x,y, layerIndex = @currentLayer)->
+			return +@layers[layerIndex][(@x*y)+x]
 		
 		addCols: (num)->
-			newGame = ''
-			for i in [0...@x]
-				newGame += @game.substring(@x * i, (@x * (i + 1))) + multiplyString('0', num)
-			@game = newGame
+			for layer,j in @layers
+				newLayer = ''
+				for i in [0...@y]
+					newLayer += layer.substring(@x * i, (@x * (i + 1))) + String.times '0', num
+				@layers[j] = newLayer
 			@x+=num
 		addRows: (num)->
-			@game += multiplyString('0',@x*num)
+			for layer in @layers 
+				layer += String.times '0', @x * num
 			@y+=num
 		subtractCols: (num)->
-			newGame = ''
-			for i in [0...@x]
-				newGame += @game.substring(@x * i, (@x * (i + 1)) - num)
+			for layer,j in @layers 
+				newGame = ''
+				for i in [0...@x]
+					newGame += layer.substring(@x * i, (@x * (i + 1)) - num)
+				@layers[j] = newGame
 			@x -= num
-			@game = newGame
 		subtractRows: (num)->
+			#for layer in @layers
+			#	layer = layer.substring(0,@x*@y)
 			@y -= num
-			@game = @game.substring(0,@x*@y)
-		updateCell: (i, v)->
-			@game = @game.replaceAt(i,v)
+		updateCell: (i, v,layerIndex = @currentLayer)->
+			@layers[layerIndex] = @layers[layerIndex].replaceAt(i,v)
+		addLayer: ->
+			@layers.push String.times '0', @x * @y
+		getLayerColor: (layerIndex = @currentLayer)-> @fgcolor.split(',')[layerIndex]
+		setLayerColor: (color, layerIndex = @currentLayer)->
+			colors = @fgcolor.split ','
+			colors[layerIndex] = color
+			@fgcolor = colors.join ','
+			
+		getGame: ->
+			@layers.join(',')
+		currentLayer: 0
 		title: 'untitled'
 		bgcolor: '#ddd'
 		fgcolor: '#00f'

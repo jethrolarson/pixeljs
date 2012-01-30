@@ -1,11 +1,11 @@
-(function() {
+
   (function($) {
     /**
     	A simple interface for playing sounds in games.
     
     	@name Sound
     	@namespace
-    	*/
+    */
     var BASE_URL, Sound, directory, format, loadSoundChannel, sounds, _ref;
     directory = (typeof App !== "undefined" && App !== null ? (_ref = App.directories) != null ? _ref.sounds : void 0 : void 0) || "sounds";
     format = "wav";
@@ -46,13 +46,11 @@
       
       		@param {String} id id or name of the sound file to play
       		@param {String} maxChannels max number of sounds able to be played simultaneously
-      		*/
+      */
       play: function(id, maxChannels) {
         var channel, channels, freeChannels, sound;
         maxChannels || (maxChannels = 4);
-        if (!sounds[id]) {
-          sounds[id] = [loadSoundChannel(id)];
-        }
+        if (!sounds[id]) sounds[id] = [loadSoundChannel(id)];
         channels = sounds[id];
         freeChannels = $.grep(channels, function(sound) {
           return sound.currentTime === sound.duration || sound.currentTime === 0;
@@ -60,7 +58,7 @@
         if (channel = freeChannels.first()) {
           try {
             channel.currentTime = 0;
-          } catch (_e) {}
+          } catch (_error) {}
           return channel.play();
         } else {
           if (!maxChannels || channels.length < maxChannels) {
@@ -85,7 +83,7 @@
       		@param {String} url location of sound file to play
       
       		@returns {Sound} this sound object
-      		*/
+      */
       playFromUrl: function(url) {
         var sound;
         sound = $('<audio />').get(0);
@@ -106,11 +104,10 @@
       		@methodOf Sound
       
       		@param {String} id id or name of sound to stop playing.
-      		*/
+      */
       stop: function(id) {
         var _ref2;
         return (_ref2 = sounds[id]) != null ? _ref2.stop() : void 0;
       }
     }, (typeof exports !== "undefined" && exports !== null ? exports : this)["Sound"] = Sound);
   })(jQuery);
-}).call(this);

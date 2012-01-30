@@ -4,10 +4,6 @@
 @import _typo
 @import game_grid
 @import _farbtastic
-$bgc: #333
-body
-	color: #ddd
-	background-color: $bgc
 #page
 	//width: 800px
 	margin: 38px auto
@@ -18,8 +14,9 @@ body
 	top: 0
 	left: 0
 	line-height: 32px
-	border-bottom: 1px solid hsl(0,0,40%)
-	background-color: transparentize($bgc,.1)
+	+background-image(linear-gradient(darken($bgc,5%) 0%, $bgc 98%,lighten($bgc,10%) 100%))
+	+box-shadow(0 0 15px rgba(0,0,0,.4))
+	+text-shadow(0 1px 1px rgba(0,0,0,.4))
 	z-index: 100
 	a
 		text-decoration: none
@@ -39,6 +36,8 @@ body
 .sliderWidget
 	margin: 4px 10px
 	vertical-align: bottom
-	
 	display: inline-block
-	width: 400px
+	width: 532px
+
+.field
+	padding: 4px 0

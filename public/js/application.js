@@ -1,5 +1,4 @@
-(function() {
-  var __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+
   window.Game = {
     gameMode: 'play',
     dragMode: 'break',
@@ -7,17 +6,18 @@
     isErasing: false,
     mute: false,
     colWidth: 40,
+    MAX_CELL_WIDTH: 60,
     init: function($game) {
       this.$game = $game;
       this.$gridCell = this.$game.find('#gridCell');
-      this.$grid = this.$game.find('#grid');
       this.$win = this.$game.find('#win');
       this.$lose = this.$game.find('#lose');
       this.$score = this.$game.find('#score');
       this.$games = this.$game.find('#games');
       this.$colHints = this.$game.find('#colHints');
       this.$rowHints = this.$game.find('#rowHints');
-      this.$grid.remove();
+      this.$layers = this.$game.find('#layers');
+      this.$colorSheet = $(document.createElement('style')).prependTo(this.$game);
       this.$game.trigger('init');
       this.loadAssets();
       this.bindEvents();
@@ -28,15 +28,15 @@
     },
     edit: function() {
       this.gameMode = 'edit';
-      this.$grid.enableContext();
+      this.$gridCell.enableContext();
       this.assets.paint = new SoundGroup('paint.wav');
       return this.start();
     },
     getCol: function(x) {
-      return this.$grid.find("li:nth-child(" + this.level.x + "n+" + (x + 2) + ")");
+      return this.getGrid().find("li:nth-child(" + this.level.x + "n+" + (x + 2) + ")");
     },
     getRow: function(y) {
-      return this.$grid.find('li').slice(y * this.level.x, (y + 1) * this.level.x);
+      return this.getGrid().find('li').slice(y * this.level.x, (y + 1) * this.level.x);
     },
     getCoord: function(el) {
       var index;
@@ -49,9 +49,7 @@
     isGameComplete: function() {
       var i, _ref;
       for (i = 0, _ref = this.level.y; 0 <= _ref ? i < _ref : i > _ref; 0 <= _ref ? i++ : i--) {
-        if (!this.isLineComplete(this.getRow(i))) {
-          return false;
-        }
+        if (!this.isLineComplete(this.getRow(i))) return false;
       }
       return true;
     },
@@ -113,56 +111,76 @@
       }
       return this.$rowHints.html(html);
     },
+    renderLayerUI: function() {
+      var i, layer, layerUI, _len, _ref;
+      layerUI = '';
+      _ref = this.level.layers;
+      for (i = 0, _len = _ref.length; i < _len; i++) {
+        layer = _ref[i];
+        layerUI += "<div>\n<a href=\"#layer" + i + "\" class=\"changeLayer layer" + i + " " + (i === this.level.currentLayer ? 'on' : '') + "\">&nbsp;</a>\n<input type=\"color\" name=\"fgcolor" + i + "\" value=\"" + (this.level.getLayerColor(i)) + "\" style=\"background-color:" + (this.level.getLayerColor(i)) + "\"/> \n</div>";
+      }
+      if (this.gameMode !== 'play') {
+        layerUI += '<button id="addLayer" type="button">+</button>';
+      }
+      return this.$layers.html(layerUI);
+    },
     loadGame: function(level) {
       this.level = Level(level);
       this.renderLevel();
+      this.renderLayerUI();
       return this.updateScore();
     },
+    getGrid: function(layerIndex) {
+      if (layerIndex == null) layerIndex = this.level.currentLayer;
+      return $('#layer_' + layerIndex);
+    },
     renderLevel: function() {
-      var cell, cells, html, i, title, _len, _ref;
-      this.score = 0;
-      if (this.gameMode === 'play') {
-        title = this.level.levelSet ? "<a href=\"/levelSet/" + this.level.levelSet + "\">" + this.level.levelSetName + "</a>" : "" + this.level.levelSetName;
-        title += " &gt; " + this.level.title;
-        $('#title').html(title);
-        $('#par').text("Par: " + this.level.par);
-      }
+      var cell, cells, html, i, isOn, layer, layerhtml, paint, _len, _ref;
       html = '';
       cells = this.level.x * this.level.y;
-      for (cell = 0; 0 <= cells ? cell < cells : cell > cells; 0 <= cells ? cell++ : cell--) {
-        html += '<li> </li>';
-      }
-      this.$grid.html(html);
-      this.$cells = this.$grid.find('li');
-      if (this.gameMode === 'play') {
-        this.renderHints();
-      } else {
-        _ref = this.$cells;
-        for (i = 0, _len = _ref.length; i < _len; i++) {
-          cell = _ref[i];
-          $(cell).toggleClass('paint', +this.level.game[i] === 1);
+      _ref = this.level.layers;
+      for (i = 0, _len = _ref.length; i < _len; i++) {
+        layer = _ref[i];
+        layerhtml = '';
+        for (cell = 0; 0 <= cells ? cell < cells : cell > cells; 0 <= cells ? cell++ : cell--) {
+          if (this.gameMode !== 'play' && +layer[cell]) {
+            paint = ' class="paint"';
+          } else {
+            paint = '';
+          }
+          layerhtml += "<li" + paint + "> </li>";
         }
+        isOn = i === this.level.currentLayer ? 'on' : '';
+        html += "<ul id='layer_" + i + "' class='" + isOn + "'>" + layerhtml + "</ul>";
       }
-      this.$colorSheet = $(document.createElement('style')).prependTo(this.$grid);
+      this.$gridCell.html(html);
+      if (this.gameMode === 'play') {
+        this.score = 0;
+        $('#title').html(this.level.title);
+        $('#par').text("Par: " + this.level.par);
+        this.renderHints();
+      }
       this.updateStyles();
       this.updateHints();
-      return this.$gridCell.append(this.$grid);
+      return this.$gridCell.append(this.getGrid());
     },
     updateStyles: function() {
-      var css, fontSize, gridHeight, gridWidth;
+      var css, fontSize, gridHeight, gridWidth, i, layer, _len, _ref;
       css = '';
-      this.colWidth = Math.floor(this.$gridCell.width() / this.level.x);
+      this.colWidth = Math.min(Math.floor(this.$gridCell.width() / this.level.x), this.MAX_CELL_WIDTH);
       gridWidth = this.colWidth * this.level.x;
       gridHeight = this.colWidth * this.level.y;
       fontSize = Math.min(this.colWidth * .7, 20);
-      css += "#grid li{\n	width: " + this.colWidth + "px;\n	height: " + this.colWidth + "px;\n}\n#grid{\n	width: " + gridWidth + "px;\n}\n#win,#lose{\n	width: " + gridWidth + "px;\n	height: " + gridHeight + "px;\n	line-height: " + gridHeight + "px;\n}\n#rowHints,\n#colHints{\n	font-size: " + fontSize + "px;\n}\n#rowHints li,\n#rowHints li div{\n	height: " + this.colWidth + "px;\n	line-height: " + this.colWidth + "px;\n}\n#colHints li div{\n	width: " + this.colWidth + "px;\n}";
-      if (this.level.fgcolor) {
-        css += "	#grid .paint, \n	#grid .on{\n		background-color:" + this.level.fgcolor + "\n}";
+      css += "#gridCell ul li{\n	width: " + this.colWidth + "px;\n	height: " + this.colWidth + "px;\n}\n#gridCell ul{\n	width: " + gridWidth + "px;\n}\n#win,#lose{\n	width: " + gridWidth + "px;\n	height: " + gridHeight + "px;\n	line-height: " + gridHeight + "px;\n}\n#rowHints,\n#colHints{\n	font-size: " + fontSize + "px;\n}\n#rowHints li,\n#rowHints li div{\n	height: " + this.colWidth + "px;\n	line-height: " + this.colWidth + "px;\n}\n#colHints li div{\n	width: " + this.colWidth + "px;\n}";
+      _ref = this.level.layers;
+      for (i = 0, _len = _ref.length; i < _len; i++) {
+        layer = _ref[i];
+        css += "	#gridCell ul#layer_" + i + " .paint, \n	#gridCell ul#layer_" + i + " .on,\n	#game .changeLayer.layer" + i + "{\n		background-color:" + (this.level.getLayerColor(i)) + "\n}";
       }
       if (this.level.bgcolor) {
-        css += "#grid{background-color:" + this.level.bgcolor + "}";
+        css += "#gridCell ul:first-child{background-color: " + this.level.bgcolor + "}";
       }
-      return this.$colorSheet.html(css);
+      return this.$colorSheet.html('').html(css);
     },
     loadAssets: function() {
       return this.assets = {
@@ -173,14 +191,23 @@
         win: new Audio('win.wav')
       };
     },
+    addLayer: function() {
+      this.level.addLayer();
+      this.renderLayerUI();
+      return this.renderLevel();
+    },
+    changeLayer: function(layer) {
+      this.level.currentLayer = layer;
+      this.$gridCell.find('ul').removeClass('on');
+      return this.getGrid().addClass('on');
+    },
     bindEvents: function() {
-      this.$grid.disableContext().delegate('li', {
+      var _this = this;
+      this.$gridCell.disableContext().delegate('li', {
         'mouseover': $.proxy(this.eGridMouseover, this),
         'touchmove': $.proxy(this.eGridTouchmove, this),
         'mousedown touchstart': $.proxy(this.eGridMousedown, this)
-      }).mouseout(__bind(function() {
-        return this.$cells.removeClass('hilight');
-      }, this));
+      });
       this.$game.bind({
         "break": $.proxy(this.eBreak, this),
         mark: $.proxy(this.eMark, this),
@@ -188,25 +215,32 @@
         win: $.proxy(this.eWin, this),
         paint: $.proxy(this.ePaint, this),
         erase: $.proxy(this.eErase, this),
-        die: __bind(function() {
-          this.score += 1;
-          this.$game.addClass('shake');
-          if (!this.mute) {
-            this.assets.boom.play();
-          }
-          this.updateScore();
-          return setTimeout(__bind(function() {
-            return this.$game.removeClass('shake');
-          }, this), 300);
-        }, this)
+        die: function() {
+          _this.score += 1;
+          _this.$game.addClass('shake');
+          if (!_this.mute) _this.assets.boom.play();
+          _this.updateScore();
+          return setTimeout(function() {
+            return _this.$game.removeClass('shake');
+          }, 300);
+        }
       });
-      $('#mute').bind('change', __bind(function(e) {
-        this.mute = e.target.checked;
+      $('#mute').bind('change', function(e) {
+        _this.mute = e.target.checked;
         return true;
-      }, this));
-      return $(document).bind('mouseup', __bind(function() {
-        return this.isDragging = false;
-      }, this));
+      });
+      $(document).bind({
+        mouseup: function() {
+          return _this.isDragging = false;
+        }
+      });
+      return $(window).bind({
+        hashchange: function() {
+          var layerRE;
+          layerRE = /^#layer(\d)+/.exec(location.hash);
+          if (layerRE.length) return _this.changeLayer(+layerRE[1]);
+        }
+      });
     },
     getGolfScore: function() {
       var label, par;
@@ -240,9 +274,7 @@
     eBreak: function(e, el) {
       var $el, coord;
       $el = $(el);
-      if (this.gameMode === 'edit' || $el.hasClass('mark')) {
-        return;
-      }
+      if (this.gameMode === 'edit' || $el.hasClass('mark')) return;
       coord = this.getCoord(el);
       if (this.level.getAt(coord.x, coord.y)) {
         $el.addClass('on');
@@ -250,9 +282,7 @@
         if (this.isGameComplete()) {
           return this.$game.trigger('win');
         } else {
-          if (!this.mute) {
-            return this.assets.bing.play();
-          }
+          if (!this.mute) return this.assets.bing.play();
         }
       } else if (!$el.hasClass('error')) {
         $el.addClass('error');
@@ -269,25 +299,19 @@
       }
     },
     eMark: function(e, el) {
-      if (this.gameMode !== 'play') {
-        return;
-      }
-      if (!this.mute) {
-        this.assets.mark.play();
-      }
+      if (this.gameMode !== 'play') return;
+      if (!this.mute) this.assets.mark.play();
       return $(el).toggleClass('mark', !this.isErasing);
     },
     ePaint: function(e, el) {
       var $el;
       $el = $(el);
-      this.level.updateCell(this.$grid.find('li').index(el), this.isErasing ? '0' : '1');
+      this.level.updateCell(this.getGrid().find('li').index(el), this.isErasing ? '0' : '1');
       return $(el).toggleClass('paint', !this.isErasing);
     },
     eWin: function() {
       this.dragMode = null;
-      if (!this.mute) {
-        this.assets.win.play();
-      }
+      if (!this.mute) this.assets.win.play();
       this.$win.text(this.getGolfScore());
       this.$win.show();
       return localStorage[this.title] = true;
@@ -300,12 +324,8 @@
       return this.assets.hoverSound.play();
     },
     eGridMouseover: function(e) {
-      if (this.isDragging) {
-        this.$game.trigger(this.dragMode, e.target);
-      }
-      if (!this.mute) {
-        return this.assets.hoverSound.play();
-      }
+      if (this.isDragging) this.$game.trigger(this.dragMode, e.target);
+      if (!this.mute) return this.assets.hoverSound.play();
     },
     eGridMousedown: function(e) {
       var $el;
@@ -313,9 +333,7 @@
       $el = $(e.target);
       if (this.gameMode === 'play') {
         this.dragMode = e.which !== 1 ? 'mark' : 'break';
-        if (this.dragMode === 'mark') {
-          this.isErasing = $el.hasClass('mark');
-        }
+        if (this.dragMode === 'mark') this.isErasing = $el.hasClass('mark');
       } else {
         this.dragMode = 'paint';
         this.isErasing = $el.hasClass('paint');
@@ -324,4 +342,3 @@
       return this.$game.trigger(this.dragMode, e.target);
     }
   };
-}).call(this);

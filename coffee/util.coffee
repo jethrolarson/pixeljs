@@ -3,6 +3,11 @@ unless Function.bind?
 		context ||= this
 		return -> fn.apply(context, arguments)
 
+String.times = (str, times)->
+	o = ''
+	o += str for i in [0...times]
+	o
+
 String.prototype.replaceAt = (index, char)->
 	return this.substr(0, index) + char + this.substr(index+char.length)
 
@@ -32,12 +37,6 @@ window.levelToDataURL = (level)->
 			imageData.data[idx+3] = 0xff;
 		ctx.putImageData(imageData, 0, 0)
 		return c.toDataURL()
-	
-window.multiplyString = (str,times)->
-	s = ''
-	for i in [0...times]
-		s+=str
-	s
 	
 window.
 

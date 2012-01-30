@@ -3,47 +3,62 @@ $ ->
 	Game.edit()
 	
 	$('form').submit ->
-		@game.value = Game.level.game
+		$('#gametxt').val Game.level.getGame()
+		true
 
 	FARBTASTIC_WIDTH = 195
 	$('<div id="picker"></div>').appendTo 'body'
 	$picker = $('#picker').hide()
 	fb = $.farbtastic('#picker')
 	
-	$('input[type=color]').focus ->
-		fb.linkTo(this)
-		pos = $(this).offset()
-		$picker.css(
-			top: pos.top - (FARBTASTIC_WIDTH / 2) + 8, 
-			left: pos.left + $(this).outerWidth()
-		).show()
-	.blur ->
-		$picker.hide()
-	.change ->
-		if this.name is 'fgcolor'
-			Game.level.fgcolor = this.value
-		else
-			Game.level.bgcolor = this.value
-		Game.renderLevel()
-	$('#x').appendTo('#colHints').each ->
-		$('<div class="sliderWidget" id="xSlider"/>').insertBefore(this).slider
-			step: 1
-			value: this.value
-			min: 1
-			max: 32
-			slide: (e, ui)=>
-				this.value = ui.value
-				Game.updateCols @value
-	$('#y').appendTo('#rowHints').each ->
-		max = 32
-		$('<div class="sliderWidget" id="ySlider" style="height:400px"/>').insertBefore(this).slider
-			orientation: 'vertical'
-			step: 1
-			value: max-this.value
-			min: 1
-			max: max
-			height: 400
-			slide: (e, ui)=>
-				this.value = max - ui.value
-				Game.updateRows @value
+	$('input[type=color]').live 
+		focus: ->
+			fb.linkTo(this)
+			pos = $(this).position()
+			$picker.css(
+				top: pos.top - (FARBTASTIC_WIDTH / 2) + 8, 
+				left: pos.left - FARBTASTIC_WIDTH
+			).show()
+		blur: ->
+			$picker.hide()
+		change: ->
+			if this.name is 'bgcolor'
+				Game.level.bgcolor = this.value
+			else
+				layerRE = /fgcolor(\d)/.exec this.name
+				if layerRE and layerRE.length
+					Game.level.setLayerColor this.value, +layerRE[1]
+					$('#fgcolor').val Game.level.fgcolor
+			_.debounce(Game.renderLevel(),200)
+	$x = $('#x').appendTo('#colHints')
+	$('<div class="sliderWidget" id="xSlider"/>').insertBefore($x).slider
+		step: 1
+		value: $x.val()
+		min: 1
+		max: 32
+		slide: (e, ui)->
+			$x.val ui.value
+			Game.updateCols $x.val()
+	
+	$y = $('#y').appendTo '#rowHints'
+	max = 32
+	$('<div class="sliderWidget" style="height:532px"/>').insertBefore($y).slider
+		orientation: 'vertical'
+		step: 1
+		value: max - $y.val()
+		min: 1
+		max: max
+		height: 532
+		slide: (e, ui)=>
+			$y.val max - ui.value
+			Game.updateRows $y.val()
+	
+	$('#addLayer').live 'click', ->
+		#duplicate field, switch type to hidden. 
+		Game.addLayer()
+	$('.changeLayer').live 'click', (e)->
+		$('.changeLayer').removeClass 'on'
+		$(this).addClass 'on'
+
+
 	

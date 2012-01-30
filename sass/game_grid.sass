@@ -127,13 +127,30 @@ $cell-border-width: 1px
 
 #lose
 	color: red
-
-#grid
+#layers
+	white-space: nowrap
+	input
+		width: 22px
+.changeLayer
+	margin: 0 0 1px
+	width: 22px
+	height: 22px
+	display: inline-block
+	text-decoration: none
+	&.on
+		outline: 1px solid yellow
+#gridCell ul
+	pointer-events: none
+	&.on
+		pointer-events: auto
+	&:first-child
+		position: static
+	position: absolute
 	float: left
 	+clearfix
 	+reset-list
 	cursor: move
-	background: #ddd
+	
 	border: 1px solid
 		color: $bc_highlight $bc_lowlight $bc_lowlight $bc_highlight
 	&.dragging
@@ -163,7 +180,6 @@ $cell-border-width: 1px
 		background: url(../images/flag_red.png) no-repeat center center
 	.on, &.paint
 		-webkit-transition: background-color .25s linear
-		background: #8ad
 	.error
 		background-image: url(../images/cross.png)
 		opacity: .8
