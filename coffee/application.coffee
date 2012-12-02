@@ -9,28 +9,144 @@ window.Game =
 	#constants
 	colWidth: 40
 	MAX_CELL_WIDTH: 60
+	lastCell: ''
 	init: ($game)->
 		@$game= $game
-		@$gridCell= @$game.find '#gridCell'
-		@$win=      @$game.find '#win'
-		@$lose=     @$game.find '#lose'
-		@$score=    @$game.find '#score'
-		@$games=    @$game.find '#games'
-		@$colHints= @$game.find '#colHints'
-		@$rowHints= @$game.find '#rowHints'
-		@$layers=   @$game.find '#layers'
+		@$gridCell= @$game.find('#gridCell')
+		@$win=      @$game.find('#win')
+		@$lose=     @$game.find('#lose')
+		@$score=    @$game.find('#score')
+		@$games=    @$game.find('#games')
+		@$colHints= @$game.find('#colHints')
+		@$rowHints= @$game.find('#rowHints')
+		@$layers=   @$game.find('#layers')
+		@$canvas= $('#canvas')
 		@$colorSheet = $(document.createElement 'style').prependTo(@$game)
 		@$game.trigger 'init'
+		
+
+		canvas = document.getElementById('canvas')
+		
 		@loadAssets()
 		@bindEvents()
 		this
 	start: ->
 		#load game data
 		@loadGame window.level
+	blip: 0
+	drawGrid: ->
+		#adjusts the color of the lines based on the background #HACKY
+		@p.stroke(if @p.brightness(@bgc) > 80 then 0 else 200)
+		#draw gridlines
+		for i in [1...@level.x]
+			if i % 5
+				@p.strokeWeight(1)
+			else
+				@p.strokeWeight(3)
+			@p.line(i * @cw + @gridBounds.x1, @gridBounds.y1, i * @cw + @gridBounds.x1, @level.y * @cw + @gridBounds.y1)
+		for i in [1...@level.y]
+			if i % 5
+				@p.strokeWeight(1)
+			else
+				@p.strokeWeight(3)
+			@p.line(@gridBounds.x1, i * @cw + @gridBounds.y1, @level.x * @cw + @gridBounds.x1, i * @cw + @gridBounds.y1)
+		@p.fill(0, 102, 153)
+	drawCell: (x,y)->
+		cellMargin = 0
+		@p.rect(
+			x * @cw + @gridBounds.x1 + cellMargin,
+			y * @cw + @gridBounds.y1 + cellMargin,
+			@cw - cellMargin*2,
+			@cw - cellMargin*2
+		)
+	drawCells: ->
+		@p.noStroke()
+		
+		for layer in @level.layers
+			fgc = color.hexToRGB(@level.getLayerColor());
+			@p.fill(fgc.r,fgc.g,fgc.b)
+
+			if @gameMode is 'play'
+				for col,celly in layer.paint
+					for cell,cellx in col
+						if +cell
+							@drawCell(cellx,celly)
+				for col,celly in layer.mark
+					for cell,cellx in col
+						if +cell
+							@p.fill(100,0,0)
+							@drawCell(cellx,celly)
+			else
+				for col,celly in layer.grid
+					for cell,cellx in col
+						if +cell
+							@drawCell(cellx,celly)
+		@
+	draw: ->
+		@p.background 80
+		
+		gridW = (@w - @gridBounds.x1 - (@w - @gridBounds.x2))
+		xw =  Math.floor(gridW / @level.x)
+		gridH = (@h - @gridBounds.y1 - (@h - @gridBounds.y2))
+		yw = Math.floor(gridH / @level.y)
+		@cw = Math.min(xw, yw) #cell size
+		gridW = @cw * @level.x
+		gridH = @cw * @level.y
+		@bgc = color.hexToRGB(@level.bgcolor)
+		@bgc = @p.color(@bgc.r,@bgc.g,@bgc.b)
+		@p.fill(@bgc)
+		@p.rect(@gridBounds.x1,@gridBounds.y1,gridW,gridH)
+		#current cell
+		gridX = Math.floor((@p.mouseX - @gridBounds.x1)/ @cw)
+		gridY = Math.floor((@p.mouseY - @gridBounds.y1)/ @cw)
+		curCell = gridX+','+gridY
+
+		
+		x = gridX * @cw
+		y = gridY * @cw
+		@p.text(gridX+','+gridY,10,10)
+		#if mouse in grid
+		if @p.mouseX > @gridBounds.x1 and @p.mouseY > @gridBounds.y1 and gridX < @level.x and gridY < @level.y
+			
+			if @p.mouseIsPressed
+				
+				if @gameMode is 'play'
+					@dragMode = if @p.mouseButton is @p.RIGHT then 'mark' else 'grid'
+					if @newlyPressed and @dragMode is 'mark'
+						@isErasing = @level.currentLayer.marks[gridX][gridY]
+					@level.setAt(gridX, gridY, +!@isErasing,'paint')
+				else
+					@dragMode = 'paint'
+					if @newlyPressed
+						@isErasing = @level.getAt(gridX, gridY)
+					@level.setAt(gridX, gridY, +!@isErasing)
+				if @lastCell isnt curCell
+					@assets.bing.play()
+			else
+				if @lastCell isnt curCell
+					@assets.hoverSound.play()
+
+		@newlyPressed = false
+		
+		#draw the cells
+		@drawCells()
+
+		@drawGrid()
+		
+		
+		@p.fill(20,80,200,50)
+		#hover effects
+		
+		# 	#paint row highlight
+		# 	@p.rect(@gridBounds.x1, y+@gridBounds.y1, gridW, @cw)
+		# 	#paint col highlight
+		# 	@p.rect(x+@gridBounds.x1, @gridBounds.y1, @cw, gridH)
+		@lastCell = curCell
+		this
 	edit: ->
 		@gameMode = 'edit'
 		@$gridCell.enableContext()
-		@assets.paint = new SoundGroup 'paint.wav'
+		
 		@start()
 	getCol: (x)-> 
 		@getGrid().find("li:nth-child(#{@level.x}n+#{x+2})") #isn't nth-child confusing?
@@ -89,8 +205,9 @@ window.Game =
 		layerUI = ''
 		for layer,i in @level.layers
 			layerUI += """<div>
-				<a href="#layer#{i}" class="changeLayer layer#{i} #{if i is @level.currentLayer then 'on' else ''}">&nbsp;</a>
-				<input type="color" name="fgcolor#{i}" value="#{@level.getLayerColor(i)}" style="background-color:#{@level.getLayerColor(i)}"/> 
+				<a href="#layer#{i}" class="changeLayer layer#{i} #{if i is @level.currentLayerIndex then 'on' else ''}">&nbsp;</a>
+				<input type="color" name="fgcolor#{i}" value="#{@level.getLayerColor(i)}" style="background-color:#{@level.getLayerColor(i)}"/>
+				<a class="layerVisibility" href="#layer#{i}">|</a>
 				</div>
 			"""
 		if @gameMode isnt 'play'
@@ -102,10 +219,31 @@ window.Game =
 		@renderLevel()
 		@renderLayerUI()
 		@updateScore()
-	getGrid: (layerIndex = @level.currentLayer)->
-		$('#layer_'+layerIndex)
+	getGrid: (layerIndex = @level.currentLayerIndex)-> $('#layer_'+layerIndex)
 	renderLevel: ->
+		@w = window.innerWidth
+		@h = window.innerHeight
+		@gridBounds = # this is the rectangle that the grid gets drawn in
+			x1:10
+			y1:10
+			x2: @w-20
+			y2: @h-30
+
+		new Processing(canvas, (p)=>
+			@p = p
+			@p.width = @w
+			@p.height = @h
+			@p.draw = @draw.bind(this)
+			@p.frameRate(24)
+			@p.mousePressed = =>
+				@newlyPressed = true
+				@p.mouseIsPressed = true
+			@p.mouseReleased = =>
+				@p.mouseIsPressed = false
+		)
 		
+		
+
 		# Build grid
 		html= ''
 		cells = @level.x * @level.y
@@ -117,7 +255,7 @@ window.Game =
 				else
 					paint = ''
 				layerhtml += "<li#{paint}> </li>"
-			isOn = if i is @level.currentLayer then 'on' else ''
+			isOn = if i is @level.currentLayerIndex then 'on' else ''
 			html += "<ul id='layer_#{i}' class='#{isOn}'>#{layerhtml}</ul>"
 		@$gridCell.html html
 		
@@ -174,22 +312,55 @@ window.Game =
 		@$colorSheet.html('').html(css)
 			
 	loadAssets: ->
-		@assets = {
-			hoverSound: new SoundGroup 'grid_hover.wav'
-			boom: new SoundGroup 'boom.wav'
-			bing: new SoundGroup 'bing.wav'
-			mark: new SoundGroup 'mark.wav'
-			win: new Audio 'win.wav'
-		}
+		soundManager.setup(
+			# where to find flash audio SWFs, as needed
+			url: '/public/js/soundmanager/swf/'
+			onready: =>
+				@assets = {
+					hoverSound: soundManager.createSound({
+						id: 'hoverSound'
+						url: '/public/audio/grid_hover.wav'
+					})
+					boom: soundManager.createSound({
+						id: 'boom'
+						url: '/public/audio/boom.wav'
+					})
+
+					bing: soundManager.createSound({
+						id: 'bing'
+						url: '/public/audio/bing.wav'
+					})
+					mark: soundManager.createSound({
+						id: 'mark'
+						url: '/public/audio/mark.wav'
+					})
+
+					win: soundManager.createSound({
+						id: 'win'
+						url: '/public/audio/win.wav'
+					})
+					paint: soundManager.createSound({
+						id: 'paint'
+						url: '/public/audio/paint.wav'
+					})
+				}
+		)
+		
+
+		# ...and play it
+		
+		
 	addLayer: ->
 		@level.addLayer()
 		@renderLayerUI()
 		@renderLevel()
 	changeLayer: (layer)->
-		@level.currentLayer = layer
+		@level.setLayer(layer)
 		#hide layers ontop of the selected one
 		@$gridCell.find('ul').removeClass('on')
 		@getGrid().addClass('on')
+		if @gameMode is 'play'
+			@renderHints()
 		
 
 	# ======== #	
@@ -224,12 +395,20 @@ window.Game =
 			mouseup: => 
 				@isDragging= false
 			#deal with layer switching
-		$(window).bind
-			hashchange: =>
-				layerRE = /^#layer(\d)+/.exec location.hash
-				if layerRE.length
-					@changeLayer +layerRE[1]
-
+		that = this
+		$('.changeLayer').live 'click',->
+			layerRE = /^#layer(\d)+/.exec this.hash
+			if layerRE.length
+				that.changeLayer +layerRE[1]
+				$('.changeLayer').removeClass 'on'
+				$(this).addClass 'on'
+		$('.layerVisibility').live 'click',(e)->
+			e.preventDefault()
+			layerRE = /^#layer(\d)+/.exec this.hash
+			if layerRE.length
+				layer = +layerRE[i]
+				layerVisibility = @level.getLayerVisibility layer
+				@level.setLayerVisibility layer, !layerVisibility
 	getGolfScore: ->
 		par =  @score - @level.par
 		label = ''
@@ -271,27 +450,28 @@ window.Game =
 			$el.addClass('error')
 			@$game.trigger('die', el)
 	updateHints: ->
-		for y in [0...@level.y]
-			@isLineComplete(
-				@getRow(y)
-			) and $('#rowHints li').eq(y).addClass('done')
-		for x in [0...@level.x]
-			@isLineComplete(
-				@getCol(x)
-			) and $('#colHints li').eq(x).addClass('done')
-		return
+		# FIXME
+		# for y in [0...@level.y]
+		# 	@isLineComplete(
+		# 		@getRow(y)
+		# 	) and $('#rowHints li').eq(y).addClass('done')
+		# for x in [0...@level.x]
+		# 	@isLineComplete(
+		# 		@getCol(x)
+		# 	) and $('#colHints li').eq(x).addClass('done')
+		# return
 	eMark: (e,el)->
 		return unless @gameMode is 'play'
 		@assets.mark.play() unless @mute
 		$(el).toggleClass('mark', not @isErasing)
 	ePaint: (e,el)->
 		$el = $(el)
-		@level.updateCell(@getGrid().find('li').index(el), if @isErasing then '0' else '1')
+		#@level.updateCell(@getGrid().find('li').index(el), if @isErasing then '0' else '1')
 		$(el).toggleClass('paint', not @isErasing)
 	eWin: ->
 		@dragMode= null	
 		@assets.win.play() unless @mute
-		@$win.text(@getGolfScore())
+		@$win.text @getGolfScore()
 		@$win.show()
 		localStorage[@title] = true
 
@@ -313,6 +493,8 @@ window.Game =
 			@isErasing = $el.hasClass('mark') if @dragMode is 'mark'
 		else
 			@dragMode = 'paint'
-			@isErasing = $el.hasClass('paint')
+			@isErasing = $el.hasClass 'paint'
 		@isDragging = true
 		@$game.trigger @dragMode, e.target
+
+

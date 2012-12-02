@@ -100,7 +100,9 @@ SoundGroup::stop = (channel)->
 		@getNotPlaying().stop()
 SoundGroup::getNotPlaying = ->
 	for channel in @channels
-		return channel if currentTime = 0 || channel.audio.ended
+		if channel.audio.currentTime is 0 || channel.audio.ended
+			channel.audio.currentTime = 0
+			return channel.audio 
 	return @addChannel()
 window.SoundGroup = SoundGroup
 

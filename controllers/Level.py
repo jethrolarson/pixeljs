@@ -35,7 +35,6 @@ class Edit(webapp.RequestHandler):
     user = models.getCurrentUser()
     key = self.request.get('key')
     levelSet = None
-    
     #new level
     if not len(key):
       level = models.Level()

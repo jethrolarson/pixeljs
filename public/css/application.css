@@ -10,7 +10,6 @@ html {
   background-image: -webkit-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
   background-image: -moz-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
   background-image: -o-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
-  background-image: -ms-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
   background-image: linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
   background-repeat: no-repeat;
 }
@@ -32,7 +31,6 @@ html {
   background-image: -webkit-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
   background-image: -moz-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
   background-image: -o-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
-  background-image: -ms-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
   background-image: linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
   background-repeat: no-repeat;
 }
@@ -122,9 +120,8 @@ input[type=number] {
   border-radius: 5px;
   border-width: 1px;
   border-color: #777777 #666666 #444444;
-  -moz-box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(179, 179, 179, 0.4);
   -webkit-box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(179, 179, 179, 0.4);
-  -o-box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(179, 179, 179, 0.4);
+  -moz-box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(179, 179, 179, 0.4);
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.6), 0 1px 0 rgba(179, 179, 179, 0.4);
   padding: 3px 6px;
 }
@@ -621,7 +618,6 @@ html {
   background-image: -webkit-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
   background-image: -moz-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
   background-image: -o-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
-  background-image: -ms-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
   background-image: linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
   background-repeat: no-repeat;
 }
@@ -690,7 +686,6 @@ html {
   background-image: -webkit-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
   background-image: -moz-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
   background-image: -o-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
-  background-image: -ms-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
   background-image: linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
   background-repeat: no-repeat;
 }
@@ -712,7 +707,6 @@ html {
   background-image: -webkit-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
   background-image: -moz-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
   background-image: -o-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
-  background-image: -ms-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
   background-image: linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
   background-repeat: no-repeat;
 }
@@ -846,20 +840,6 @@ body {
   }
 }
 
-/* line 74, ../../sass/game_grid.sass */
-.shake {
-  -webkit-animation-name: shake;
-  -webkit-animation-duration: 0.3s;
-  -webkit-transform-origin: 50% 50%;
-  -webkit-animation-iteration-count: infinite;
-  -webkit-animation-timing-function: linear;
-  -moz-animation-name: shake;
-  -moz-animation-duration: 0.3s;
-  -moz-transform-origin: 50% 50%;
-  -moz-animation-iteration-count: infinite;
-  -moz-animation-timing-function: linear;
-}
-
 /* line 86, ../../sass/game_grid.sass */
 #game {
   -webkit-user-select: none;
@@ -945,7 +925,6 @@ body {
 /* line 120, ../../sass/game_grid.sass */
 #win {
   position: absolute;
-  /*width/height set in js */
   display: none;
   color: green;
   text-align: center;
@@ -993,11 +972,25 @@ body {
   border: 1px solid;
   border-color: white #888888 #888888 white;
 }
-/* line 144, ../../sass/game_grid.sass */
+/* line 145, ../../sass/game_grid.sass */
 #gridCell ul.on {
+  opacity: 1;
   pointer-events: auto;
 }
 /* line 146, ../../sass/game_grid.sass */
+#gridCell ul.on li {
+  opacity: 1;
+}
+/* line 150, ../../sass/game_grid.sass */
+#gridCell ul.on .mark {
+  background: url(../images/flag_red.png) no-repeat center center;
+}
+/* line 152, ../../sass/game_grid.sass */
+#gridCell ul.on .error {
+  background-image: url(../images/cross.png);
+  opacity: 0.8;
+}
+/* line 155, ../../sass/game_grid.sass */
 #gridCell ul:first-child {
   position: static;
 }
@@ -1017,19 +1010,19 @@ body {
   color: #aaaaaa;
   list-style: none;
 }
-/* line 156, ../../sass/game_grid.sass */
+/* line 165, ../../sass/game_grid.sass */
 #gridCell ul.dragging {
   cursor: -moz-grabbing;
 }
-/* line 158, ../../sass/game_grid.sass */
+/* line 167, ../../sass/game_grid.sass */
 #gridCell ul li {
+  opacity: 0.5;
   float: left;
   text-align: center;
   width: 40px;
   height: 40px;
-  -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
-  -ms-box-sizing: border-box;
+  -moz-box-sizing: border-box;
   box-sizing: border-box;
   border: 1px solid;
   border-color: white #888888 #888888 white;
@@ -1037,42 +1030,38 @@ body {
   background-repeat: no-repeat;
   background-position: center center;
 }
-/* line 170, ../../sass/game_grid.sass */
+/* line 180, ../../sass/game_grid.sass */
 #gridCell ul li a {
   text-decoration: none;
   display: block;
   text-align: center;
 }
-/* line 174, ../../sass/game_grid.sass */
+/* line 184, ../../sass/game_grid.sass */
 #gridCell ul li:hover {
   outline: 2px solid #ffffaa;
   border: 1px #999999 solid;
 }
-/* line 177, ../../sass/game_grid.sass */
+/* line 187, ../../sass/game_grid.sass */
 #gridCell ul .show {
   background: #dddddd;
 }
-/* line 179, ../../sass/game_grid.sass */
-#gridCell ul .mark {
-  background: url(../images/flag_red.png) no-repeat center center;
-}
-/* line 181, ../../sass/game_grid.sass */
+/* line 190, ../../sass/game_grid.sass */
 #gridCell ul .on, #gridCell ul.paint {
   -webkit-transition: background-color 0.25s linear;
 }
-/* line 183, ../../sass/game_grid.sass */
-#gridCell ul .error {
-  background-image: url(../images/cross.png);
-  opacity: 0.8;
-}
 
 @media only screen and (max-device-width: 1024px), only screen and (max-device-width: 480px) {
-  /* line 188, ../../sass/game_grid.sass */
+  /* line 194, ../../sass/game_grid.sass */
   #grid li:hover {
     outline: 0;
     border: none;
   }
 }
+/* line 198, ../../sass/game_grid.sass */
+#x, #y {
+  width: 60px;
+}
+
 /**
  * Farbtastic Color Picker 1.2
  * © 2008 Steven Wittens
@@ -1133,8 +1122,8 @@ body {
 
 /* line 7, ../../sass/application.sass */
 #page {
-  margin: 38px auto;
-  padding: 1em;
+  margin: 0 auto;
+  padding: 0;
 }
 
 /* line 11, ../../sass/application.sass */
@@ -1148,11 +1137,9 @@ body {
   background-image: -webkit-linear-gradient(#262626 0%, #333333 98%, #4d4d4d 100%);
   background-image: -moz-linear-gradient(#262626 0%, #333333 98%, #4d4d4d 100%);
   background-image: -o-linear-gradient(#262626 0%, #333333 98%, #4d4d4d 100%);
-  background-image: -ms-linear-gradient(#262626 0%, #333333 98%, #4d4d4d 100%);
   background-image: linear-gradient(#262626 0%, #333333 98%, #4d4d4d 100%);
-  -moz-box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
   -webkit-box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
-  -o-box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+  -moz-box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
   z-index: 100;

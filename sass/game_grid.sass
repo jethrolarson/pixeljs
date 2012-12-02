@@ -71,17 +71,17 @@ $cell-border-width: 1px
 	100%
 		-moz-transform: translate(1px, -2px)
 
-.shake
-	-webkit-animation-name: shake
-	-webkit-animation-duration: 0.3s
-	-webkit-transform-origin: 50% 50%
-	-webkit-animation-iteration-count: infinite
-	-webkit-animation-timing-function: linear
-	-moz-animation-name: shake
-	-moz-animation-duration: 0.3s
-	-moz-transform-origin: 50% 50%
-	-moz-animation-iteration-count: infinite
-	-moz-animation-timing-function: linear
+	// .shake
+	// 	-webkit-animation-name: shake
+	// 	-webkit-animation-duration: 0.3s
+	// 	-webkit-transform-origin: 50% 50%
+	// 	-webkit-animation-iteration-count: infinite
+	// 	-webkit-animation-timing-function: linear
+	// 	-moz-animation-name: shake
+	// 	-moz-animation-duration: 0.3s
+	// 	-moz-transform-origin: 50% 50%
+	// 	-moz-animation-iteration-count: infinite
+	// 	-moz-animation-timing-function: linear
 
 #game
 	+user-select
@@ -119,7 +119,7 @@ $cell-border-width: 1px
 
 #win
 	position: absolute
-	/*width/height set in js
+	//width/height set in js
 	display: none
 	color: green
 	text-align: center
@@ -141,8 +141,17 @@ $cell-border-width: 1px
 		outline: 1px solid yellow
 #gridCell ul
 	pointer-events: none
+	
 	&.on
+		li
+			opacity: 1
+		opacity: 1
 		pointer-events: auto
+		.mark
+			background: url(../images/flag_red.png) no-repeat center center
+		.error
+			background-image: url(../images/cross.png)
+			opacity: .8
 	&:first-child
 		position: static
 	position: absolute
@@ -156,6 +165,7 @@ $cell-border-width: 1px
 	&.dragging
 		cursor: -moz-grabbing
 	li
+		opacity: .5
 		float: left
 		text-align: center
 		width: $cell-size
@@ -176,15 +186,19 @@ $cell-border-width: 1px
 			border: 1px #999 solid
 	.show
 		background: #ddd
-	.mark
-		background: url(../images/flag_red.png) no-repeat center center
+	
 	.on, &.paint
 		-webkit-transition: background-color .25s linear
-	.error
-		background-image: url(../images/cross.png)
-		opacity: .8
 
 @media only screen and (max-device-width: 1024px), only screen and (max-device-width: 480px)
 	#grid li:hover		 
 		outline: 0
 		border: none
+
+#x,#y
+	width: 60px
+	//width: 100%
+
+
+	//-webkit-appearance: slider-vertical
+	//height: 100%

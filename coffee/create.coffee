@@ -30,35 +30,16 @@ $ ->
 					Game.level.setLayerColor this.value, +layerRE[1]
 					$('#fgcolor').val Game.level.fgcolor
 			_.debounce(Game.renderLevel(),200)
-	$x = $('#x').appendTo('#colHints')
-	$('<div class="sliderWidget" id="xSlider"/>').insertBefore($x).slider
-		step: 1
-		value: $x.val()
-		min: 1
-		max: 32
-		slide: (e, ui)->
-			$x.val ui.value
-			Game.updateCols $x.val()
+	$('#x').change ->
+		Game.updateCols this.value
 	
-	$y = $('#y').appendTo '#rowHints'
-	max = 32
-	$('<div class="sliderWidget" style="height:532px"/>').insertBefore($y).slider
-		orientation: 'vertical'
-		step: 1
-		value: max - $y.val()
-		min: 1
-		max: max
-		height: 532
-		slide: (e, ui)=>
-			$y.val max - ui.value
-			Game.updateRows $y.val()
+	$('#y').change ->
+		Game.updateRows this.value
 	
 	$('#addLayer').live 'click', ->
 		#duplicate field, switch type to hidden. 
 		Game.addLayer()
-	$('.changeLayer').live 'click', (e)->
-		$('.changeLayer').removeClass 'on'
-		$(this).addClass 'on'
+		
 
 
 	
