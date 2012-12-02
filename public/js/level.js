@@ -42,12 +42,15 @@
   };
 
   Matrix.prototype.getRow = function(y) {
-    var i, row, _i, _len, _ref;
+    var col, row, _i, _len, _ref;
+    if (y >= this.y) {
+      return null;
+    }
     row = [];
     _ref = this.cols;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      i = _ref[_i];
-      row.push(this.cols[i][y]);
+      col = _ref[_i];
+      row.push(col[y]);
     }
     return row;
   };
@@ -111,6 +114,54 @@
     this.paint = new Matrix(this.x, this.y);
     this.fgcolor = options.fgcolor;
     return this;
+  };
+
+  Layer.prototype.getRowHints = function() {
+    var hints, row, _i, _ref;
+    hints = [];
+    for (row = _i = 0, _ref = this.y; 0 <= _ref ? _i < _ref : _i > _ref; row = 0 <= _ref ? ++_i : --_i) {
+      hints.push(this.getLineHints(this.grid.getRow(row)));
+    }
+    return hints;
+  };
+
+  Layer.prototype.getColHints = function() {
+    var hints, i, _i, _ref;
+    hints = [];
+    for (i = _i = 0, _ref = this.x; 0 <= _ref ? _i < _ref : _i > _ref; i = 0 <= _ref ? ++_i : --_i) {
+      hints.push(this.getLineHints(this.grid.getCol(i)));
+    }
+    return hints;
+  };
+
+  Layer.prototype.getLineHints = function(row) {
+    var cell, hint, hints, i, pushHint, _i, _len;
+    hints = [];
+    hint = 0;
+    pushHint = function(force) {
+      if (force == null) {
+        force = false;
+      }
+      if (hint > 0 || force) {
+        hints.push(hint);
+      }
+      return hint = 0;
+    };
+    for (i = _i = 0, _len = row.length; _i < _len; i = ++_i) {
+      cell = row[i];
+      if (+cell) {
+        hint += 1;
+        if (i === row.length - 1) {
+          pushHint();
+        }
+      } else {
+        pushHint();
+      }
+    }
+    if (hints.length === 0) {
+      pushHint(true);
+    }
+    return hints;
   };
 
   window.Level = function(level) {

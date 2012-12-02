@@ -18,9 +18,10 @@ Matrix = (x, y, initialValues, defaultValue="0")->
 Matrix::getAt = (x,y)-> @cols[x][y]
 Matrix::setAt = (x,y,val)-> @cols[x][y] = val
 Matrix::getRow = (y)->
+	if y >= @y then return null
 	row = []
-	for i in @cols
-		row.push @cols[i][y]
+	for col in @cols
+		row.push col[y]
 	return row
 
 Matrix::getCol = (x)-> @cols[x]
@@ -66,33 +67,33 @@ Layer = (options)->
 	@fgcolor = options.fgcolor
 	@
 
-# getRowHints: ->
-# 	hints = []
-# 	for row in [0...@y]
-# 		hints.push @getLineHints @getRow row
-# 	return hints
+Layer::getRowHints= ->
+	hints = []
+	for row in [0...@y]
+		hints.push @getLineHints @grid.getRow row
+	return hints
 
-# getColHints: ->
-# 	hints= []
-# 	for i in [0...@x]
-# 		hints.push @getLineHints @getCol i
-# 	return hints
+Layer::getColHints= ->
+	hints= []
+	for i in [0...@x]
+		hints.push @getLineHints @grid.getCol i
+	return hints
 
-# getLineHints: (row)->
-# 	hints= []
-# 	hint= 0
-# 	pushHint = (force=false)->
-# 		if hint > 0 or force
-# 			hints.push(hint)
-# 		hint= 0
-# 	for cell, i in row
-# 		if +cell
-# 			hint += 1
-# 			pushHint() if i is row.length - 1
-# 		else
-# 			pushHint()
-# 	pushHint(true) if hints.length is 0
-# 	return hints
+Layer::getLineHints= (row)->
+	hints= []
+	hint= 0
+	pushHint = (force=false)->
+		if hint > 0 or force
+			hints.push(hint)
+		hint= 0
+	for cell, i in row
+		if +cell
+			hint += 1
+			pushHint() if i is row.length - 1
+		else
+			pushHint()
+	pushHint(true) if hints.length is 0
+	return hints
 
 #TODO Add Marks for each layer
 window.Level = (level)->

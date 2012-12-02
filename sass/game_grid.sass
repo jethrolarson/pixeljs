@@ -83,6 +83,16 @@ $cell-border-width: 1px
 	// 	-moz-animation-iteration-count: infinite
 	// 	-moz-animation-timing-function: linear
 
+#menu
+	position: fixed
+	left: 0
+	top: 0
+	padding: 10px 5px
+	width: 140px
+	input
+		max-width: 100%
+	input[type=number]
+		width: 3.4em
 #game
 	+user-select
 	table
@@ -132,9 +142,12 @@ $cell-border-width: 1px
 #lose
 	color: red
 #layers
+	padding: 10px 5px
+	position: fixed
+	right: 0
+	top: 0
 	white-space: nowrap
-	input
-		width: 22px
+	
 .changeLayer
 	margin: 0 0 1px
 	width: 22px

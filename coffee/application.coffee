@@ -43,19 +43,19 @@ window.Game =
 				@p.strokeWeight(1)
 			else
 				@p.strokeWeight(3)
-			@p.line(i * @cw + @gridBounds.x1, @gridBounds.y1, i * @cw + @gridBounds.x1, @level.y * @cw + @gridBounds.y1)
+			@p.line(i * @cw + @offset.x, @offset.y, i * @cw + @offset.x, @level.y * @cw + @offset.y)
 		for i in [1...@level.y]
 			if i % 5
 				@p.strokeWeight(1)
 			else
 				@p.strokeWeight(3)
-			@p.line(@gridBounds.x1, i * @cw + @gridBounds.y1, @level.x * @cw + @gridBounds.x1, i * @cw + @gridBounds.y1)
+			@p.line(@offset.x, i * @cw + @offset.y, @level.x * @cw + @offset.x, i * @cw + @offset.y)
 		@p.fill(0, 102, 153)
 	drawCell: (x,y)->
 		cellMargin = 0
 		@p.rect(
-			x * @cw + @gridBounds.x1 + cellMargin,
-			y * @cw + @gridBounds.y1 + cellMargin,
+			x * @cw + @offset.x + cellMargin,
+			y * @cw + @offset.y + cellMargin,
 			@cw - cellMargin*2,
 			@cw - cellMargin*2
 		)
@@ -63,49 +63,65 @@ window.Game =
 		@p.noStroke()
 		
 		for layer,layerIndex in @level.layers
+			if @gameMode is 'play' and layerIndex > @level.currentLayerIndex
+				break
 			fgc = color.hexToRGB(layer.fgcolor)
 			for x in [0...@level.x]
 				for y in [0...@level.y]
 					if @gameMode is 'play'
-						if +layer.mark[y][x]
+						if +layer.mark.getAt x, y
 							@p.fill(100,0,0)
 							@drawCell(x,y)
-						if +layer.paint[y][x]
-							@p.fill(fgc.r,fgc.g,fgc.b)
+						if +layer.paint.getAt x,y
+							if +layer.grid.getAt x,y
+								@p.fill(fgc.r,fgc.g,fgc.b)
+							else if layer is @level.currentLayer
+								@p.fill(200,0,0)
 							@drawCell(x,y)
 					else
-						if layer.visible && +layer.grid.getAt(x,y)
+						if layer.visible && +layer.grid.getAt x,y
 							@p.fill(fgc.r,fgc.g,fgc.b)
 							@drawCell(x,y)
 		@
 	draw: ->
 		@p.background 80
-		
+		rowHints = @level.currentLayer.getRowHints()
+		biggestRowHints = 1
+		for row in rowHints
+			biggestRowHints = row.length if row.length > biggestRowHints
+		colHints = @level.currentLayer.getColHints()
+		biggestColHints = 1
+		for col in colHints
+			biggestColHints = col.length if col.length > biggestColHints
+		colHints = @level.currentLayer.getColHints()
 		gridW = (@w - @gridBounds.x1 - (@w - @gridBounds.x2))
-		xw =  Math.floor(gridW / @level.x)
+		xw =  Math.floor(gridW / (@level.x + biggestRowHints))
 		gridH = (@h - @gridBounds.y1 - (@h - @gridBounds.y2))
-		yw = Math.floor(gridH / @level.y)
-		@cw = Math.min(xw, yw) #cell size
+		yw = Math.floor(gridH / (@level.y + biggestColHints))
+		#cell size
+		@cw = Math.min(xw, yw)
+		@offset = 
+			x: @gridBounds.x1 + (biggestRowHints * @cw)
+			y: @gridBounds.y1 + (biggestColHints * @cw)
 		gridW = @cw * @level.x
 		gridH = @cw * @level.y
 		@bgc = color.hexToRGB(@level.bgcolor)
 		@bgc = @p.color(@bgc.r,@bgc.g,@bgc.b)
 		@p.fill(@bgc)
-		@p.rect(@gridBounds.x1,@gridBounds.y1,gridW,gridH)
+		@p.rect(@offset.x,@offset.y,gridW,gridH)
 		#current cell
-		gridX = Math.floor((@p.mouseX - @gridBounds.x1)/ @cw)
-		gridY = Math.floor((@p.mouseY - @gridBounds.y1)/ @cw)
+		gridX = Math.floor((@p.mouseX - @offset.x)/ @cw)
+		gridY = Math.floor((@p.mouseY - @offset.y)/ @cw)
 		curCell = gridX+','+gridY
-
 		
 		x = gridX * @cw
 		y = gridY * @cw
 		@p.text(gridX+','+gridY,10,10)
 		#if mouse in grid
-		if @p.mouseX > @gridBounds.x1 and @p.mouseY > @gridBounds.y1 and gridX < @level.x and gridY < @level.y
+		if @p.mouseX > @offset.x and @p.mouseY > @offset.y and gridX < @level.x and gridY < @level.y
 			
 			if @p.mouseIsPressed
-				
+				cell = +@level.currentLayer.grid.getAt(gridX, gridY)
 				if @gameMode is 'play'
 					@dragMode = if @p.mouseButton is @p.RIGHT then 'mark' else 'grid'
 					if @newlyPressed and @dragMode is 'mark'
@@ -113,13 +129,17 @@ window.Game =
 					if @dragMode is 'mark'
 						@level.currentLayer.mark.setAt(gridX, gridY, !@isErasing,'paint')
 					else
+						prev = +@level.currentLayer.paint.getAt gridX, gridY
 						@level.currentLayer.paint.setAt(gridX, gridY, "1",'paint')
-					#TODO break the cell
+						if !prev
+							if cell
+								@assets.bing.play()
+							else
+								@assets.boom.play()
+
 				else
-					cell = +@level.currentLayer.grid.getAt(gridX, gridY)
 					if @newlyPressed
 						@isErasing = !!cell
-						
 					if !!cell isnt !@isErasing
 						@level.currentLayer.grid.setAt(gridX, gridY, (+!@isErasing).toString())
 						if @lastCell isnt curCell or @newlyPressed
@@ -140,9 +160,9 @@ window.Game =
 		#hover effects
 		
 		# 	#paint row highlight
-		# 	@p.rect(@gridBounds.x1, y+@gridBounds.y1, gridW, @cw)
+		# 	@p.rect(@gridBounds.x1, y+@offset., gridW, @cw)
 		# 	#paint col highlight
-		# 	@p.rect(x+@gridBounds.x1, @gridBounds.y1, @cw, gridH)
+		# 	@p.rect(x+@gridBounds.x1, @offset., @cw, gridH)
 		@lastCell = curCell
 		this
 	edit: ->
@@ -174,35 +194,7 @@ window.Game =
 			if @level.getAt(coord.x,coord.y) and not $(cell).hasClass('on')
 				return false
 		return true
-	updateCols: (cols)->
-		delta = cols - @level.x
-		if delta > 0
-			@level.addCols delta
-		else if delta < 0
-			@level.subtractCols Math.abs delta
-		@renderLevel()
-	updateRows: (cols)->
-		delta = cols - @level.y
-		if delta > 0
-			@level.addRows delta
-		else if delta < 0
-			@level.subtractRows Math.abs delta
-		@renderLevel()
-	renderHints: ->
-		html= ''
-		for hintGroup in @level.getColHints()
-			html += '<li>'
-			for hint in hintGroup
-				html += '<div>'+hint+'</div>'
-			html += '</li>'
-		@$colHints.html(html)
-		html= ''
-		for hintGroup in @level.getRowHints()
-			html += '<li>'
-			for hint in hintGroup
-				html += '<div>'+hint+'</div>'
-			html += '</li>'
-		@$rowHints.html(html)
+	
 	renderLayerUI: ->
 		layerUI = ''
 		for layer,i in @level.layers
@@ -218,20 +210,21 @@ window.Game =
 		@$layers.html layerUI
 	loadGame: (level)->
 		@level = Level level
-		
+		if @gameMode is 'play'
+			@changeLayer(0)
 		@renderLevel()
 		@renderLayerUI()
 		@updateScore()
-	getGrid: (layerIndex = @level.currentLayerIndex)-> $('#layer_'+layerIndex)
 	renderLevel: ->
 		@w = window.innerWidth
 		@h = window.innerHeight
 		@gridBounds = # this is the rectangle that the grid gets drawn in
 			x1:10
 			y1:10
-			x2: @w-20
+			x2: @w-80
 			y2: @h-30
-
+		if @gameMode isnt 'play'
+			@gridBounds.x1 = 140
 		new Processing(canvas, (p)=>
 			@p = p
 			@p.width = @w
@@ -250,7 +243,6 @@ window.Game =
 			$('#title').html @level.title
 			$('#par').text("Par: "+@level.par)
 			@updateHints()
-			@renderHints()
 	
 	loadAssets: ->
 		@assets = {
@@ -266,11 +258,6 @@ window.Game =
 		@renderLevel()
 	changeLayer: (layer)->
 		@level.setLayer(layer)
-		#hide layers ontop of the selected one
-		@$gridCell.find('ul').removeClass('on')
-		@getGrid().addClass('on')
-		if @gameMode is 'play'
-			@renderHints()
 
 	# =========
 	#	Events

@@ -9,34 +9,38 @@ var level = {{level|jsonify}};
 	<input name="levelSetName" value="{{level.levelSetName}}" type="hidden"/>
 	
 	<input name="game" id="gametxt" type="hidden" value="{{level.game}}"/>
-	
 	<input name="fgcolor" id="fgcolor" type="hidden" value="{{level.fgcolor}}" style="background-color: {{level.fgcolor}}" />
-	<div class="field">
-		<label>Title </label>
-		<input name="title" type="text" value="{{level.title}}"/>
-	</div>
-	
-	<div class="field">
-		<label>
-			X
-			<input type="number" min="3" max="32" name="x" id="x" value="{{level.x}}"/>
-		</label>
-		<label>
-			Y
+	<div id="layers"></div>
+	<div id="menu">
+
+		<div class="field">
+			<input name="title" type="text" value="{{level.title}}" placeholder="title"/>
+		</div>
+		
+		<div class="field">
+			<label>
+				
+				<input type="number" min="3" max="32" name="x" id="x" value="{{level.x}}"/>
+				X
+			</label>
 			<input type="number" min="3" max="32" name="y" id="y" value="{{level.y}}"/>
-		</label>
-	</div>
-	<div class="field">
-		<label>Par </label>
-		<input name="par" type="number" min="1" max="10" step="1" value="{{level.par}}"/>
-	</div>
-	<div class="field">
-		<label>Background</label>
-		<input name="bgcolor" type="color" value="{{level.bgcolor}}" style="background-color: {{level.bgcolor}}" />
+		</div>
+		<div class="field">
+			<label>Par </label>
+			<input name="par" type="number" min="1" max="10" step="1" value="{{level.par}}"/>
+		</div>
+		<div class="field">
+			<label>BG</label>
+			<input name="bgcolor" type="color" value="{{level.bgcolor}}" style="background-color: {{level.bgcolor}}" />
+		</div>
+		<label><input type="checkbox" name="mute" value="1" id="mute"/> Mute</label>
+		<div class="field">
+			<button type="submit">Save</button> <button type="submit" name="play" value="1">Test</button>
+		</div>
 	</div>
 	{% include '../partials/grid.html'%}
 	
-	<button type="submit">Save</button> <button type="submit" name="play" value="1">Test</button>
+	
 </form>
 {%endblock%}
 {%block scripts%}
