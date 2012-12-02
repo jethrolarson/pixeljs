@@ -6,6 +6,7 @@
     Game.init($('#game'));
     Game.edit();
     $('form').submit(function() {
+      $('#fgcolor').val(Game.level.getLayerColors());
       $('#gametxt').val(Game.level.getGame());
       return true;
     });

@@ -15,10 +15,7 @@ var level = {{level|jsonify}};
 		<label>Title </label>
 		<input name="title" type="text" value="{{level.title}}"/>
 	</div>
-	<div class="field">
-		<label>BG Color</label>
-		<input name="bgcolor" type="color" value="{{level.bgcolor}}" style="background-color: {{level.bgcolor}}" />
-	</div>
+	
 	<div class="field">
 		<label>
 			X
@@ -33,7 +30,10 @@ var level = {{level|jsonify}};
 		<label>Par </label>
 		<input name="par" type="number" min="1" max="10" step="1" value="{{level.par}}"/>
 	</div>
-	<canvas id="canvas"></canvas>
+	<div class="field">
+		<label>Background</label>
+		<input name="bgcolor" type="color" value="{{level.bgcolor}}" style="background-color: {{level.bgcolor}}" />
+	</div>
 	{% include '../partials/grid.html'%}
 	
 	<button type="submit">Save</button> <button type="submit" name="play" value="1">Test</button>

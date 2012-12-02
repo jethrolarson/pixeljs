@@ -98,24 +98,26 @@
     this.audio.autobuffer = true;
     this.audio.src = AUDIOPATH + filename;
     this.audio.load();
-    this.isPlaying = false;
     return this;
   };
 
   Audio.prototype.isLoaded = false;
 
   Audio.prototype.play = function() {
+    if ($.browser.chrome) {
+      this.audio.load();
+    }
     try {
-      this.audio.currentTime = 0;
+      this.stop();
     } catch (_error) {}
     this.audio.play();
-    return this.isPlaying = true;
+    return this;
   };
 
   Audio.prototype.stop = function() {
     this.audio.currentTime = 0;
-    this.isPlaying = false;
-    return this.audio.pause();
+    this.audio.pause();
+    return this;
   };
 
   window.Audio = Audio;
@@ -132,6 +134,9 @@
   };
 
   SoundGroup.prototype.play = function(channel) {
+    if (Game.mute) {
+      return;
+    }
     if (typeof channel !== 'undefined') {
       return this.channels[channel].play();
     } else {
@@ -148,9 +153,9 @@
 
   SoundGroup.prototype.stop = function(channel) {
     if (typeof channel !== 'undefined') {
-      return this.channels[channel].stop();
+      return this.channels[channel];
     } else {
-      return this.getNotPlaying().stop();
+      return this.getNotPlaying();
     }
   };
 
@@ -159,9 +164,8 @@
     _ref = this.channels;
     for (_i = 0, _len = _ref.length; _i < _len; _i++) {
       channel = _ref[_i];
-      if (channel.audio.currentTime === 0 || channel.audio.ended) {
-        channel.audio.currentTime = 0;
-        return channel.audio;
+      if (channel.audio.currentTime === 0 || channel.audio.currentTime === channel.audio.duration) {
+        return channel;
       }
     }
     return this.addChannel();

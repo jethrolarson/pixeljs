@@ -62,18 +62,20 @@ Audio = (filename)->
 	@audio.autobuffer = true
 	@audio.src = AUDIOPATH+filename
 	@audio.load()
-	@isPlaying = false
 	return this
 Audio::isLoaded = false
 Audio::play = ->
+	if $.browser.chrome
+		@audio.load()
 	try
-		@audio.currentTime = 0
+		@stop()
 	@audio.play()
-	@isPlaying = true
+	@
 Audio::stop = ->
 	@audio.currentTime = 0
-	@isPlaying = false
 	@audio.pause()
+	@
+
 window.Audio = Audio
 
 
@@ -85,6 +87,8 @@ SoundGroup = (filename, channels)->
 		@addChannel()
 	this
 SoundGroup::play = (channel)->
+	if Game.mute
+		return
 	if typeof channel isnt 'undefined'
 		@channels[channel].play()
 	else
@@ -95,14 +99,13 @@ SoundGroup::addChannel = ->
 	return newAudio
 SoundGroup::stop = (channel)->
 	if typeof channel isnt 'undefined'
-		@channels[channel].stop()
+		@channels[channel]
 	else
-		@getNotPlaying().stop()
+		@getNotPlaying()
 SoundGroup::getNotPlaying = ->
 	for channel in @channels
-		if channel.audio.currentTime is 0 || channel.audio.ended
-			channel.audio.currentTime = 0
-			return channel.audio 
+		if channel.audio.currentTime is 0 || channel.audio.currentTime is channel.audio.duration
+			return channel
 	return @addChannel()
 window.SoundGroup = SoundGroup
 

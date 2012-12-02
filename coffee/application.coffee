@@ -19,7 +19,7 @@ window.Game =
 		@$games=    @$game.find('#games')
 		@$colHints= @$game.find('#colHints')
 		@$rowHints= @$game.find('#rowHints')
-		@$layers=   @$game.find('#layers')
+		@$layers=   $('#layers')
 		@$canvas= $('#canvas')
 		@$colorSheet = $(document.createElement 'style').prependTo(@$game)
 		@$game.trigger 'init'
@@ -62,25 +62,21 @@ window.Game =
 	drawCells: ->
 		@p.noStroke()
 		
-		for layer in @level.layers
-			fgc = color.hexToRGB(@level.getLayerColor());
-			@p.fill(fgc.r,fgc.g,fgc.b)
-
-			if @gameMode is 'play'
-				for col,celly in layer.paint
-					for cell,cellx in col
-						if +cell
-							@drawCell(cellx,celly)
-				for col,celly in layer.mark
-					for cell,cellx in col
-						if +cell
+		for layer,layerIndex in @level.layers
+			fgc = color.hexToRGB(layer.fgcolor)
+			for x in [0...@level.x]
+				for y in [0...@level.y]
+					if @gameMode is 'play'
+						if +layer.mark[y][x]
 							@p.fill(100,0,0)
-							@drawCell(cellx,celly)
-			else
-				for col,celly in layer.grid
-					for cell,cellx in col
-						if +cell
-							@drawCell(cellx,celly)
+							@drawCell(x,y)
+						if +layer.paint[y][x]
+							@p.fill(fgc.r,fgc.g,fgc.b)
+							@drawCell(x,y)
+					else
+						if layer.visible && +layer.grid.getAt(x,y)
+							@p.fill(fgc.r,fgc.g,fgc.b)
+							@drawCell(x,y)
 		@
 	draw: ->
 		@p.background 80
@@ -113,15 +109,21 @@ window.Game =
 				if @gameMode is 'play'
 					@dragMode = if @p.mouseButton is @p.RIGHT then 'mark' else 'grid'
 					if @newlyPressed and @dragMode is 'mark'
-						@isErasing = @level.currentLayer.marks[gridX][gridY]
-					@level.setAt(gridX, gridY, +!@isErasing,'paint')
+						@isErasing = +@level.currentLayer.marks.getAt(gridX,gridY)
+					if @dragMode is 'mark'
+						@level.currentLayer.mark.setAt(gridX, gridY, !@isErasing,'paint')
+					else
+						@level.currentLayer.paint.setAt(gridX, gridY, "1",'paint')
+					#TODO break the cell
 				else
-					@dragMode = 'paint'
+					cell = +@level.currentLayer.grid.getAt(gridX, gridY)
 					if @newlyPressed
-						@isErasing = @level.getAt(gridX, gridY)
-					@level.setAt(gridX, gridY, +!@isErasing)
-				if @lastCell isnt curCell
-					@assets.bing.play()
+						@isErasing = !!cell
+						
+					if !!cell isnt !@isErasing
+						@level.currentLayer.grid.setAt(gridX, gridY, (+!@isErasing).toString())
+						if @lastCell isnt curCell or @newlyPressed
+							@assets.bing.play()
 			else
 				if @lastCell isnt curCell
 					@assets.hoverSound.play()
@@ -205,9 +207,10 @@ window.Game =
 		layerUI = ''
 		for layer,i in @level.layers
 			layerUI += """<div>
-				<a href="#layer#{i}" class="changeLayer layer#{i} #{if i is @level.currentLayerIndex then 'on' else ''}">&nbsp;</a>
-				<input type="color" name="fgcolor#{i}" value="#{@level.getLayerColor(i)}" style="background-color:#{@level.getLayerColor(i)}"/>
-				<a class="layerVisibility" href="#layer#{i}">|</a>
+				<input 
+					class="changeLayer layer#{i} #{if i is @level.currentLayerIndex then 'on' else ''}"
+					type="color" name="fgcolor#{i}" value="#{layer.fgcolor}" style="background-color:#{layer.fgcolor}"/>
+				<a class="layerVisibility" href="#layer#{i}">&#9635;</a>
 				</div>
 			"""
 		if @gameMode isnt 'play'
@@ -242,75 +245,13 @@ window.Game =
 				@p.mouseIsPressed = false
 		)
 		
-		
-
-		# Build grid
-		html= ''
-		cells = @level.x * @level.y
-		for layer,i in @level.layers
-			layerhtml = ''
-			for cell in [0...cells]
-				if @gameMode isnt 'play' and +layer[cell]
-					paint = ' class="paint"'
-				else
-					paint = ''
-				layerhtml += "<li#{paint}> </li>"
-			isOn = if i is @level.currentLayerIndex then 'on' else ''
-			html += "<ul id='layer_#{i}' class='#{isOn}'>#{layerhtml}</ul>"
-		@$gridCell.html html
-		
 		if @gameMode is 'play'
 			@score = 0;
 			$('#title').html @level.title
 			$('#par').text("Par: "+@level.par)
+			@updateHints()
 			@renderHints()
-
-		@updateStyles()
-		@updateHints()
-		@$gridCell.append(@getGrid())
-	updateStyles: ->
-		css = ''
-		@colWidth = Math.min(Math.floor(@$gridCell.width() / @level.x), this.MAX_CELL_WIDTH)
-		gridWidth= @colWidth * @level.x
-		gridHeight= @colWidth * @level.y
-		fontSize = Math.min(@colWidth * .7, 20)
-		css += """
-			#gridCell ul li{
-				width: #{@colWidth}px;
-				height: #{@colWidth}px;
-			}
-			#gridCell ul{
-				width: #{gridWidth}px;
-			}
-			#win,#lose{
-				width: #{gridWidth}px;
-				height: #{gridHeight}px;
-				line-height: #{gridHeight}px;
-			}
-			#rowHints,
-			#colHints{
-				font-size: #{fontSize}px;
-			}
-			#rowHints li,
-			#rowHints li div{
-				height: #{@colWidth}px;
-				line-height: #{@colWidth}px;
-			}
-			#colHints li div{
-				width: #{@colWidth}px;
-			}
-		"""
-		for layer,i in @level.layers
-			css += """
-				#gridCell ul#layer_#{i} .paint, 
-				#gridCell ul#layer_#{i} .on,
-				#game .changeLayer.layer#{i}{
-					background-color:#{@level.getLayerColor(i)}
-			}"""
-		if @level.bgcolor
-			css += "#gridCell ul:first-child{background-color: #{@level.bgcolor}}"
-		@$colorSheet.html('').html(css)
-			
+	
 	loadAssets: ->
 		@assets = {
 			hoverSound: new SoundGroup 'grid_hover.wav'
@@ -330,23 +271,16 @@ window.Game =
 		@getGrid().addClass('on')
 		if @gameMode is 'play'
 			@renderHints()
-		
 
-	# ======== #	
-	#	 Events	 #
-	# ======== #
+	# =========
+	#	Events
+	# =========
 	bindEvents: ->
-		@$gridCell.disableContext().delegate('li', {
-			'mouseover': $.proxy(@eGridMouseover, this)
-			'touchmove': $.proxy(@eGridTouchmove, this)
-			'mousedown touchstart': $.proxy(@eGridMousedown, this)
-		})
 		@$game.bind
 			break: $.proxy(@eBreak, this)
 			mark:  $.proxy(@eMark, this)
 			lose:  $.proxy(@eLose, this)
 			win:   $.proxy(@eWin, this)
-			paint: $.proxy(@ePaint, this)
 			erase: $.proxy(@eErase, this)
 			die: =>
 				@score += 1
@@ -359,25 +293,23 @@ window.Game =
 		$('#mute').bind 'change',(e)=>
 			@mute = e.target.checked
 			true
-	
-		$(document).bind 
-			mouseup: => 
-				@isDragging= false
-			#deal with layer switching
 		that = this
-		$('.changeLayer').live 'click',->
-			layerRE = /^#layer(\d)+/.exec this.hash
+		$('.changeLayer').live 'click',(e)->
+			layerRE = /layer(\d)+/.exec this.className
 			if layerRE.length
 				that.changeLayer +layerRE[1]
-				$('.changeLayer').removeClass 'on'
-				$(this).addClass 'on'
+				if not $(this).hasClass('on')
+					$('.changeLayer').removeClass 'on'
+					$(this).addClass 'on'
+					e.preventDefault()
+
 		$('.layerVisibility').live 'click',(e)->
 			e.preventDefault()
 			layerRE = /^#layer(\d)+/.exec this.hash
 			if layerRE.length
-				layer = +layerRE[i]
-				layerVisibility = @level.getLayerVisibility layer
-				@level.setLayerVisibility layer, !layerVisibility
+				layerIndex = +layerRE[1]
+				that.level.layers[layerIndex].visible = !that.level.layers[layerIndex].visible
+			true
 	getGolfScore: ->
 		par =  @score - @level.par
 		label = ''
@@ -399,7 +331,7 @@ window.Game =
 			label = "Tripple Bogey"
 		else if par > 3
 			label = @score+" over par"
-	
+		
 	updateScore: ->
 		if @gameMode is 'play'
 			@$score.text "Faults: " + @score
@@ -429,41 +361,12 @@ window.Game =
 		# 		@getCol(x)
 		# 	) and $('#colHints li').eq(x).addClass('done')
 		# return
-	eMark: (e,el)->
-		return unless @gameMode is 'play'
-		@assets.mark.play() unless @mute
-		$(el).toggleClass('mark', not @isErasing)
-	ePaint: (e,el)->
-		$el = $(el)
-		#@level.updateCell(@getGrid().find('li').index(el), if @isErasing then '0' else '1')
-		$(el).toggleClass('paint', not @isErasing)
+	
 	eWin: ->
 		@dragMode= null	
 		@assets.win.play() unless @mute
 		@$win.text @getGolfScore()
 		@$win.show()
 		localStorage[@title] = true
-
-	eGridTouchmove: (e)->
-		e.preventDefault()
-		$el= $ e.target
-		@$game.trigger(@dragMode, e.target)
-		@assets.hoverSound.play()
-	eGridMouseover: (e)->
-		if @isDragging
-			@$game.trigger(@dragMode, e.target)
-		@assets.hoverSound.play() unless @mute
-
-	eGridMousedown: (e)->
-		e.preventDefault()
-		$el = $(e.target)
-		if @gameMode is 'play'
-			@dragMode = if e.which isnt 1 then 'mark' else 'break'
-			@isErasing = $el.hasClass('mark') if @dragMode is 'mark'
-		else
-			@dragMode = 'paint'
-			@isErasing = $el.hasClass 'paint'
-		@isDragging = true
-		@$game.trigger @dragMode, e.target
 
 

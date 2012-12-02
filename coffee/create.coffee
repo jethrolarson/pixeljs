@@ -3,6 +3,7 @@ $ ->
 	Game.edit()
 	
 	$('form').submit ->
+		$('#fgcolor').val Game.level.getLayerColors()
 		$('#gametxt').val Game.level.getGame()
 		true
 
