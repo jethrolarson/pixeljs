@@ -146,7 +146,7 @@ window.Game =
 	edit: ->
 		@gameMode = 'edit'
 		@$gridCell.enableContext()
-		
+		@assets.paint = new SoundGroup 'paint.wav'
 		@start()
 	getCol: (x)-> 
 		@getGrid().find("li:nth-child(#{@level.x}n+#{x+2})") #isn't nth-child confusing?
@@ -312,44 +312,13 @@ window.Game =
 		@$colorSheet.html('').html(css)
 			
 	loadAssets: ->
-		soundManager.setup(
-			# where to find flash audio SWFs, as needed
-			url: '/public/js/soundmanager/swf/'
-			onready: =>
-				@assets = {
-					hoverSound: soundManager.createSound({
-						id: 'hoverSound'
-						url: '/public/audio/grid_hover.wav'
-					})
-					boom: soundManager.createSound({
-						id: 'boom'
-						url: '/public/audio/boom.wav'
-					})
-
-					bing: soundManager.createSound({
-						id: 'bing'
-						url: '/public/audio/bing.wav'
-					})
-					mark: soundManager.createSound({
-						id: 'mark'
-						url: '/public/audio/mark.wav'
-					})
-
-					win: soundManager.createSound({
-						id: 'win'
-						url: '/public/audio/win.wav'
-					})
-					paint: soundManager.createSound({
-						id: 'paint'
-						url: '/public/audio/paint.wav'
-					})
-				}
-		)
-		
-
-		# ...and play it
-		
-		
+		@assets = {
+			hoverSound: new SoundGroup 'grid_hover.wav'
+			boom: new SoundGroup 'boom.wav'
+			bing: new SoundGroup 'bing.wav'
+			mark: new SoundGroup 'mark.wav'
+			win: new Audio 'win.wav'
+		}
 	addLayer: ->
 		@level.addLayer()
 		@renderLayerUI()

@@ -158,6 +158,7 @@
     edit: function() {
       this.gameMode = 'edit';
       this.$gridCell.enableContext();
+      this.assets.paint = new SoundGroup('paint.wav');
       return this.start();
     },
     getCol: function(x) {
@@ -338,38 +339,13 @@
       return this.$colorSheet.html('').html(css);
     },
     loadAssets: function() {
-      var _this = this;
-      return soundManager.setup({
-        url: '/public/js/soundmanager/swf/',
-        onready: function() {
-          return _this.assets = {
-            hoverSound: soundManager.createSound({
-              id: 'hoverSound',
-              url: '/public/audio/grid_hover.wav'
-            }),
-            boom: soundManager.createSound({
-              id: 'boom',
-              url: '/public/audio/boom.wav'
-            }),
-            bing: soundManager.createSound({
-              id: 'bing',
-              url: '/public/audio/bing.wav'
-            }),
-            mark: soundManager.createSound({
-              id: 'mark',
-              url: '/public/audio/mark.wav'
-            }),
-            win: soundManager.createSound({
-              id: 'win',
-              url: '/public/audio/win.wav'
-            }),
-            paint: soundManager.createSound({
-              id: 'paint',
-              url: '/public/audio/paint.wav'
-            })
-          };
-        }
-      });
+      return this.assets = {
+        hoverSound: new SoundGroup('grid_hover.wav'),
+        boom: new SoundGroup('boom.wav'),
+        bing: new SoundGroup('bing.wav'),
+        mark: new SoundGroup('mark.wav'),
+        win: new Audio('win.wav')
+      };
     },
     addLayer: function() {
       this.level.addLayer();
