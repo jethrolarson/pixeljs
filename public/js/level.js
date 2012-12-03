@@ -164,6 +164,34 @@
     return hints;
   };
 
+  Layer.prototype.isRowComplete = function(y) {
+    var cell, complete, i, paintRow, row, _i, _len;
+    row = this.grid.getRow(y);
+    paintRow = this.paint.getRow(y);
+    complete = true;
+    for (i = _i = 0, _len = row.length; _i < _len; i = ++_i) {
+      cell = row[i];
+      if (+cell && !+paintRow[i]) {
+        complete = false;
+      }
+    }
+    return complete;
+  };
+
+  Layer.prototype.isColComplete = function(x) {
+    var cell, complete, i, paintCol, row, _i, _len;
+    row = this.grid.getCol(x);
+    paintCol = this.paint.getCol(x);
+    complete = true;
+    for (i = _i = 0, _len = row.length; _i < _len; i = ++_i) {
+      cell = row[i];
+      if (+cell && !+paintCol[i]) {
+        complete = false;
+      }
+    }
+    return complete;
+  };
+
   window.Level = function(level) {
     return ($.extend({
       init: function() {

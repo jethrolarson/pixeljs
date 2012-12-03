@@ -61,7 +61,7 @@ window.Game =
 		)
 	drawCells: ->
 		@p.noStroke()
-		
+		@score = 0
 		for layer,layerIndex in @level.layers
 			if @gameMode is 'play' and layerIndex > @level.currentLayerIndex
 				break
@@ -69,14 +69,15 @@ window.Game =
 			for x in [0...@level.x]
 				for y in [0...@level.y]
 					if @gameMode is 'play'
-						if +layer.mark.getAt x, y
-							@p.fill(100,0,0)
-							@drawCell(x,y)
 						if +layer.paint.getAt x,y
 							if +layer.grid.getAt x,y
 								@p.fill(fgc.r,fgc.g,fgc.b)
 							else if layer is @level.currentLayer
 								@p.fill(200,0,0)
+								@score += 1
+							@drawCell(x,y)
+						else if +layer.mark.getAt x, y
+							@p.fill(0,200,0)
 							@drawCell(x,y)
 					else
 						if layer.visible && +layer.grid.getAt x,y
@@ -125,7 +126,7 @@ window.Game =
 				if @gameMode is 'play'
 					@dragMode = if @p.mouseButton is @p.RIGHT then 'mark' else 'grid'
 					if @newlyPressed and @dragMode is 'mark'
-						@isErasing = +@level.currentLayer.marks.getAt(gridX,gridY)
+						@isErasing = +@level.currentLayer.mark.getAt(gridX,gridY)
 					if @dragMode is 'mark'
 						@level.currentLayer.mark.setAt(gridX, gridY, !@isErasing,'paint')
 					else
@@ -153,10 +154,39 @@ window.Game =
 		#draw the cells
 		@drawCells()
 
+		for hintGroup,y in rowHints
+			rowComplete = @level.currentLayer.isRowComplete(y)
+			for hint,x in hintGroup
+				pos = 
+					x: @cw * x + @gridBounds.x1
+					y: @cw * y + @offset.y
+				@p.fill(255)
+				@p.rect(pos.x, pos.y , @cw, @cw)
+				if rowComplete
+					@p.fill(200)
+				else
+					@p.fill(0)
+				@p.text(hint, pos.x + @cw/2, pos.y + @cw/2)
+		for hintGroup,x in colHints
+			colComplete = @level.currentLayer.isColComplete(x)
+			for hint,y in hintGroup
+				pos =
+					x: @cw * x + @offset.x
+					y: @cw * y + @gridBounds.y1
+				@p.fill(255)
+				@p.rect(pos.x, pos.y , @cw, @cw)
+				if colComplete
+					@p.fill(200)
+				else
+					@p.fill(0)
+				@p.text(hint, pos.x + @cw/2, pos.y + @cw/2)
+
 		@drawGrid()
 		
 		
-		@p.fill(20,80,200,50)
+		@p.fill(255)
+
+		@p.text("Faults: #{@score}/#{@level.par}", 10,40)
 		#hover effects
 		
 		# 	#paint row highlight
@@ -168,13 +198,7 @@ window.Game =
 	edit: ->
 		@gameMode = 'edit'
 		@$gridCell.enableContext()
-		@assets.paint = new SoundGroup 'paint.wav'
 		@start()
-	getCol: (x)-> 
-		@getGrid().find("li:nth-child(#{@level.x}n+#{x+2})") #isn't nth-child confusing?
-	getRow: (y)-> 
-		@getGrid().find('li').slice(y * @level.x, (y + 1) * @level.x)
-
 	getCoord: (el)->
 		index = $(el).parent().children('li').index(el)
 		return {
@@ -187,14 +211,6 @@ window.Game =
 			if not @isLineComplete(@getRow(i))
 				return false
 		return true
-
-	isLineComplete: ($line)->
-		for cell in $line
-			coord = @getCoord cell
-			if @level.getAt(coord.x,coord.y) and not $(cell).hasClass('on')
-				return false
-		return true
-	
 	renderLayerUI: ->
 		layerUI = ''
 		for layer,i in @level.layers

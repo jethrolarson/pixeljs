@@ -95,6 +95,24 @@ Layer::getLineHints= (row)->
 	pushHint(true) if hints.length is 0
 	return hints
 
+Layer::isRowComplete = (y)->
+	row = @grid.getRow(y)
+	paintRow = @paint.getRow(y)
+	complete = true
+	for cell,i in row
+		if +cell and !+paintRow[i]
+			complete = false
+	return complete
+
+Layer::isColComplete = (x)->
+	row = @grid.getCol(x)
+	paintCol = @paint.getCol(x)
+	complete = true
+	for cell,i in row
+		if +cell and !+paintCol[i]
+			complete = false
+	return complete
+
 #TODO Add Marks for each layer
 window.Level = (level)->
 	($.extend {
@@ -146,8 +164,7 @@ window.Level = (level)->
 				fgcolor: fgcolor
 			@
 		getLayerColor: (layerIndex = @currentLayerIndex)-> @layers[layerIndex].fgcolor
-		setLayerColor: (color, layerIndex = @currentLayerIndex)->
-			@layers[layerIndex].fgcolor = color
+		setLayerColor: (color, layerIndex = @currentLayerIndex)-> @layers[layerIndex].fgcolor = color
 		getLayerVisibility: (layerIndex = @currentLayerIndex)->
 			#if undefined assume true
 			@layerVisibility[layerIndex] is undefined or @layerVisibility[layerIndex]
