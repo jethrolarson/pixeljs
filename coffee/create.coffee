@@ -7,11 +7,21 @@ $ ->
 		$('#gametxt').val Game.level.getGame()
 		true
 
+	$('#x').change ->
+		Game.updateCols this.value
+	
+	$('#y').change ->
+		Game.updateRows this.value
+	
+	$('#addLayer').live 'click', ->
+		#duplicate field, switch type to hidden. 
+		Game.addLayer()
+	
+	###
 	FARBTASTIC_WIDTH = 195
 	$('<div id="picker"></div>').appendTo 'body'
 	$picker = $('#picker').hide()
 	fb = $.farbtastic('#picker')
-	
 	$('input[type=color]').live 
 		focus: ->
 			fb.linkTo(this)
@@ -31,15 +41,8 @@ $ ->
 					Game.level.setLayerColor this.value, +layerRE[1]
 					$('#fgcolor').val Game.level.fgcolor
 			_.debounce(Game.renderLevel(),200)
-	$('#x').change ->
-		Game.updateCols this.value
+	###
 	
-	$('#y').change ->
-		Game.updateRows this.value
-	
-	$('#addLayer').live 'click', ->
-		#duplicate field, switch type to hidden. 
-		Game.addLayer()
 		
 
 

@@ -10,6 +10,7 @@
     colWidth: 40,
     MAX_CELL_WIDTH: 60,
     lastCell: '',
+    showAll: false,
     init: function($game) {
       var canvas;
       this.$game = $game;
@@ -66,8 +67,8 @@
       _ref = this.level.layers;
       for (layerIndex = _i = 0, _len = _ref.length; _i < _len; layerIndex = ++_i) {
         layer = _ref[layerIndex];
-        if (this.gameMode === 'play' && layerIndex > this.level.currentLayerIndex) {
-          break;
+        if (!this.showAll && layerIndex !== this.level.currentLayerIndex) {
+          continue;
         }
         fgc = color.hexToRGB(layer.fgcolor);
         for (x = _j = 0, _ref1 = this.level.x; 0 <= _ref1 ? _j < _ref1 : _j > _ref1; x = 0 <= _ref1 ? ++_j : --_j) {
@@ -76,17 +77,18 @@
               if (+layer.paint.getAt(x, y)) {
                 if (+layer.grid.getAt(x, y)) {
                   this.p.fill(fgc.r, fgc.g, fgc.b);
+                  this.drawCell(x, y);
                 } else if (layer === this.level.currentLayer) {
                   this.p.fill(200, 0, 0);
                   this.score += 1;
+                  this.drawCell(x, y);
                 }
-                this.drawCell(x, y);
               } else if (+layer.mark.getAt(x, y)) {
                 this.p.fill(0, 200, 0);
                 this.drawCell(x, y);
               }
             } else {
-              if (layer.visible && +layer.grid.getAt(x, y)) {
+              if (+layer.grid.getAt(x, y)) {
                 this.p.fill(fgc.r, fgc.g, fgc.b);
                 this.drawCell(x, y);
               }
@@ -97,30 +99,33 @@
       return this;
     },
     draw: function() {
-      var biggestColHints, biggestRowHints, cell, col, colComplete, colHints, curCell, gridH, gridW, gridX, gridY, hint, hintGroup, pos, prev, row, rowComplete, rowHints, x, xw, y, yw, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _len5, _m, _n;
+      var biggestColHints, biggestRowHints, cell, col, colComplete, colHints, curCell, gridH, gridW, gridX, gridY, hint, hintGroup, i, level, pos, prev, row, rowComplete, rowHints, x, xw, y, yw, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _len5, _len6, _m, _n, _o, _ref;
       this.p.background(80);
       rowHints = this.level.currentLayer.getRowHints();
-      biggestRowHints = 1;
-      for (_i = 0, _len = rowHints.length; _i < _len; _i++) {
-        row = rowHints[_i];
-        if (row.length > biggestRowHints) {
-          biggestRowHints = row.length;
+      biggestRowHints = 0;
+      biggestColHints = 0;
+      if (this.gameMode === 'play') {
+        for (_i = 0, _len = rowHints.length; _i < _len; _i++) {
+          row = rowHints[_i];
+          if (row.length > biggestRowHints) {
+            biggestRowHints = row.length;
+          }
         }
-      }
-      colHints = this.level.currentLayer.getColHints();
-      biggestColHints = 1;
-      for (_j = 0, _len1 = colHints.length; _j < _len1; _j++) {
-        col = colHints[_j];
-        if (col.length > biggestColHints) {
-          biggestColHints = col.length;
+        colHints = this.level.currentLayer.getColHints();
+        for (_j = 0, _len1 = colHints.length; _j < _len1; _j++) {
+          col = colHints[_j];
+          if (col.length > biggestColHints) {
+            biggestColHints = col.length;
+          }
         }
+        colHints = this.level.currentLayer.getColHints();
       }
-      colHints = this.level.currentLayer.getColHints();
       gridW = this.w - this.gridBounds.x1 - (this.w - this.gridBounds.x2);
       xw = Math.floor(gridW / (this.level.x + biggestRowHints));
       gridH = this.h - this.gridBounds.y1 - (this.h - this.gridBounds.y2);
       yw = Math.floor(gridH / (this.level.y + biggestColHints));
       this.cw = Math.min(xw, yw);
+      this.p.textSize(Math.floor(this.cw / 3));
       this.offset = {
         x: this.gridBounds.x1 + (biggestRowHints * this.cw),
         y: this.gridBounds.y1 + (biggestColHints * this.cw)
@@ -136,7 +141,6 @@
       curCell = gridX + ',' + gridY;
       x = gridX * this.cw;
       y = gridY * this.cw;
-      this.p.text(gridX + ',' + gridY, 10, 10);
       if (this.p.mouseX > this.offset.x && this.p.mouseY > this.offset.y && gridX < this.level.x && gridY < this.level.y) {
         if (this.p.mouseIsPressed) {
           cell = +this.level.currentLayer.grid.getAt(gridX, gridY);
@@ -164,6 +168,13 @@
             }
             if (!!cell !== !this.isErasing) {
               this.level.currentLayer.grid.setAt(gridX, gridY, (+(!this.isErasing)).toString());
+              _ref = this.level.layers;
+              for (i = _k = 0, _len2 = _ref.length; _k < _len2; i = ++_k) {
+                level = _ref[i];
+                if (i !== this.level.currentLayerIndex) {
+                  level.grid.setAt(gridX, gridY, "0");
+                }
+              }
               if (this.lastCell !== curCell || this.newlyPressed) {
                 this.assets.bing.play();
               }
@@ -177,52 +188,56 @@
       }
       this.newlyPressed = false;
       this.drawCells();
-      for (y = _k = 0, _len2 = rowHints.length; _k < _len2; y = ++_k) {
-        hintGroup = rowHints[y];
-        rowComplete = this.level.currentLayer.isRowComplete(y);
-        for (x = _l = 0, _len3 = hintGroup.length; _l < _len3; x = ++_l) {
-          hint = hintGroup[x];
-          pos = {
-            x: this.cw * x + this.gridBounds.x1,
-            y: this.cw * y + this.offset.y
-          };
-          this.p.fill(255);
-          this.p.rect(pos.x, pos.y, this.cw, this.cw);
-          if (rowComplete) {
-            this.p.fill(200);
-          } else {
-            this.p.fill(0);
+      if (this.gameMode === 'play') {
+        for (y = _l = 0, _len3 = rowHints.length; _l < _len3; y = ++_l) {
+          hintGroup = rowHints[y];
+          rowComplete = this.level.currentLayer.isRowComplete(y);
+          for (x = _m = 0, _len4 = hintGroup.length; _m < _len4; x = ++_m) {
+            hint = hintGroup[x];
+            pos = {
+              x: this.cw * x + this.gridBounds.x1,
+              y: this.cw * y + this.offset.y
+            };
+            this.p.fill(255);
+            this.p.rect(pos.x, pos.y, this.cw, this.cw);
+            if (rowComplete) {
+              this.p.fill(200);
+            } else {
+              this.p.fill(0);
+            }
+            this.p.textAlign(this.p.CENTER, this.p.CENTER);
+            this.p.text(hint, pos.x + this.cw / 2, pos.y + this.cw / 2);
           }
-          this.p.text(hint, pos.x + this.cw / 2, pos.y + this.cw / 2);
         }
-      }
-      for (x = _m = 0, _len4 = colHints.length; _m < _len4; x = ++_m) {
-        hintGroup = colHints[x];
-        colComplete = this.level.currentLayer.isColComplete(x);
-        for (y = _n = 0, _len5 = hintGroup.length; _n < _len5; y = ++_n) {
-          hint = hintGroup[y];
-          pos = {
-            x: this.cw * x + this.offset.x,
-            y: this.cw * y + this.gridBounds.y1
-          };
-          this.p.fill(255);
-          this.p.rect(pos.x, pos.y, this.cw, this.cw);
-          if (colComplete) {
-            this.p.fill(200);
-          } else {
-            this.p.fill(0);
+        for (x = _n = 0, _len5 = colHints.length; _n < _len5; x = ++_n) {
+          hintGroup = colHints[x];
+          colComplete = this.level.currentLayer.isColComplete(x);
+          for (y = _o = 0, _len6 = hintGroup.length; _o < _len6; y = ++_o) {
+            hint = hintGroup[y];
+            pos = {
+              x: this.cw * x + this.offset.x,
+              y: this.cw * y + this.gridBounds.y1
+            };
+            this.p.fill(255);
+            this.p.rect(pos.x, pos.y, this.cw, this.cw);
+            if (colComplete) {
+              this.p.fill(200);
+            } else {
+              this.p.fill(0);
+            }
+            this.p.text(hint, pos.x + this.cw / 2, pos.y + this.cw / 2);
           }
-          this.p.text(hint, pos.x + this.cw / 2, pos.y + this.cw / 2);
         }
       }
       this.drawGrid();
       this.p.fill(255);
+      this.p.textAlign(this.p.LEFT);
       this.p.text("Faults: " + this.score + "/" + this.level.par, 10, 40);
       this.lastCell = curCell;
       return this;
     },
     edit: function() {
-      this.gameMode = 'edit';
+      this.showAll = this.gameMode = 'edit';
       this.$gridCell.enableContext();
       return this.start();
     },
@@ -249,12 +264,12 @@
       _ref = this.level.layers;
       for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
         layer = _ref[i];
-        layerUI += "<div>\n<input \n	class=\"changeLayer layer" + i + " " + (i === this.level.currentLayerIndex ? 'on' : '') + "\"\n	type=\"color\" name=\"fgcolor" + i + "\" value=\"" + layer.fgcolor + "\" style=\"background-color:" + layer.fgcolor + "\"/>\n<a class=\"layerVisibility\" href=\"#layer" + i + "\">&#9635;</a>\n</div>";
+        layerUI += "<div>\n	<input \n		class=\"changeLayer layer" + i + " " + (i === this.level.currentLayerIndex ? 'on' : '') + "\"\n		type=\"color\" name=\"fgcolor" + i + "\" value=\"" + layer.fgcolor + "\" style=\"background-color:" + layer.fgcolor + "\"/>\n</div>";
       }
       if (this.gameMode !== 'play') {
         layerUI += '<button id="addLayer" type="button">+</button>';
       }
-      return this.$layers.html(layerUI);
+      return this.$layers.html(layerUI + "<a class=\"showAll\" href=\"\">&#9635;</a>");
     },
     loadGame: function(level) {
       this.level = Level(level);
@@ -313,8 +328,18 @@
       this.renderLayerUI();
       return this.renderLevel();
     },
-    changeLayer: function(layer) {
-      return this.level.setLayer(layer);
+    changeLayer: function(layerIndex) {
+      var i, layer, _i, _len, _ref;
+      if (this.gameMode === 'play') {
+        _ref = this.level.layers;
+        for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
+          layer = _ref[i];
+          if (i !== layerIndex) {
+            layer.visible = false;
+          }
+        }
+      }
+      return this.level.setLayer(layerIndex);
     },
     bindEvents: function() {
       var that,
@@ -354,14 +379,13 @@
           }
         }
       });
-      return $('.layerVisibility').live('click', function(e) {
-        var layerIndex, layerRE;
+      return $('.showAll').live('click', function(e) {
+        var $this, isOn;
         e.preventDefault();
-        layerRE = /^#layer(\d)+/.exec(this.hash);
-        if (layerRE.length) {
-          layerIndex = +layerRE[1];
-          that.level.layers[layerIndex].visible = !that.level.layers[layerIndex].visible;
-        }
+        $this = $(this);
+        isOn = $this.hasClass('on');
+        that.showAll = !isOn;
+        $this.toggleClass('on', !isOn);
         return true;
       });
     },
@@ -425,6 +449,26 @@
       this.$win.text(this.getGolfScore());
       this.$win.show();
       return localStorage[this.title] = true;
+    },
+    updateCols: function(cols) {
+      var delta;
+      delta = cols - this.level.x;
+      if (delta > 0) {
+        this.level.addCols(delta);
+      } else if (delta < 0) {
+        this.level.subtractCols(Math.abs(delta));
+      }
+      return this.renderLevel();
+    },
+    updateRows: function(cols) {
+      var delta;
+      delta = cols - this.level.y;
+      if (delta > 0) {
+        this.level.addRows(delta);
+      } else if (delta < 0) {
+        this.level.subtractRows(Math.abs(delta));
+      }
+      return this.renderLevel();
     }
   };
 

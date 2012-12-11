@@ -10,6 +10,7 @@ window.Game =
 	colWidth: 40
 	MAX_CELL_WIDTH: 60
 	lastCell: ''
+	showAll: false
 	init: ($game)->
 		@$game= $game
 		@$gridCell= @$game.find('#gridCell')
@@ -63,8 +64,8 @@ window.Game =
 		@p.noStroke()
 		@score = 0
 		for layer,layerIndex in @level.layers
-			if @gameMode is 'play' and layerIndex > @level.currentLayerIndex
-				break
+			if not @showAll and layerIndex isnt @level.currentLayerIndex
+				continue
 			fgc = color.hexToRGB(layer.fgcolor)
 			for x in [0...@level.x]
 				for y in [0...@level.y]
@@ -72,35 +73,40 @@ window.Game =
 						if +layer.paint.getAt x,y
 							if +layer.grid.getAt x,y
 								@p.fill(fgc.r,fgc.g,fgc.b)
+								@drawCell(x,y)
 							else if layer is @level.currentLayer
 								@p.fill(200,0,0)
 								@score += 1
-							@drawCell(x,y)
+								@drawCell(x,y)
+							
 						else if +layer.mark.getAt x, y
 							@p.fill(0,200,0)
 							@drawCell(x,y)
 					else
-						if layer.visible && +layer.grid.getAt x,y
+						if +layer.grid.getAt x,y
 							@p.fill(fgc.r,fgc.g,fgc.b)
 							@drawCell(x,y)
 		@
 	draw: ->
 		@p.background 80
 		rowHints = @level.currentLayer.getRowHints()
-		biggestRowHints = 1
-		for row in rowHints
-			biggestRowHints = row.length if row.length > biggestRowHints
-		colHints = @level.currentLayer.getColHints()
-		biggestColHints = 1
-		for col in colHints
-			biggestColHints = col.length if col.length > biggestColHints
-		colHints = @level.currentLayer.getColHints()
+		biggestRowHints = 0
+		biggestColHints = 0
+		if @gameMode is 'play'
+			for row in rowHints
+				biggestRowHints = row.length if row.length > biggestRowHints
+			colHints = @level.currentLayer.getColHints()
+			
+			for col in colHints
+				biggestColHints = col.length if col.length > biggestColHints
+			colHints = @level.currentLayer.getColHints()
 		gridW = (@w - @gridBounds.x1 - (@w - @gridBounds.x2))
 		xw =  Math.floor(gridW / (@level.x + biggestRowHints))
 		gridH = (@h - @gridBounds.y1 - (@h - @gridBounds.y2))
 		yw = Math.floor(gridH / (@level.y + biggestColHints))
 		#cell size
 		@cw = Math.min(xw, yw)
+		@p.textSize(Math.floor(@cw/3) )
 		@offset = 
 			x: @gridBounds.x1 + (biggestRowHints * @cw)
 			y: @gridBounds.y1 + (biggestColHints * @cw)
@@ -117,10 +123,9 @@ window.Game =
 		
 		x = gridX * @cw
 		y = gridY * @cw
-		@p.text(gridX+','+gridY,10,10)
+		# @p.text(gridX+','+gridY,10,10)
 		#if mouse in grid
 		if @p.mouseX > @offset.x and @p.mouseY > @offset.y and gridX < @level.x and gridY < @level.y
-			
 			if @p.mouseIsPressed
 				cell = +@level.currentLayer.grid.getAt(gridX, gridY)
 				if @gameMode is 'play'
@@ -143,6 +148,8 @@ window.Game =
 						@isErasing = !!cell
 					if !!cell isnt !@isErasing
 						@level.currentLayer.grid.setAt(gridX, gridY, (+!@isErasing).toString())
+						for level, i in @level.layers when i isnt @level.currentLayerIndex
+							level.grid.setAt(gridX,gridY,"0")
 						if @lastCell isnt curCell or @newlyPressed
 							@assets.bing.play()
 			else
@@ -153,39 +160,39 @@ window.Game =
 		
 		#draw the cells
 		@drawCells()
-
-		for hintGroup,y in rowHints
-			rowComplete = @level.currentLayer.isRowComplete(y)
-			for hint,x in hintGroup
-				pos = 
-					x: @cw * x + @gridBounds.x1
-					y: @cw * y + @offset.y
-				@p.fill(255)
-				@p.rect(pos.x, pos.y , @cw, @cw)
-				if rowComplete
-					@p.fill(200)
-				else
-					@p.fill(0)
-				@p.text(hint, pos.x + @cw/2, pos.y + @cw/2)
-		for hintGroup,x in colHints
-			colComplete = @level.currentLayer.isColComplete(x)
-			for hint,y in hintGroup
-				pos =
-					x: @cw * x + @offset.x
-					y: @cw * y + @gridBounds.y1
-				@p.fill(255)
-				@p.rect(pos.x, pos.y , @cw, @cw)
-				if colComplete
-					@p.fill(200)
-				else
-					@p.fill(0)
-				@p.text(hint, pos.x + @cw/2, pos.y + @cw/2)
+		if @gameMode is 'play'
+			for hintGroup,y in rowHints
+				rowComplete = @level.currentLayer.isRowComplete(y)
+				for hint,x in hintGroup
+					pos = 
+						x: @cw * x + @gridBounds.x1
+						y: @cw * y + @offset.y
+					@p.fill(255)
+					@p.rect(pos.x, pos.y , @cw, @cw)
+					if rowComplete
+						@p.fill(200)
+					else
+						@p.fill(0)
+					@p.textAlign(@p.CENTER,@p.CENTER);
+					@p.text(hint, pos.x + @cw/2, pos.y + @cw/2)
+			for hintGroup,x in colHints
+				colComplete = @level.currentLayer.isColComplete(x)
+				for hint,y in hintGroup
+					pos =
+						x: @cw * x + @offset.x
+						y: @cw * y + @gridBounds.y1
+					@p.fill(255)
+					@p.rect(pos.x, pos.y , @cw, @cw)
+					if colComplete
+						@p.fill(200)
+					else
+						@p.fill(0)
+					@p.text(hint, pos.x + @cw/2, pos.y + @cw/2)
 
 		@drawGrid()
 		
-		
 		@p.fill(255)
-
+		@p.textAlign(@p.LEFT)
 		@p.text("Faults: #{@score}/#{@level.par}", 10,40)
 		#hover effects
 		
@@ -196,6 +203,7 @@ window.Game =
 		@lastCell = curCell
 		this
 	edit: ->
+		@showAll =
 		@gameMode = 'edit'
 		@$gridCell.enableContext()
 		@start()
@@ -214,16 +222,16 @@ window.Game =
 	renderLayerUI: ->
 		layerUI = ''
 		for layer,i in @level.layers
-			layerUI += """<div>
+			layerUI += """
+			<div>
 				<input 
 					class="changeLayer layer#{i} #{if i is @level.currentLayerIndex then 'on' else ''}"
 					type="color" name="fgcolor#{i}" value="#{layer.fgcolor}" style="background-color:#{layer.fgcolor}"/>
-				<a class="layerVisibility" href="#layer#{i}">&#9635;</a>
-				</div>
+			</div>
 			"""
 		if @gameMode isnt 'play'
 			layerUI += '<button id="addLayer" type="button">+</button>'
-		@$layers.html layerUI
+		@$layers.html layerUI + """<a class="showAll" href="">&#9635;</a>"""
 	loadGame: (level)->
 		@level = Level level
 		if @gameMode is 'play'
@@ -272,8 +280,11 @@ window.Game =
 		@level.addLayer()
 		@renderLayerUI()
 		@renderLevel()
-	changeLayer: (layer)->
-		@level.setLayer(layer)
+	changeLayer: (layerIndex)->
+		if @gameMode is 'play'
+			for layer,i in @level.layers
+				layer.visible = false if i isnt layerIndex
+		@level.setLayer(layerIndex)
 
 	# =========
 	#	Events
@@ -306,12 +317,12 @@ window.Game =
 					$(this).addClass 'on'
 					e.preventDefault()
 
-		$('.layerVisibility').live 'click',(e)->
+		$('.showAll').live 'click',(e)->
 			e.preventDefault()
-			layerRE = /^#layer(\d)+/.exec this.hash
-			if layerRE.length
-				layerIndex = +layerRE[1]
-				that.level.layers[layerIndex].visible = !that.level.layers[layerIndex].visible
+			$this = $(this)
+			isOn = $this.hasClass('on')
+			that.showAll = not isOn
+			$this.toggleClass('on',not isOn)
 			true
 	getGolfScore: ->
 		par =  @score - @level.par
@@ -371,5 +382,21 @@ window.Game =
 		@$win.text @getGolfScore()
 		@$win.show()
 		localStorage[@title] = true
+
+	updateCols: (cols)->
+		delta = cols - @level.x
+		if delta > 0
+			@level.addCols delta
+		else if delta < 0
+			@level.subtractCols Math.abs delta
+		@renderLevel()
+	updateRows: (cols)->
+		delta = cols - @level.y
+		if delta > 0
+			@level.addRows delta
+		else if delta < 0
+			@level.subtractRows Math.abs delta
+		@renderLevel()
+
 
 

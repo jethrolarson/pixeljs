@@ -2,44 +2,12 @@
 (function() {
 
   $(function() {
-    var $picker, FARBTASTIC_WIDTH, fb;
     Game.init($('#game'));
     Game.edit();
     $('form').submit(function() {
       $('#fgcolor').val(Game.level.getLayerColors());
       $('#gametxt').val(Game.level.getGame());
       return true;
-    });
-    FARBTASTIC_WIDTH = 195;
-    $('<div id="picker"></div>').appendTo('body');
-    $picker = $('#picker').hide();
-    fb = $.farbtastic('#picker');
-    $('input[type=color]').live({
-      focus: function() {
-        var pos;
-        fb.linkTo(this);
-        pos = $(this).position();
-        return $picker.css({
-          top: pos.top - (FARBTASTIC_WIDTH / 2) + 8,
-          left: pos.left - FARBTASTIC_WIDTH
-        }).show();
-      },
-      blur: function() {
-        return $picker.hide();
-      },
-      change: function() {
-        var layerRE;
-        if (this.name === 'bgcolor') {
-          Game.level.bgcolor = this.value;
-        } else {
-          layerRE = /fgcolor(\d)/.exec(this.name);
-          if (layerRE && layerRE.length) {
-            Game.level.setLayerColor(this.value, +layerRE[1]);
-            $('#fgcolor').val(Game.level.fgcolor);
-          }
-        }
-        return _.debounce(Game.renderLevel(), 200);
-      }
     });
     $('#x').change(function() {
       return Game.updateCols(this.value);
@@ -50,6 +18,32 @@
     return $('#addLayer').live('click', function() {
       return Game.addLayer();
     });
+    /*
+    	FARBTASTIC_WIDTH = 195
+    	$('<div id="picker"></div>').appendTo 'body'
+    	$picker = $('#picker').hide()
+    	fb = $.farbtastic('#picker')
+    	$('input[type=color]').live 
+    		focus: ->
+    			fb.linkTo(this)
+    			pos = $(this).position()
+    			$picker.css(
+    				top: pos.top - (FARBTASTIC_WIDTH / 2) + 8, 
+    				left: pos.left - FARBTASTIC_WIDTH
+    			).show()
+    		blur: ->
+    			$picker.hide()
+    		change: ->
+    			if this.name is 'bgcolor'
+    				Game.level.bgcolor = this.value
+    			else
+    				layerRE = /fgcolor(\d)/.exec this.name
+    				if layerRE and layerRE.length
+    					Game.level.setLayerColor this.value, +layerRE[1]
+    					$('#fgcolor').val Game.level.fgcolor
+    			_.debounce(Game.renderLevel(),200)
+    */
+
   });
 
 }).call(this);
