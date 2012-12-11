@@ -15,33 +15,29 @@
     $('#y').change(function() {
       return Game.updateRows(this.value);
     });
-    return $('#addLayer').live('click', function() {
+    $('#addLayer').live('click', function() {
       return Game.addLayer();
+    });
+    return $('input[type=color]').live({
+      change: function() {
+        var layerRE;
+        if (this.name === 'bgcolor') {
+          Game.level.bgcolor = this.value;
+        } else {
+          layerRE = /fgcolor(\d)/.exec(this.name);
+          if (layerRE && layerRE.length) {
+            Game.level.setLayerColor(this.value, +layerRE[1]);
+            $('#fgcolor').val(Game.level.fgcolor);
+          }
+        }
+        return _.debounce(Game.renderLevel(), 200);
+      }
     });
     /*
     	FARBTASTIC_WIDTH = 195
     	$('<div id="picker"></div>').appendTo 'body'
     	$picker = $('#picker').hide()
     	fb = $.farbtastic('#picker')
-    	$('input[type=color]').live 
-    		focus: ->
-    			fb.linkTo(this)
-    			pos = $(this).position()
-    			$picker.css(
-    				top: pos.top - (FARBTASTIC_WIDTH / 2) + 8, 
-    				left: pos.left - FARBTASTIC_WIDTH
-    			).show()
-    		blur: ->
-    			$picker.hide()
-    		change: ->
-    			if this.name is 'bgcolor'
-    				Game.level.bgcolor = this.value
-    			else
-    				layerRE = /fgcolor(\d)/.exec this.name
-    				if layerRE and layerRE.length
-    					Game.level.setLayerColor this.value, +layerRE[1]
-    					$('#fgcolor').val Game.level.fgcolor
-    			_.debounce(Game.renderLevel(),200)
     */
 
   });

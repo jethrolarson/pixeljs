@@ -60,39 +60,58 @@ window.Game =
 			@cw - cellMargin*2,
 			@cw - cellMargin*2
 		)
+	drawMark: (x,y, color=@p.color(0,0,0))->
+		@p.stroke color
+		@p.line(
+			x * @cw + @offset.x,
+			y * @cw + @offset.y,
+			(x+1) * @cw + @offset.x,
+			(y+1) * @cw + @offset.y
+		)
+		@p.line(
+			x * @cw + @offset.x,
+			(y+1) * @cw + @offset.y,
+			(x+1) * @cw + @offset.x,
+			y * @cw + @offset.y
+		)
+		@p.noStroke()
 	drawCells: ->
 		@p.noStroke()
 		@score = 0
 		for layer,layerIndex in @level.layers
-			if not @showAll and layerIndex isnt @level.currentLayerIndex
-				continue
+			continue if not @showAll and layerIndex isnt @level.currentLayerIndex
 			fgc = color.hexToRGB(layer.fgcolor)
 			for x in [0...@level.x]
 				for y in [0...@level.y]
 					if @gameMode is 'play'
 						if +layer.paint.getAt x,y
+							#draw fills
 							if +layer.grid.getAt x,y
 								@p.fill(fgc.r,fgc.g,fgc.b)
 								@drawCell(x,y)
+							#draw faults
 							else if layer is @level.currentLayer
-								@p.fill(200,0,0)
 								@score += 1
-								@drawCell(x,y)
-							
+								@drawMark x, y, @p.color(180,30,30)
+						#draw marks
 						else if +layer.mark.getAt x, y
-							@p.fill(0,200,0)
-							@drawCell(x,y)
+							@p.fill 0, 200, 0
+							@drawMark x, y
 					else
+						#draw fills (edit mode)
 						if +layer.grid.getAt x,y
 							@p.fill(fgc.r,fgc.g,fgc.b)
 							@drawCell(x,y)
 		@
 	draw: ->
 		@p.background 80
-		rowHints = @level.currentLayer.getRowHints()
+		
 		biggestRowHints = 0
 		biggestColHints = 0
 		if @gameMode is 'play'
+			biggestRowHints = 3
+			biggestColHints = 3
+			rowHints = @level.currentLayer.getRowHints()
 			for row in rowHints
 				biggestRowHints = row.length if row.length > biggestRowHints
 			colHints = @level.currentLayer.getColHints()
@@ -130,18 +149,24 @@ window.Game =
 				cell = +@level.currentLayer.grid.getAt(gridX, gridY)
 				if @gameMode is 'play'
 					@dragMode = if @p.mouseButton is @p.RIGHT then 'mark' else 'grid'
+					
 					if @newlyPressed and @dragMode is 'mark'
 						@isErasing = +@level.currentLayer.mark.getAt(gridX,gridY)
+					
+					# add mark
 					if @dragMode is 'mark'
 						@level.currentLayer.mark.setAt(gridX, gridY, !@isErasing,'paint')
+					#paint
 					else
 						prev = +@level.currentLayer.paint.getAt gridX, gridY
-						@level.currentLayer.paint.setAt(gridX, gridY, "1",'paint')
-						if !prev
-							if cell
-								@assets.bing.play()
-							else
-								@assets.boom.play()
+						#only paint if there's no mark on the line to prevent user error
+						if !+@level.currentLayer.mark.getAt gridX, gridY
+							@level.currentLayer.paint.setAt(gridX, gridY, "1",'paint')
+							if !prev
+								if cell
+									@assets.bing.play()
+								else
+									@assets.boom.play()
 
 				else
 					if @newlyPressed
@@ -152,10 +177,11 @@ window.Game =
 							level.grid.setAt(gridX,gridY,"0")
 						if @lastCell isnt curCell or @newlyPressed
 							@assets.bing.play()
+			###
 			else
 				if @lastCell isnt curCell
 					@assets.hoverSound.play()
-
+			###
 		@newlyPressed = false
 		
 		#draw the cells
@@ -220,6 +246,8 @@ window.Game =
 				return false
 		return true
 	renderLayerUI: ->
+		if @gameMode is 'play' and @level.layers.length is 1
+			return
 		layerUI = ''
 		for layer,i in @level.layers
 			layerUI += """
@@ -265,8 +293,6 @@ window.Game =
 		if @gameMode is 'play'
 			@score = 0;
 			$('#title').html @level.title
-			$('#par').text("Par: "+@level.par)
-			@updateHints()
 	
 	loadAssets: ->
 		@assets = {
@@ -349,32 +375,7 @@ window.Game =
 	updateScore: ->
 		if @gameMode is 'play'
 			@$score.text "Faults: " + @score
-	eBreak: (e, el)->
-		$el= $(el)
-		return if @gameMode is 'edit' or $el.hasClass 'mark'
-		
-		coord= @getCoord(el)
-		if @level.getAt(coord.x,coord.y)
-			$el.addClass('on')
-			@updateHints()
-			if @isGameComplete() 
-				@$game.trigger('win')
-			else
-				@assets.bing.play() unless @mute
-		else if not $el.hasClass('error')
-			$el.addClass('error')
-			@$game.trigger('die', el)
-	updateHints: ->
-		# FIXME
-		# for y in [0...@level.y]
-		# 	@isLineComplete(
-		# 		@getRow(y)
-		# 	) and $('#rowHints li').eq(y).addClass('done')
-		# for x in [0...@level.x]
-		# 	@isLineComplete(
-		# 		@getCol(x)
-		# 	) and $('#colHints li').eq(x).addClass('done')
-		# return
+	
 	
 	eWin: ->
 		@dragMode= null	

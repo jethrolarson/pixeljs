@@ -16,22 +16,16 @@ $ ->
 	$('#addLayer').live 'click', ->
 		#duplicate field, switch type to hidden. 
 		Game.addLayer()
-	
-	###
-	FARBTASTIC_WIDTH = 195
-	$('<div id="picker"></div>').appendTo 'body'
-	$picker = $('#picker').hide()
-	fb = $.farbtastic('#picker')
 	$('input[type=color]').live 
-		focus: ->
-			fb.linkTo(this)
-			pos = $(this).position()
-			$picker.css(
-				top: pos.top - (FARBTASTIC_WIDTH / 2) + 8, 
-				left: pos.left - FARBTASTIC_WIDTH
-			).show()
-		blur: ->
-			$picker.hide()
+		# focus: ->
+		# 	fb.linkTo(this)
+		# 	pos = $(this).position()
+		# 	$picker.css(
+		# 		top: pos.top - (FARBTASTIC_WIDTH / 2) + 8, 
+		# 		left: pos.left - FARBTASTIC_WIDTH
+		# 	).show()
+		# blur: ->
+		# 	$picker.hide()
 		change: ->
 			if this.name is 'bgcolor'
 				Game.level.bgcolor = this.value
@@ -41,6 +35,12 @@ $ ->
 					Game.level.setLayerColor this.value, +layerRE[1]
 					$('#fgcolor').val Game.level.fgcolor
 			_.debounce(Game.renderLevel(),200)
+	###
+	FARBTASTIC_WIDTH = 195
+	$('<div id="picker"></div>').appendTo 'body'
+	$picker = $('#picker').hide()
+	fb = $.farbtastic('#picker')
+	
 	###
 	
 		

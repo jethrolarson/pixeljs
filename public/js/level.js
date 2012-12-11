@@ -213,26 +213,30 @@
         return this.currentLayer = this.layers[this.currentLayerIndex];
       },
       addCols: function(num) {
-        var layer, _i, _len, _ref;
+        var layer, _i, _len, _ref, _results;
+        this.x += num;
         _ref = this.layers;
+        _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           layer = _ref[_i];
           layer.grid.addCols(num);
           layer.mark.addCols();
-          layer.paint.addCols();
+          _results.push(layer.paint.addCols());
         }
-        return this.x += num;
+        return _results;
       },
       addRows: function(num) {
-        var layer, _i, _len, _ref;
+        var layer, _i, _len, _ref, _results;
+        this.y += num;
         _ref = this.layers;
+        _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           layer = _ref[_i];
           layer.grid.addRows(num);
           layer.mark.addRows(num);
-          layer.paint.addRows(num);
+          _results.push(layer.paint.addRows(num));
         }
-        return this.y += num;
+        return _results;
       },
       subtractCols: function(num) {
         var layer, _i, _len, _ref, _results;

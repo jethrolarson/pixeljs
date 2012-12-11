@@ -60,6 +60,15 @@
       cellMargin = 0;
       return this.p.rect(x * this.cw + this.offset.x + cellMargin, y * this.cw + this.offset.y + cellMargin, this.cw - cellMargin * 2, this.cw - cellMargin * 2);
     },
+    drawMark: function(x, y, color) {
+      if (color == null) {
+        color = this.p.color(0, 0, 0);
+      }
+      this.p.stroke(color);
+      this.p.line(x * this.cw + this.offset.x, y * this.cw + this.offset.y, (x + 1) * this.cw + this.offset.x, (y + 1) * this.cw + this.offset.y);
+      this.p.line(x * this.cw + this.offset.x, (y + 1) * this.cw + this.offset.y, (x + 1) * this.cw + this.offset.x, y * this.cw + this.offset.y);
+      return this.p.noStroke();
+    },
     drawCells: function() {
       var fgc, layer, layerIndex, x, y, _i, _j, _k, _len, _ref, _ref1, _ref2;
       this.p.noStroke();
@@ -79,13 +88,12 @@
                   this.p.fill(fgc.r, fgc.g, fgc.b);
                   this.drawCell(x, y);
                 } else if (layer === this.level.currentLayer) {
-                  this.p.fill(200, 0, 0);
                   this.score += 1;
-                  this.drawCell(x, y);
+                  this.drawMark(x, y, this.p.color(180, 30, 30));
                 }
               } else if (+layer.mark.getAt(x, y)) {
                 this.p.fill(0, 200, 0);
-                this.drawCell(x, y);
+                this.drawMark(x, y);
               }
             } else {
               if (+layer.grid.getAt(x, y)) {
@@ -101,10 +109,12 @@
     draw: function() {
       var biggestColHints, biggestRowHints, cell, col, colComplete, colHints, curCell, gridH, gridW, gridX, gridY, hint, hintGroup, i, level, pos, prev, row, rowComplete, rowHints, x, xw, y, yw, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _len5, _len6, _m, _n, _o, _ref;
       this.p.background(80);
-      rowHints = this.level.currentLayer.getRowHints();
       biggestRowHints = 0;
       biggestColHints = 0;
       if (this.gameMode === 'play') {
+        biggestRowHints = 3;
+        biggestColHints = 3;
+        rowHints = this.level.currentLayer.getRowHints();
         for (_i = 0, _len = rowHints.length; _i < _len; _i++) {
           row = rowHints[_i];
           if (row.length > biggestRowHints) {
@@ -153,12 +163,14 @@
               this.level.currentLayer.mark.setAt(gridX, gridY, !this.isErasing, 'paint');
             } else {
               prev = +this.level.currentLayer.paint.getAt(gridX, gridY);
-              this.level.currentLayer.paint.setAt(gridX, gridY, "1", 'paint');
-              if (!prev) {
-                if (cell) {
-                  this.assets.bing.play();
-                } else {
-                  this.assets.boom.play();
+              if (!+this.level.currentLayer.mark.getAt(gridX, gridY)) {
+                this.level.currentLayer.paint.setAt(gridX, gridY, "1", 'paint');
+                if (!prev) {
+                  if (cell) {
+                    this.assets.bing.play();
+                  } else {
+                    this.assets.boom.play();
+                  }
                 }
               }
             }
@@ -180,11 +192,13 @@
               }
             }
           }
-        } else {
-          if (this.lastCell !== curCell) {
-            this.assets.hoverSound.play();
-          }
         }
+        /*
+        			else
+        				if @lastCell isnt curCell
+        					@assets.hoverSound.play()
+        */
+
       }
       this.newlyPressed = false;
       this.drawCells();
@@ -260,6 +274,9 @@
     },
     renderLayerUI: function() {
       var i, layer, layerUI, _i, _len, _ref;
+      if (this.gameMode === 'play' && this.level.layers.length === 1) {
+        return;
+      }
       layerUI = '';
       _ref = this.level.layers;
       for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
@@ -309,9 +326,7 @@
       });
       if (this.gameMode === 'play') {
         this.score = 0;
-        $('#title').html(this.level.title);
-        $('#par').text("Par: " + this.level.par);
-        return this.updateHints();
+        return $('#title').html(this.level.title);
       }
     },
     loadAssets: function() {
@@ -418,29 +433,6 @@
         return this.$score.text("Faults: " + this.score);
       }
     },
-    eBreak: function(e, el) {
-      var $el, coord;
-      $el = $(el);
-      if (this.gameMode === 'edit' || $el.hasClass('mark')) {
-        return;
-      }
-      coord = this.getCoord(el);
-      if (this.level.getAt(coord.x, coord.y)) {
-        $el.addClass('on');
-        this.updateHints();
-        if (this.isGameComplete()) {
-          return this.$game.trigger('win');
-        } else {
-          if (!this.mute) {
-            return this.assets.bing.play();
-          }
-        }
-      } else if (!$el.hasClass('error')) {
-        $el.addClass('error');
-        return this.$game.trigger('die', el);
-      }
-    },
-    updateHints: function() {},
     eWin: function() {
       this.dragMode = null;
       if (!this.mute) {

@@ -132,17 +132,18 @@ window.Level = (level)->
 			@currentLayerIndex = layerIndex
 			@currentLayer = @layers[@currentLayerIndex]
 		addCols: (num)->
+			@x += num
 			for layer in @layers
 				layer.grid.addCols(num)
 				layer.mark.addCols()
 				layer.paint.addCols()
-			@x += num
 		addRows: (num)->#FIXME
+			@y+=num
 			for layer in @layers
 				layer.grid.addRows(num)
 				layer.mark.addRows(num)
 				layer.paint.addRows(num)
-			@y+=num
+			
 		subtractCols: (num)->#FIXME
 			@x -= num
 			for layer in @layers
