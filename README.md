@@ -3,7 +3,7 @@ TODO
 - Implement partial line hint completion
 - Fix the indicators for faults and flags
 - Music
-! touchmove doesn't track target
+- Fix touchmove not tracking target
 - Fix drawMode switch for touch devices
 
 - Use user-created levels as a tiled background for the homepage
