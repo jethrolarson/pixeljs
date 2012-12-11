@@ -1,16 +1,13 @@
 TODO
 ====
-- Implement Stacking Puzzles
 - Implement partial line hint completion
-- Make flags less obtrusive
+- Fix the indicators for faults and flags
 - Music
-- Make changing width/height not truncate data
 ! touchmove doesn't track target
-- Enable drawMode switch
-- Omit faults and par info from edit mode
+- Fix drawMode switch for touch devices
 
 - Use user-created levels as a tiled background for the homepage
-- Add "Enter the unknown"
+- Add "Enter the unknown" a la [Time Fcuk](http://www.newgrounds.com/portal/view/511754)
 
 Later
 ======
