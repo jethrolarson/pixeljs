@@ -12,22 +12,12 @@
     lastCell: '',
     showAll: false,
     init: function($game) {
-      var canvas;
-      this.$game = $game;
-      this.$gridCell = this.$game.find('#gridCell');
-      this.$win = this.$game.find('#win');
-      this.$lose = this.$game.find('#lose');
-      this.$score = this.$game.find('#score');
-      this.$games = this.$game.find('#games');
-      this.$colHints = this.$game.find('#colHints');
-      this.$rowHints = this.$game.find('#rowHints');
+      this.$win = $('#win');
       this.$layers = $('#layers');
       this.$canvas = $('#canvas');
-      this.$colorSheet = $(document.createElement('style')).prependTo(this.$game);
-      this.$game.trigger('init');
-      canvas = document.getElementById('canvas');
       this.loadAssets();
       this.bindEvents();
+      this.start();
       return this;
     },
     start: function() {
@@ -87,11 +77,11 @@
                 if (+layer.grid.getAt(x, y)) {
                   this.p.fill(fgc.r, fgc.g, fgc.b);
                   this.drawCell(x, y);
-                } else if (layer === this.level.currentLayer) {
+                } else if (layer === this.level.currentLayer && !this.level.currentLayer.complete) {
                   this.score += 1;
                   this.drawMark(x, y, this.p.color(180, 30, 30));
                 }
-              } else if (+layer.mark.getAt(x, y)) {
+              } else if (+layer.mark.getAt(x, y && !this.level.currentLayer.complete)) {
                 this.p.fill(0, 200, 0);
                 this.drawMark(x, y);
               }
@@ -107,13 +97,13 @@
       return this;
     },
     draw: function() {
-      var biggestColHints, biggestRowHints, cell, col, colComplete, colHints, curCell, gridH, gridW, gridX, gridY, hint, hintGroup, i, level, pos, prev, row, rowComplete, rowHints, x, xw, y, yw, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _len5, _len6, _m, _n, _o, _ref;
+      var biggestColHints, biggestRowHints, cell, col, colComplete, colHints, curCell, gridH, gridW, gridX, gridY, hint, hintGroup, hoverX, hoverY, i, layer, level, pos, prev, row, rowComplete, rowHints, x, xw, y, yw, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _len5, _len6, _len7, _m, _n, _o, _p, _ref, _ref1;
       this.p.background(80);
       biggestRowHints = 0;
       biggestColHints = 0;
       if (this.gameMode === 'play') {
-        biggestRowHints = 3;
-        biggestColHints = 3;
+        biggestRowHints = 2;
+        biggestColHints = 2;
         rowHints = this.level.currentLayer.getRowHints();
         for (_i = 0, _len = rowHints.length; _i < _len; _i++) {
           row = rowHints[_i];
@@ -149,9 +139,9 @@
       gridX = Math.floor((this.p.mouseX - this.offset.x) / this.cw);
       gridY = Math.floor((this.p.mouseY - this.offset.y) / this.cw);
       curCell = gridX + ',' + gridY;
-      x = gridX * this.cw;
-      y = gridY * this.cw;
-      if (this.p.mouseX > this.offset.x && this.p.mouseY > this.offset.y && gridX < this.level.x && gridY < this.level.y) {
+      hoverX = gridX * this.cw;
+      hoverY = gridY * this.cw;
+      if (!this.level.currentLayer.complete && this.p.mouseX > this.offset.x && this.p.mouseY > this.offset.y && gridX < this.level.x && gridY < this.level.y) {
         if (this.p.mouseIsPressed) {
           cell = +this.level.currentLayer.grid.getAt(gridX, gridY);
           if (this.gameMode === 'play') {
@@ -202,7 +192,8 @@
       }
       this.newlyPressed = false;
       this.drawCells();
-      if (this.gameMode === 'play') {
+      if (this.gameMode === 'play' && !this.level.currentLayer.complete) {
+        this.level.currentLayer.complete = true;
         for (y = _l = 0, _len3 = rowHints.length; _l < _len3; y = ++_l) {
           hintGroup = rowHints[y];
           rowComplete = this.level.currentLayer.isRowComplete(y);
@@ -217,6 +208,7 @@
             if (rowComplete) {
               this.p.fill(200);
             } else {
+              this.level.currentLayer.complete = false;
               this.p.fill(0);
             }
             this.p.textAlign(this.p.CENTER, this.p.CENTER);
@@ -244,9 +236,29 @@
         }
       }
       this.drawGrid();
+      this.win = true;
+      _ref1 = this.level.layers;
+      for (_p = 0, _len7 = _ref1.length; _p < _len7; _p++) {
+        layer = _ref1[_p];
+        if (!layer.complete) {
+          this.win = false;
+          break;
+        }
+      }
+      if (this.win) {
+        this.eWin();
+      }
       this.p.fill(255);
       this.p.textAlign(this.p.LEFT);
-      this.p.text("Faults: " + this.score + "/" + this.level.par, 10, 40);
+      if (this.gameMode === 'play') {
+        this.p.text("Faults: " + this.score + "/" + this.level.par, 10, 40);
+      }
+      if (!this.level.currentLayer.complete && gridX >= 0 && gridX < this.level.x && gridY >= 0 && gridY < this.level.y) {
+        this.p.noStroke();
+        this.p.fill(30, 30, 200, 90);
+        this.p.rect(this.offset.x, hoverY + this.offset.y, gridW, this.cw);
+        this.p.rect(hoverX + this.offset.x, this.offset.y, this.cw, gridH);
+      }
       this.lastCell = curCell;
       return this;
     },
@@ -281,7 +293,11 @@
       _ref = this.level.layers;
       for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
         layer = _ref[i];
-        layerUI += "<div>\n	<input \n		class=\"changeLayer layer" + i + " " + (i === this.level.currentLayerIndex ? 'on' : '') + "\"\n		type=\"color\" name=\"fgcolor" + i + "\" value=\"" + layer.fgcolor + "\" style=\"background-color:" + layer.fgcolor + "\"/>\n</div>";
+        if (this.gameMode === 'play') {
+          layerUI += "<div>\n	<div class=\"changeLayer layer" + i + " " + (i === this.level.currentLayerIndex ? 'on' : void 0) + "\"\n		style=\"background-color:" + layer.fgcolor + "\"/>\n	</div>\n</div>";
+        } else {
+          layerUI += "<div>\n	<input \n		class=\"changeLayer layer" + i + " " + (i === this.level.currentLayerIndex ? 'on' : '') + "\"\n		type=\"color\" name=\"fgcolor" + i + "\" value=\"" + layer.fgcolor + "\" style=\"background-color:" + layer.fgcolor + "\"/>\n</div>";
+        }
       }
       if (this.gameMode !== 'play') {
         layerUI += '<button id="addLayer" type="button">+</button>';
@@ -294,8 +310,7 @@
         this.changeLayer(0);
       }
       this.renderLevel();
-      this.renderLayerUI();
-      return this.updateScore();
+      return this.renderLayerUI();
     },
     renderLevel: function() {
       var _this = this;
@@ -307,7 +322,11 @@
         x2: this.w - 80,
         y2: this.h - 30
       };
-      if (this.gameMode !== 'play') {
+      if (this.gameMode === 'play') {
+        if (this.level.layers.length === 1) {
+          this.gridBounds.x2 = this.w - 10;
+        }
+      } else {
         this.gridBounds.x1 = 140;
       }
       new Processing(canvas, function(p) {
@@ -359,24 +378,6 @@
     bindEvents: function() {
       var that,
         _this = this;
-      this.$game.bind({
-        "break": $.proxy(this.eBreak, this),
-        mark: $.proxy(this.eMark, this),
-        lose: $.proxy(this.eLose, this),
-        win: $.proxy(this.eWin, this),
-        erase: $.proxy(this.eErase, this),
-        die: function() {
-          _this.score += 1;
-          _this.$game.addClass('shake');
-          if (!_this.mute) {
-            _this.assets.boom.play();
-          }
-          _this.updateScore();
-          return setTimeout(function() {
-            return _this.$game.removeClass('shake');
-          }, 300);
-        }
-      });
       $('#mute').bind('change', function(e) {
         _this.mute = e.target.checked;
         return true;
@@ -428,19 +429,12 @@
         return label = this.score + " over par";
       }
     },
-    updateScore: function() {
-      if (this.gameMode === 'play') {
-        return this.$score.text("Faults: " + this.score);
-      }
-    },
     eWin: function() {
-      this.dragMode = null;
+      this.$win.html("<h1>" + this.level.title + "</h1>\n<i>" + this.time + "</i>\n<b>" + (this.getGolfScore(this.score)) + " " + this.score + " fault" + (this.score !== 1 ? 's' : void 0) + "</b>");
       if (!this.mute) {
         this.assets.win.play();
       }
-      this.$win.text(this.getGolfScore());
-      this.$win.show();
-      return localStorage[this.title] = true;
+      return this.$win.show();
     },
     updateCols: function(cols) {
       var delta;

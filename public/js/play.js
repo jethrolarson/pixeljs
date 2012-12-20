@@ -2,8 +2,7 @@
 (function() {
 
   $(function() {
-    Game.init($('#game'));
-    return Game.start();
+    return Game.init();
   });
 
 }).call(this);

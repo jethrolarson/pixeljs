@@ -12,24 +12,13 @@ window.Game =
 	lastCell: ''
 	showAll: false
 	init: ($game)->
-		@$game= $game
-		@$gridCell= @$game.find('#gridCell')
-		@$win=      @$game.find('#win')
-		@$lose=     @$game.find('#lose')
-		@$score=    @$game.find('#score')
-		@$games=    @$game.find('#games')
-		@$colHints= @$game.find('#colHints')
-		@$rowHints= @$game.find('#rowHints')
+		@$win=      $('#win')
 		@$layers=   $('#layers')
 		@$canvas= $('#canvas')
-		@$colorSheet = $(document.createElement 'style').prependTo(@$game)
-		@$game.trigger 'init'
-		
-
-		canvas = document.getElementById('canvas')
 		
 		@loadAssets()
 		@bindEvents()
+		@start()
 		this
 	start: ->
 		#load game data
@@ -90,11 +79,11 @@ window.Game =
 								@p.fill(fgc.r,fgc.g,fgc.b)
 								@drawCell(x,y)
 							#draw faults
-							else if layer is @level.currentLayer
+							else if layer is @level.currentLayer and not @level.currentLayer.complete
 								@score += 1
 								@drawMark x, y, @p.color(180,30,30)
 						#draw marks
-						else if +layer.mark.getAt x, y
+						else if +layer.mark.getAt x, y and not @level.currentLayer.complete
 							@p.fill 0, 200, 0
 							@drawMark x, y
 					else
@@ -109,8 +98,8 @@ window.Game =
 		biggestRowHints = 0
 		biggestColHints = 0
 		if @gameMode is 'play'
-			biggestRowHints = 3
-			biggestColHints = 3
+			biggestRowHints = 2
+			biggestColHints = 2
 			rowHints = @level.currentLayer.getRowHints()
 			for row in rowHints
 				biggestRowHints = row.length if row.length > biggestRowHints
@@ -140,11 +129,11 @@ window.Game =
 		gridY = Math.floor((@p.mouseY - @offset.y)/ @cw)
 		curCell = gridX+','+gridY
 		
-		x = gridX * @cw
-		y = gridY * @cw
+		hoverX = gridX * @cw
+		hoverY = gridY * @cw
 		# @p.text(gridX+','+gridY,10,10)
 		#if mouse in grid
-		if @p.mouseX > @offset.x and @p.mouseY > @offset.y and gridX < @level.x and gridY < @level.y
+		if not @level.currentLayer.complete and @p.mouseX > @offset.x and @p.mouseY > @offset.y and gridX < @level.x and gridY < @level.y
 			if @p.mouseIsPressed
 				cell = +@level.currentLayer.grid.getAt(gridX, gridY)
 				if @gameMode is 'play'
@@ -186,7 +175,8 @@ window.Game =
 		
 		#draw the cells
 		@drawCells()
-		if @gameMode is 'play'
+		if @gameMode is 'play' and not @level.currentLayer.complete
+			@level.currentLayer.complete = true
 			for hintGroup,y in rowHints
 				rowComplete = @level.currentLayer.isRowComplete(y)
 				for hint,x in hintGroup
@@ -198,6 +188,7 @@ window.Game =
 					if rowComplete
 						@p.fill(200)
 					else
+						@level.currentLayer.complete = false
 						@p.fill(0)
 					@p.textAlign(@p.CENTER,@p.CENTER);
 					@p.text(hint, pos.x + @cw/2, pos.y + @cw/2)
@@ -216,16 +207,28 @@ window.Game =
 					@p.text(hint, pos.x + @cw/2, pos.y + @cw/2)
 
 		@drawGrid()
-		
+		@win = true
+		for layer in @level.layers
+			if not layer.complete
+				@win = false
+				break
+		# if @level.currentLayer.complete
+		# 	alert()
+		if @win
+			@eWin()
 		@p.fill(255)
 		@p.textAlign(@p.LEFT)
-		@p.text("Faults: #{@score}/#{@level.par}", 10,40)
-		#hover effects
+		if @gameMode is 'play'
+			@p.text("Faults: #{@score}/#{@level.par}", 10,40)
 		
-		# 	#paint row highlight
-		# 	@p.rect(@gridBounds.x1, y+@offset., gridW, @cw)
-		# 	#paint col highlight
-		# 	@p.rect(x+@gridBounds.x1, @offset., @cw, gridH)
+		#hover effects
+		if not @level.currentLayer.complete and gridX >= 0 and gridX < @level.x and gridY >= 0 and gridY < @level.y
+			@p.noStroke()
+			@p.fill(30,30,200,90)
+			#paint row highlight
+			@p.rect(@offset.x, hoverY+@offset.y, gridW, @cw)
+			#paint col highlight
+			@p.rect(hoverX+@offset.x, @offset.y, @cw, gridH)
 		@lastCell = curCell
 		this
 	edit: ->
@@ -250,13 +253,22 @@ window.Game =
 			return
 		layerUI = ''
 		for layer,i in @level.layers
-			layerUI += """
-			<div>
-				<input 
-					class="changeLayer layer#{i} #{if i is @level.currentLayerIndex then 'on' else ''}"
-					type="color" name="fgcolor#{i}" value="#{layer.fgcolor}" style="background-color:#{layer.fgcolor}"/>
-			</div>
-			"""
+			if @gameMode is 'play'
+				layerUI += """
+				<div>
+					<div class="changeLayer layer#{i} #{if i is @level.currentLayerIndex then 'on'}"
+						style="background-color:#{layer.fgcolor}"/>
+					</div>
+				</div>
+				"""
+			else
+				layerUI += """
+				<div>
+					<input 
+						class="changeLayer layer#{i} #{if i is @level.currentLayerIndex then 'on' else ''}"
+						type="color" name="fgcolor#{i}" value="#{layer.fgcolor}" style="background-color:#{layer.fgcolor}"/>
+				</div>
+				"""
 		if @gameMode isnt 'play'
 			layerUI += '<button id="addLayer" type="button">+</button>'
 		@$layers.html layerUI + """<a class="showAll" href="">&#9635;</a>"""
@@ -266,7 +278,6 @@ window.Game =
 			@changeLayer(0)
 		@renderLevel()
 		@renderLayerUI()
-		@updateScore()
 	renderLevel: ->
 		@w = window.innerWidth
 		@h = window.innerHeight
@@ -275,7 +286,10 @@ window.Game =
 			y1:10
 			x2: @w-80
 			y2: @h-30
-		if @gameMode isnt 'play'
+		if @gameMode is 'play'
+			if @level.layers.length is 1
+				@gridBounds.x2 = @w - 10
+		else
 			@gridBounds.x1 = 140
 		new Processing(canvas, (p)=>
 			@p = p
@@ -316,20 +330,6 @@ window.Game =
 	#	Events
 	# =========
 	bindEvents: ->
-		@$game.bind
-			break: $.proxy(@eBreak, this)
-			mark:  $.proxy(@eMark, this)
-			lose:  $.proxy(@eLose, this)
-			win:   $.proxy(@eWin, this)
-			erase: $.proxy(@eErase, this)
-			die: =>
-				@score += 1
-				@$game.addClass('shake')
-				@assets.boom.play() unless @mute
-				@updateScore()
-				setTimeout( =>
-					@$game.removeClass('shake')
-				, 300)
 		$('#mute').bind 'change',(e)=>
 			@mute = e.target.checked
 			true
@@ -371,18 +371,15 @@ window.Game =
 			label = "Tripple Bogey"
 		else if par > 3
 			label = @score+" over par"
-		
-	updateScore: ->
-		if @gameMode is 'play'
-			@$score.text "Faults: " + @score
-	
 	
 	eWin: ->
-		@dragMode= null	
+		@$win.html """
+			<h1>#{@level.title}</h1>
+			<i>#{@time}</i>
+			<b>#{@getGolfScore(@score)} #{@score} fault#{if @score!=1 then 's'}</b>
+		"""
 		@assets.win.play() unless @mute
-		@$win.text @getGolfScore()
 		@$win.show()
-		localStorage[@title] = true
 
 	updateCols: (cols)->
 		delta = cols - @level.x

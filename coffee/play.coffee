@@ -1,3 +1,2 @@
 $ ->
-  Game.init($('#game'));
-  Game.start();
+  Game.init()

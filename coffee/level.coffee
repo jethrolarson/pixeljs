@@ -58,6 +58,7 @@ Layer = (options)->
 		fgcolor: "#0000ff"
 		visible: true
 	},options
+	@complete = false
 	@x = options.x
 	@y = options.y
 	@visible = options.visible

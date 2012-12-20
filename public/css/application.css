@@ -1,45 +1,3 @@
-/* line 18, ../../sass/_base.sass */
-html, body {
-  height: 100%;
-}
-
-/* line 20, ../../sass/_base.sass */
-html {
-  background-attachment: fixed;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(2%, #000000), color-stop(4%, #333333), color-stop(40%, #333333), color-stop(100%, #1a1a1a));
-  background-image: -webkit-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
-  background-image: -moz-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
-  background-image: -o-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
-  background-image: linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
-  background-repeat: no-repeat;
-}
-
-/* line 24, ../../sass/_base.sass */
-body {
-  color: #aaaaaa;
-}
-
-/* line 18, ../../sass/_base.sass */
-html, body {
-  height: 100%;
-}
-
-/* line 20, ../../sass/_base.sass */
-html {
-  background-attachment: fixed;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(2%, #000000), color-stop(4%, #333333), color-stop(40%, #333333), color-stop(100%, #1a1a1a));
-  background-image: -webkit-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
-  background-image: -moz-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
-  background-image: -o-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
-  background-image: linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
-  background-repeat: no-repeat;
-}
-
-/* line 24, ../../sass/_base.sass */
-body {
-  color: #aaaaaa;
-}
-
 /* line 37, ../../sass/_util.sass */
 .win {
   color: green;
@@ -615,27 +573,6 @@ td {
     page-break-after: avoid;
   }
 }
-/* line 18, ../../sass/_base.sass */
-html, body {
-  height: 100%;
-}
-
-/* line 20, ../../sass/_base.sass */
-html {
-  background-attachment: fixed;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(2%, #000000), color-stop(4%, #333333), color-stop(40%, #333333), color-stop(100%, #1a1a1a));
-  background-image: -webkit-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
-  background-image: -moz-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
-  background-image: -o-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
-  background-image: linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
-  background-repeat: no-repeat;
-}
-
-/* line 24, ../../sass/_base.sass */
-body {
-  color: #aaaaaa;
-}
-
 /* line 3, ../../sass/_typo.sass */
 body {
   font-size: 16px;
@@ -683,48 +620,6 @@ ul > li {
   margin-left: 10px;
 }
 
-/* line 18, ../../sass/_base.sass */
-html, body {
-  height: 100%;
-}
-
-/* line 20, ../../sass/_base.sass */
-html {
-  background-attachment: fixed;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(2%, #000000), color-stop(4%, #333333), color-stop(40%, #333333), color-stop(100%, #1a1a1a));
-  background-image: -webkit-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
-  background-image: -moz-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
-  background-image: -o-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
-  background-image: linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
-  background-repeat: no-repeat;
-}
-
-/* line 24, ../../sass/_base.sass */
-body {
-  color: #aaaaaa;
-}
-
-/* line 18, ../../sass/_base.sass */
-html, body {
-  height: 100%;
-}
-
-/* line 20, ../../sass/_base.sass */
-html {
-  background-attachment: fixed;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(2%, #000000), color-stop(4%, #333333), color-stop(40%, #333333), color-stop(100%, #1a1a1a));
-  background-image: -webkit-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
-  background-image: -moz-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
-  background-image: -o-linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
-  background-image: linear-gradient(#000000 2%, #333333 4%, #333333 40%, #1a1a1a 100%);
-  background-repeat: no-repeat;
-}
-
-/* line 24, ../../sass/_base.sass */
-body {
-  color: #aaaaaa;
-}
-
 /* line 37, ../../sass/_util.sass */
 .win {
   color: green;
@@ -735,121 +630,7 @@ body {
   color: red;
 }
 
-@-webkit-keyframes shake {
-  /* line 7, ../../sass/game_grid.sass */
-  0% {
-    -webkit-transform: translate(2px, 1px);
-  }
-
-  /* line 10, ../../sass/game_grid.sass */
-  10% {
-    -webkit-transform: translate(-1px, -2px);
-  }
-
-  /* line 13, ../../sass/game_grid.sass */
-  20% {
-    -webkit-transform: translate(-3px, 0px);
-  }
-
-  /* line 16, ../../sass/game_grid.sass */
-  30% {
-    -webkit-transform: translate(0px, 2px);
-  }
-
-  /* line 19, ../../sass/game_grid.sass */
-  40% {
-    -webkit-transform: translate(1px, -1px);
-  }
-
-  /* line 22, ../../sass/game_grid.sass */
-  50% {
-    -webkit-transform: translate(-1px, 2px);
-  }
-
-  /* line 25, ../../sass/game_grid.sass */
-  60% {
-    -webkit-transform: translate(-3px, 1px);
-  }
-
-  /* line 28, ../../sass/game_grid.sass */
-  70% {
-    -webkit-transform: translate(2px, 1px);
-  }
-
-  /* line 31, ../../sass/game_grid.sass */
-  80% {
-    -webkit-transform: translate(-1px, -1px);
-  }
-
-  /* line 34, ../../sass/game_grid.sass */
-  90% {
-    -webkit-transform: translate(2px, 2px);
-  }
-
-  /* line 37, ../../sass/game_grid.sass */
-  100% {
-    -webkit-transform: translate(1px, -2px);
-  }
-}
-
-@-moz-keyframes shake {
-  /* line 41, ../../sass/game_grid.sass */
-  0% {
-    -moz-transform: translate(2px, 1px);
-  }
-
-  /* line 44, ../../sass/game_grid.sass */
-  10% {
-    -moz-transform: translate(-1px, -2px);
-  }
-
-  /* line 47, ../../sass/game_grid.sass */
-  20% {
-    -moz-transform: translate(-3px, 0px);
-  }
-
-  /* line 50, ../../sass/game_grid.sass */
-  30% {
-    -moz-transform: translate(0px, 2px);
-  }
-
-  /* line 53, ../../sass/game_grid.sass */
-  40% {
-    -moz-transform: translate(1px, -1px);
-  }
-
-  /* line 56, ../../sass/game_grid.sass */
-  50% {
-    -moz-transform: translate(-1px, 2px);
-  }
-
-  /* line 59, ../../sass/game_grid.sass */
-  60% {
-    -moz-transform: translate(-3px, 1px);
-  }
-
-  /* line 62, ../../sass/game_grid.sass */
-  70% {
-    -moz-transform: translate(2px, 1px);
-  }
-
-  /* line 65, ../../sass/game_grid.sass */
-  80% {
-    -moz-transform: translate(-1px, -1px);
-  }
-
-  /* line 68, ../../sass/game_grid.sass */
-  90% {
-    -moz-transform: translate(2px, 2px);
-  }
-
-  /* line 71, ../../sass/game_grid.sass */
-  100% {
-    -moz-transform: translate(1px, -2px);
-  }
-}
-
-/* line 86, ../../sass/game_grid.sass */
+/* line 4, ../../sass/game_grid.sass */
 #menu {
   position: fixed;
   left: 0;
@@ -857,31 +638,16 @@ body {
   padding: 10px 5px;
   width: 140px;
 }
-/* line 92, ../../sass/game_grid.sass */
+/* line 10, ../../sass/game_grid.sass */
 #menu input {
   max-width: 100%;
 }
-/* line 94, ../../sass/game_grid.sass */
+/* line 12, ../../sass/game_grid.sass */
 #menu input[type=number] {
   width: 3.4em;
 }
 
-/* line 96, ../../sass/game_grid.sass */
-#game {
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  cursor: default;
-}
-/* line 98, ../../sass/game_grid.sass */
-#game table {
-  width: 100%;
-}
-/* line 100, ../../sass/game_grid.sass */
-#game #gridCell {
-  width: 100%;
-}
-
-/* line 103, ../../sass/game_grid.sass */
+/* line 15, ../../sass/game_grid.sass */
 #colHints {
   margin: 0;
   padding: 0;
@@ -896,21 +662,21 @@ body {
   color: #aaaaaa;
   list-style: none;
 }
-/* line 105, ../../sass/game_grid.sass */
+/* line 17, ../../sass/game_grid.sass */
 #colHints li {
   display: inline-block;
 }
-/* line 107, ../../sass/game_grid.sass */
+/* line 19, ../../sass/game_grid.sass */
 #colHints li.done div {
   text-decoration: line-through;
   color: #999999;
 }
-/* line 110, ../../sass/game_grid.sass */
+/* line 22, ../../sass/game_grid.sass */
 #colHints li div {
   text-align: center;
 }
 
-/* line 113, ../../sass/game_grid.sass */
+/* line 25, ../../sass/game_grid.sass */
 #rowHints {
   margin: 0;
   padding: 0;
@@ -925,17 +691,17 @@ body {
   color: #aaaaaa;
   list-style: none;
 }
-/* line 115, ../../sass/game_grid.sass */
+/* line 27, ../../sass/game_grid.sass */
 #rowHints li {
   white-space: nowrap;
   text-align: right;
 }
-/* line 118, ../../sass/game_grid.sass */
+/* line 30, ../../sass/game_grid.sass */
 #rowHints li.done div {
   text-decoration: line-through;
   color: #999999;
 }
-/* line 121, ../../sass/game_grid.sass */
+/* line 33, ../../sass/game_grid.sass */
 #rowHints li div {
   vertical-align: bottom;
   display: inline-block;
@@ -943,36 +709,22 @@ body {
   text-align: center;
 }
 
-/* line 127, ../../sass/game_grid.sass */
-#score, #par {
-  white-space: nowrap;
-}
-
-/* line 130, ../../sass/game_grid.sass */
-#win {
-  position: absolute;
-  display: none;
-  color: green;
-  text-align: center;
-  font-size: 60px;
-}
-
-/* line 138, ../../sass/game_grid.sass */
+/* line 39, ../../sass/game_grid.sass */
 .showAll {
   text-decoration: none;
   color: #999999 !important;
 }
-/* line 141, ../../sass/game_grid.sass */
+/* line 42, ../../sass/game_grid.sass */
 .showAll.on {
   color: white !important;
 }
 
-/* line 144, ../../sass/game_grid.sass */
+/* line 45, ../../sass/game_grid.sass */
 #lose {
   color: red;
 }
 
-/* line 146, ../../sass/game_grid.sass */
+/* line 47, ../../sass/game_grid.sass */
 #layers {
   padding: 10px 5px;
   position: fixed;
@@ -981,7 +733,7 @@ body {
   white-space: nowrap;
 }
 
-/* line 153, ../../sass/game_grid.sass */
+/* line 54, ../../sass/game_grid.sass */
 .changeLayer {
   margin: 0 0 1px;
   width: 22px;
@@ -989,111 +741,12 @@ body {
   display: inline-block;
   text-decoration: none;
 }
-/* line 159, ../../sass/game_grid.sass */
+/* line 60, ../../sass/game_grid.sass */
 .changeLayer.on {
   outline: 1px solid yellow;
 }
 
-/* line 161, ../../sass/game_grid.sass */
-#gridCell ul {
-  pointer-events: none;
-  position: absolute;
-  float: left;
-  zoom: 1;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  color: #aaaaaa;
-  cursor: move;
-  border: 1px solid;
-  border-color: white #888888 #888888 white;
-}
-/* line 164, ../../sass/game_grid.sass */
-#gridCell ul.on {
-  opacity: 1;
-  pointer-events: auto;
-}
-/* line 165, ../../sass/game_grid.sass */
-#gridCell ul.on li {
-  opacity: 1;
-}
-/* line 169, ../../sass/game_grid.sass */
-#gridCell ul.on .mark {
-  background: url(../images/flag_red.png) no-repeat center center;
-}
-/* line 171, ../../sass/game_grid.sass */
-#gridCell ul.on .error {
-  background-image: url(../images/cross.png);
-  opacity: 0.8;
-}
-/* line 174, ../../sass/game_grid.sass */
-#gridCell ul:first-child {
-  position: static;
-}
-/* line 5, ../../sass/_util.sass */
-#gridCell ul:after {
-  content: ".";
-  clear: both;
-  display: block;
-  visibility: hidden;
-  height: 0;
-}
-/* line 33, ../../sass/_util.sass */
-#gridCell ul li {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  color: #aaaaaa;
-  list-style: none;
-}
-/* line 184, ../../sass/game_grid.sass */
-#gridCell ul.dragging {
-  cursor: -moz-grabbing;
-}
-/* line 186, ../../sass/game_grid.sass */
-#gridCell ul li {
-  opacity: 0.5;
-  float: left;
-  text-align: center;
-  width: 40px;
-  height: 40px;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
-  border: 1px solid;
-  border-color: white #888888 #888888 white;
-  line-height: 40px;
-  background-repeat: no-repeat;
-  background-position: center center;
-}
-/* line 199, ../../sass/game_grid.sass */
-#gridCell ul li a {
-  text-decoration: none;
-  display: block;
-  text-align: center;
-}
-/* line 203, ../../sass/game_grid.sass */
-#gridCell ul li:hover {
-  outline: 2px solid #ffffaa;
-  border: 1px #999999 solid;
-}
-/* line 206, ../../sass/game_grid.sass */
-#gridCell ul .show {
-  background: #dddddd;
-}
-/* line 209, ../../sass/game_grid.sass */
-#gridCell ul .on, #gridCell ul.paint {
-  -webkit-transition: background-color 0.25s linear;
-}
-
-@media only screen and (max-device-width: 1024px), only screen and (max-device-width: 480px) {
-  /* line 213, ../../sass/game_grid.sass */
-  #grid li:hover {
-    outline: 0;
-    border: none;
-  }
-}
-/* line 217, ../../sass/game_grid.sass */
+/* line 63, ../../sass/game_grid.sass */
 #x, #y {
   width: 60px;
 }
@@ -1156,57 +809,67 @@ body {
   background: url(../farbtastic/marker.png) no-repeat;
 }
 
-/* line 7, ../../sass/application.sass */
+/* line 9, ../../sass/application.sass */
+html, body {
+  height: 100%;
+}
+
+/* line 11, ../../sass/application.sass */
+html {
+  background-color: #333333;
+}
+
+/* line 16, ../../sass/application.sass */
+body {
+  color: #aaaaaa;
+}
+
+/* line 19, ../../sass/application.sass */
 #page {
   margin: 0 auto;
   padding: 0;
 }
 
-/* line 11, ../../sass/application.sass */
+/* line 23, ../../sass/application.sass */
 #nav {
   width: 100%;
   position: fixed;
   top: 0;
   left: 0;
   line-height: 32px;
-  background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #262626), color-stop(98%, #333333), color-stop(100%, #4d4d4d));
-  background-image: -webkit-linear-gradient(#262626 0%, #333333 98%, #4d4d4d 100%);
-  background-image: -moz-linear-gradient(#262626 0%, #333333 98%, #4d4d4d 100%);
-  background-image: -o-linear-gradient(#262626 0%, #333333 98%, #4d4d4d 100%);
-  background-image: linear-gradient(#262626 0%, #333333 98%, #4d4d4d 100%);
   -webkit-box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
   -moz-box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
   z-index: 100;
 }
-/* line 21, ../../sass/application.sass */
+/* line 33, ../../sass/application.sass */
 #nav a {
   text-decoration: none;
   padding: 0 0 0 10px;
   float: left;
 }
-/* line 25, ../../sass/application.sass */
+/* line 37, ../../sass/application.sass */
 #nav .pull-right {
   float: right;
 }
-/* line 27, ../../sass/application.sass */
+/* line 39, ../../sass/application.sass */
 #nav .pull-right a {
   padding: 0 10px 0 0;
 }
 
-/* line 30, ../../sass/application.sass */
+/* line 42, ../../sass/application.sass */
 #picker {
   position: absolute;
 }
 
-/* line 33, ../../sass/application.sass */
+/* line 45, ../../sass/application.sass */
 .slider {
   width: 1.3em;
   text-align: center;
 }
 
-/* line 36, ../../sass/application.sass */
+/* line 48, ../../sass/application.sass */
 .sliderWidget {
   margin: 4px 10px;
   vertical-align: bottom;
@@ -1214,12 +877,12 @@ body {
   width: 532px;
 }
 
-/* line 42, ../../sass/application.sass */
+/* line 54, ../../sass/application.sass */
 .field {
   padding: 4px 0;
 }
 
-/* line 45, ../../sass/application.sass */
+/* line 57, ../../sass/application.sass */
 input[type=color] {
   width: 32px;
   height: 30px;

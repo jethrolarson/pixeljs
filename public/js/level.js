@@ -106,6 +106,7 @@
       fgcolor: "#0000ff",
       visible: true
     }, options);
+    this.complete = false;
     this.x = options.x;
     this.y = options.y;
     this.visible = options.visible;
