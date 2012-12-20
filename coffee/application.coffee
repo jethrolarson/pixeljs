@@ -12,7 +12,6 @@ window.Game =
 	lastCell: ''
 	showAll: false
 	init: ($game)->
-		@$win=      $('#win')
 		@$layers=   $('#layers')
 		@$canvas= $('#canvas')
 		
@@ -83,7 +82,7 @@ window.Game =
 								@score += 1
 								@drawMark x, y, @p.color(180,30,30)
 						#draw marks
-						else if +layer.mark.getAt x, y and not @level.currentLayer.complete
+						else if +layer.mark.getAt(x, y) and not @level.currentLayer.complete
 							@p.fill 0, 200, 0
 							@drawMark x, y
 					else
@@ -144,13 +143,13 @@ window.Game =
 					
 					# add mark
 					if @dragMode is 'mark'
-						@level.currentLayer.mark.setAt(gridX, gridY, !@isErasing,'paint')
+						@level.currentLayer.mark.setAt(gridX, gridY, (+!@isErasing).toString())
 					#paint
 					else
 						prev = +@level.currentLayer.paint.getAt gridX, gridY
 						#only paint if there's no mark on the line to prevent user error
 						if !+@level.currentLayer.mark.getAt gridX, gridY
-							@level.currentLayer.paint.setAt(gridX, gridY, "1",'paint')
+							@level.currentLayer.paint.setAt(gridX, gridY, "1")
 							if !prev
 								if cell
 									@assets.bing.play()
@@ -207,20 +206,29 @@ window.Game =
 					@p.text(hint, pos.x + @cw/2, pos.y + @cw/2)
 
 		@drawGrid()
-		@win = true
+		win = true
 		for layer in @level.layers
 			if not layer.complete
-				@win = false
+				win = false
 				break
-		# if @level.currentLayer.complete
-		# 	alert()
-		if @win
-			@eWin()
+		
 		@p.fill(255)
 		@p.textAlign(@p.LEFT)
-		if @gameMode is 'play'
-			@p.text("Faults: #{@score}/#{@level.par}", 10,40)
 		
+		if @gameMode is 'play'
+			# if @level.currentLayer.complete
+			# 	alert()
+			if win
+				if not @win
+					@end = new Date()
+					@showAll = true
+					@assets.win.play() unless @mute
+					@win = true
+				#font size blah blah
+				@p.text "#{@getGolfScore(@score)}", 150, 40
+
+			@p.text("Faults: #{@score}/#{@level.par}", 10,40)
+			@p.text(@getTime(@end or new Date()), 10,60)
 		#hover effects
 		if not @level.currentLayer.complete and gridX >= 0 and gridX < @level.x and gridY >= 0 and gridY < @level.y
 			@p.noStroke()
@@ -234,8 +242,11 @@ window.Game =
 	edit: ->
 		@showAll =
 		@gameMode = 'edit'
-		@$gridCell.enableContext()
 		@start()
+	getTime: (at = new Date())->
+		n = (n)-> if n > 9 then "" + n else "0" + n
+		curTime = new Date(at - @startTime)
+		curTime.getMinutes() + ':'+n(curTime.getSeconds())
 	getCoord: (el)->
 		index = $(el).parent().children('li').index(el)
 		return {
@@ -278,6 +289,7 @@ window.Game =
 			@changeLayer(0)
 		@renderLevel()
 		@renderLayerUI()
+		@startTime = new Date()
 	renderLevel: ->
 		@w = window.innerWidth
 		@h = window.innerHeight
@@ -371,15 +383,6 @@ window.Game =
 			label = "Tripple Bogey"
 		else if par > 3
 			label = @score+" over par"
-	
-	eWin: ->
-		@$win.html """
-			<h1>#{@level.title}</h1>
-			<i>#{@time}</i>
-			<b>#{@getGolfScore(@score)} #{@score} fault#{if @score!=1 then 's'}</b>
-		"""
-		@assets.win.play() unless @mute
-		@$win.show()
 
 	updateCols: (cols)->
 		delta = cols - @level.x

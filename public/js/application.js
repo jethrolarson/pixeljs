@@ -12,7 +12,6 @@
     lastCell: '',
     showAll: false,
     init: function($game) {
-      this.$win = $('#win');
       this.$layers = $('#layers');
       this.$canvas = $('#canvas');
       this.loadAssets();
@@ -81,7 +80,7 @@
                   this.score += 1;
                   this.drawMark(x, y, this.p.color(180, 30, 30));
                 }
-              } else if (+layer.mark.getAt(x, y && !this.level.currentLayer.complete)) {
+              } else if (+layer.mark.getAt(x, y) && !this.level.currentLayer.complete) {
                 this.p.fill(0, 200, 0);
                 this.drawMark(x, y);
               }
@@ -97,7 +96,7 @@
       return this;
     },
     draw: function() {
-      var biggestColHints, biggestRowHints, cell, col, colComplete, colHints, curCell, gridH, gridW, gridX, gridY, hint, hintGroup, hoverX, hoverY, i, layer, level, pos, prev, row, rowComplete, rowHints, x, xw, y, yw, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _len5, _len6, _len7, _m, _n, _o, _p, _ref, _ref1;
+      var biggestColHints, biggestRowHints, cell, col, colComplete, colHints, curCell, gridH, gridW, gridX, gridY, hint, hintGroup, hoverX, hoverY, i, layer, level, pos, prev, row, rowComplete, rowHints, win, x, xw, y, yw, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _len5, _len6, _len7, _m, _n, _o, _p, _ref, _ref1;
       this.p.background(80);
       biggestRowHints = 0;
       biggestColHints = 0;
@@ -150,11 +149,11 @@
               this.isErasing = +this.level.currentLayer.mark.getAt(gridX, gridY);
             }
             if (this.dragMode === 'mark') {
-              this.level.currentLayer.mark.setAt(gridX, gridY, !this.isErasing, 'paint');
+              this.level.currentLayer.mark.setAt(gridX, gridY, (+(!this.isErasing)).toString());
             } else {
               prev = +this.level.currentLayer.paint.getAt(gridX, gridY);
               if (!+this.level.currentLayer.mark.getAt(gridX, gridY)) {
-                this.level.currentLayer.paint.setAt(gridX, gridY, "1", 'paint');
+                this.level.currentLayer.paint.setAt(gridX, gridY, "1");
                 if (!prev) {
                   if (cell) {
                     this.assets.bing.play();
@@ -236,22 +235,31 @@
         }
       }
       this.drawGrid();
-      this.win = true;
+      win = true;
       _ref1 = this.level.layers;
       for (_p = 0, _len7 = _ref1.length; _p < _len7; _p++) {
         layer = _ref1[_p];
         if (!layer.complete) {
-          this.win = false;
+          win = false;
           break;
         }
-      }
-      if (this.win) {
-        this.eWin();
       }
       this.p.fill(255);
       this.p.textAlign(this.p.LEFT);
       if (this.gameMode === 'play') {
+        if (win) {
+          if (!this.win) {
+            this.end = new Date();
+            this.showAll = true;
+            if (!this.mute) {
+              this.assets.win.play();
+            }
+            this.win = true;
+          }
+          this.p.text("" + (this.getGolfScore(this.score)), 150, 40);
+        }
         this.p.text("Faults: " + this.score + "/" + this.level.par, 10, 40);
+        this.p.text(this.getTime(this.end || new Date()), 10, 60);
       }
       if (!this.level.currentLayer.complete && gridX >= 0 && gridX < this.level.x && gridY >= 0 && gridY < this.level.y) {
         this.p.noStroke();
@@ -264,8 +272,22 @@
     },
     edit: function() {
       this.showAll = this.gameMode = 'edit';
-      this.$gridCell.enableContext();
       return this.start();
+    },
+    getTime: function(at) {
+      var curTime, n;
+      if (at == null) {
+        at = new Date();
+      }
+      n = function(n) {
+        if (n > 9) {
+          return "" + n;
+        } else {
+          return "0" + n;
+        }
+      };
+      curTime = new Date(at - this.startTime);
+      return curTime.getMinutes() + ':' + n(curTime.getSeconds());
     },
     getCoord: function(el) {
       var index;
@@ -310,7 +332,8 @@
         this.changeLayer(0);
       }
       this.renderLevel();
-      return this.renderLayerUI();
+      this.renderLayerUI();
+      return this.startTime = new Date();
     },
     renderLevel: function() {
       var _this = this;
@@ -428,13 +451,6 @@
       } else if (par > 3) {
         return label = this.score + " over par";
       }
-    },
-    eWin: function() {
-      this.$win.html("<h1>" + this.level.title + "</h1>\n<i>" + this.time + "</i>\n<b>" + (this.getGolfScore(this.score)) + " " + this.score + " fault" + (this.score !== 1 ? 's' : void 0) + "</b>");
-      if (!this.mute) {
-        this.assets.win.play();
-      }
-      return this.$win.show();
     },
     updateCols: function(cols) {
       var delta;

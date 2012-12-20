@@ -1,4 +1,4 @@
-from google.appengine.ext import webapp, db
+from google.appengine.ext import webapp
 import models, util
 
 

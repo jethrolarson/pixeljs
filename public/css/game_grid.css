@@ -26,83 +26,16 @@
 }
 
 /* line 15, ../../sass/game_grid.sass */
-#colHints {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  color: #aaaaaa;
-}
-/* line 33, ../../sass/_util.sass */
-#colHints li {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  color: #aaaaaa;
-  list-style: none;
-}
-/* line 17, ../../sass/game_grid.sass */
-#colHints li {
-  display: inline-block;
-}
-/* line 19, ../../sass/game_grid.sass */
-#colHints li.done div {
-  text-decoration: line-through;
-  color: #999999;
-}
-/* line 22, ../../sass/game_grid.sass */
-#colHints li div {
-  text-align: center;
-}
-
-/* line 25, ../../sass/game_grid.sass */
-#rowHints {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  color: #aaaaaa;
-}
-/* line 33, ../../sass/_util.sass */
-#rowHints li {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  color: #aaaaaa;
-  list-style: none;
-}
-/* line 27, ../../sass/game_grid.sass */
-#rowHints li {
-  white-space: nowrap;
-  text-align: right;
-}
-/* line 30, ../../sass/game_grid.sass */
-#rowHints li.done div {
-  text-decoration: line-through;
-  color: #999999;
-}
-/* line 33, ../../sass/game_grid.sass */
-#rowHints li div {
-  vertical-align: bottom;
-  display: inline-block;
-  width: 1.5em;
-  text-align: center;
-}
-
-/* line 39, ../../sass/game_grid.sass */
 .showAll {
   text-decoration: none;
   color: #999999 !important;
 }
-/* line 42, ../../sass/game_grid.sass */
+/* line 18, ../../sass/game_grid.sass */
 .showAll.on {
   color: white !important;
 }
 
-/* line 45, ../../sass/game_grid.sass */
-#lose {
-  color: red;
-}
-
-/* line 47, ../../sass/game_grid.sass */
+/* line 21, ../../sass/game_grid.sass */
 #layers {
   padding: 10px 5px;
   position: fixed;
@@ -111,7 +44,7 @@
   white-space: nowrap;
 }
 
-/* line 54, ../../sass/game_grid.sass */
+/* line 28, ../../sass/game_grid.sass */
 .changeLayer {
   margin: 0 0 1px;
   width: 22px;
@@ -119,12 +52,12 @@
   display: inline-block;
   text-decoration: none;
 }
-/* line 60, ../../sass/game_grid.sass */
+/* line 34, ../../sass/game_grid.sass */
 .changeLayer.on {
   outline: 1px solid yellow;
 }
 
-/* line 63, ../../sass/game_grid.sass */
+/* line 37, ../../sass/game_grid.sass */
 #x, #y {
   width: 60px;
 }

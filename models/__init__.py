@@ -1,6 +1,5 @@
 from google.appengine.ext import db
 from google.appengine.api import users
-import logging
 
 
 class User(db.Model):
@@ -52,7 +51,7 @@ def getUserLevelSet():
     ls = LevelSet.all().filter('owner =', getCurrentUser()).fetch(1)
     if not ls:
         user = getCurrentUser()
-        ls = LevelSet(owner = user)
+        ls = LevelSet(owner=user)
         ls.put()
     else:
         ls = ls[0]
