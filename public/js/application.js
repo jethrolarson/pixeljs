@@ -14,6 +14,9 @@
     init: function($game) {
       this.$layers = $('#layers');
       this.$canvas = $('#canvas');
+      this.$menu = $('#menu');
+      this.$faults = $('#faults');
+      this.$time = $('#time');
       this.loadAssets();
       this.bindEvents();
       this.start();
@@ -76,9 +79,11 @@
                 if (+layer.grid.getAt(x, y)) {
                   this.p.fill(fgc.r, fgc.g, fgc.b);
                   this.drawCell(x, y);
-                } else if (layer === this.level.currentLayer && !this.level.currentLayer.complete) {
+                } else if (layer === this.level.currentLayer) {
                   this.score += 1;
-                  this.drawMark(x, y, this.p.color(180, 30, 30));
+                  if (!this.level.currentLayer.complete) {
+                    this.drawMark(x, y, this.p.color(180, 30, 30));
+                  }
                 }
               } else if (+layer.mark.getAt(x, y) && !this.level.currentLayer.complete) {
                 this.p.fill(0, 200, 0);
@@ -97,7 +102,11 @@
     },
     draw: function() {
       var biggestColHints, biggestRowHints, cell, col, colComplete, colHints, curCell, gridH, gridW, gridX, gridY, hint, hintGroup, hoverX, hoverY, i, layer, level, pos, prev, row, rowComplete, rowHints, win, x, xw, y, yw, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _len5, _len6, _len7, _m, _n, _o, _p, _ref, _ref1;
-      this.p.background(80);
+      this.bgc = color.hexToRGB(this.level.bgcolor);
+      this.bgc = this.p.color(this.bgc.r, this.bgc.g, this.bgc.b);
+      this.fgc = color.hexToRGB(this.level.currentLayer.fgcolor);
+      this.fgc = this.p.color(this.fgc.r, this.fgc.g, this.fgc.b);
+      this.p.background(this.bgc);
       biggestRowHints = 0;
       biggestColHints = 0;
       if (this.gameMode === 'play') {
@@ -131,8 +140,6 @@
       };
       gridW = this.cw * this.level.x;
       gridH = this.cw * this.level.y;
-      this.bgc = color.hexToRGB(this.level.bgcolor);
-      this.bgc = this.p.color(this.bgc.r, this.bgc.g, this.bgc.b);
       this.p.fill(this.bgc);
       this.p.rect(this.offset.x, this.offset.y, gridW, gridH);
       gridX = Math.floor((this.p.mouseX - this.offset.x) / this.cw);
@@ -167,7 +174,7 @@
             if (this.newlyPressed) {
               this.isErasing = !!cell;
             }
-            if (!!cell !== !this.isErasing) {
+            if (!!cell === this.isErasing) {
               this.level.currentLayer.grid.setAt(gridX, gridY, (+(!this.isErasing)).toString());
               _ref = this.level.layers;
               for (i = _k = 0, _len2 = _ref.length; _k < _len2; i = ++_k) {
@@ -196,13 +203,14 @@
         for (y = _l = 0, _len3 = rowHints.length; _l < _len3; y = ++_l) {
           hintGroup = rowHints[y];
           rowComplete = this.level.currentLayer.isRowComplete(y);
+          hintGroup = hintGroup.reverse();
           for (x = _m = 0, _len4 = hintGroup.length; _m < _len4; x = ++_m) {
             hint = hintGroup[x];
             pos = {
-              x: this.cw * x + this.gridBounds.x1,
+              x: this.offset.x - this.cw * (x + 1),
               y: this.cw * y + this.offset.y
             };
-            this.p.fill(255);
+            this.p.fill(this.fgc);
             this.p.rect(pos.x, pos.y, this.cw, this.cw);
             if (rowComplete) {
               this.p.fill(200);
@@ -217,13 +225,14 @@
         for (x = _n = 0, _len5 = colHints.length; _n < _len5; x = ++_n) {
           hintGroup = colHints[x];
           colComplete = this.level.currentLayer.isColComplete(x);
+          hintGroup = hintGroup.reverse();
           for (y = _o = 0, _len6 = hintGroup.length; _o < _len6; y = ++_o) {
             hint = hintGroup[y];
             pos = {
               x: this.cw * x + this.offset.x,
-              y: this.cw * y + this.gridBounds.y1
+              y: this.offset.y - this.cw * (y + 1)
             };
-            this.p.fill(255);
+            this.p.fill(this.fgc);
             this.p.rect(pos.x, pos.y, this.cw, this.cw);
             if (colComplete) {
               this.p.fill(200);
@@ -258,8 +267,10 @@
           }
           this.p.text("" + (this.getGolfScore(this.score)), 150, 40);
         }
-        this.p.text("Faults: " + this.score + "/" + this.level.par, 10, 40);
-        this.p.text(this.getTime(this.end || new Date()), 10, 60);
+        this.$faults.text("" + this.score + "/" + this.level.par);
+        this.$time.text(this.getTime(this.end || new Date()));
+        this;
+
       }
       if (!this.level.currentLayer.complete && gridX >= 0 && gridX < this.level.x && gridY >= 0 && gridY < this.level.y) {
         this.p.noStroke();
@@ -316,7 +327,7 @@
       for (i = _i = 0, _len = _ref.length; _i < _len; i = ++_i) {
         layer = _ref[i];
         if (this.gameMode === 'play') {
-          layerUI += "<div>\n	<div class=\"changeLayer layer" + i + " " + (i === this.level.currentLayerIndex ? 'on' : void 0) + "\"\n		style=\"background-color:" + layer.fgcolor + "\"/>\n	</div>\n</div>";
+          layerUI += "<div class=\"changeLayer layer" + i + " " + (i === this.level.currentLayerIndex ? 'on' : void 0) + "\"\n	style=\"background-color:" + layer.fgcolor + "\"/>\n</div>";
         } else {
           layerUI += "<div>\n	<input \n		class=\"changeLayer layer" + i + " " + (i === this.level.currentLayerIndex ? 'on' : '') + "\"\n		type=\"color\" name=\"fgcolor" + i + "\" value=\"" + layer.fgcolor + "\" style=\"background-color:" + layer.fgcolor + "\"/>\n</div>";
         }

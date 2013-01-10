@@ -14,14 +14,16 @@ window.Game =
 	init: ($game)->
 		@$layers=   $('#layers')
 		@$canvas= $('#canvas')
-		
+		@$menu = $('#menu')
+		@$faults = $('#faults')
+		@$time = $('#time')
 		@loadAssets()
 		@bindEvents()
 		@start()
 		this
 	start: ->
 		#load game data
-		@loadGame window.level
+		@loadGame(window.level)
 	blip: 0
 	drawGrid: ->
 		#adjusts the color of the lines based on the background #HACKY
@@ -78,9 +80,9 @@ window.Game =
 								@p.fill(fgc.r,fgc.g,fgc.b)
 								@drawCell(x,y)
 							#draw faults
-							else if layer is @level.currentLayer and not @level.currentLayer.complete
+							else if layer is @level.currentLayer 
 								@score += 1
-								@drawMark x, y, @p.color(180,30,30)
+								@drawMark x, y, @p.color(180,30,30) if not @level.currentLayer.complete
 						#draw marks
 						else if +layer.mark.getAt(x, y) and not @level.currentLayer.complete
 							@p.fill 0, 200, 0
@@ -92,7 +94,11 @@ window.Game =
 							@drawCell(x,y)
 		@
 	draw: ->
-		@p.background 80
+		@bgc = color.hexToRGB(@level.bgcolor)
+		@bgc = @p.color(@bgc.r,@bgc.g,@bgc.b)
+		@fgc = color.hexToRGB(@level.currentLayer.fgcolor)
+		@fgc = @p.color(@fgc.r,@fgc.g,@fgc.b)
+		@p.background @bgc
 		
 		biggestRowHints = 0
 		biggestColHints = 0
@@ -119,8 +125,7 @@ window.Game =
 			y: @gridBounds.y1 + (biggestColHints * @cw)
 		gridW = @cw * @level.x
 		gridH = @cw * @level.y
-		@bgc = color.hexToRGB(@level.bgcolor)
-		@bgc = @p.color(@bgc.r,@bgc.g,@bgc.b)
+		
 		@p.fill(@bgc)
 		@p.rect(@offset.x,@offset.y,gridW,gridH)
 		#current cell
@@ -159,7 +164,7 @@ window.Game =
 				else
 					if @newlyPressed
 						@isErasing = !!cell
-					if !!cell isnt !@isErasing
+					if !!cell is @isErasing
 						@level.currentLayer.grid.setAt(gridX, gridY, (+!@isErasing).toString())
 						for level, i in @level.layers when i isnt @level.currentLayerIndex
 							level.grid.setAt(gridX,gridY,"0")
@@ -175,14 +180,16 @@ window.Game =
 		#draw the cells
 		@drawCells()
 		if @gameMode is 'play' and not @level.currentLayer.complete
+			#TODO Render partial hints
 			@level.currentLayer.complete = true
 			for hintGroup,y in rowHints
 				rowComplete = @level.currentLayer.isRowComplete(y)
+				hintGroup = hintGroup.reverse()
 				for hint,x in hintGroup
 					pos = 
-						x: @cw * x + @gridBounds.x1
+						x: @offset.x - @cw * (x+1)
 						y: @cw * y + @offset.y
-					@p.fill(255)
+					@p.fill(@fgc)
 					@p.rect(pos.x, pos.y , @cw, @cw)
 					if rowComplete
 						@p.fill(200)
@@ -193,11 +200,12 @@ window.Game =
 					@p.text(hint, pos.x + @cw/2, pos.y + @cw/2)
 			for hintGroup,x in colHints
 				colComplete = @level.currentLayer.isColComplete(x)
+				hintGroup = hintGroup.reverse()
 				for hint,y in hintGroup
 					pos =
 						x: @cw * x + @offset.x
-						y: @cw * y + @gridBounds.y1
-					@p.fill(255)
+						y: @offset.y - @cw * (y+1)
+					@p.fill(@fgc)
 					@p.rect(pos.x, pos.y , @cw, @cw)
 					if colComplete
 						@p.fill(200)
@@ -227,8 +235,9 @@ window.Game =
 				#font size blah blah
 				@p.text "#{@getGolfScore(@score)}", 150, 40
 
-			@p.text("Faults: #{@score}/#{@level.par}", 10,40)
-			@p.text(@getTime(@end or new Date()), 10,60)
+			@$faults.text("#{@score}/#{@level.par}")
+			@$time.text(@getTime(@end or new Date()))
+			@
 		#hover effects
 		if not @level.currentLayer.complete and gridX >= 0 and gridX < @level.x and gridY >= 0 and gridY < @level.y
 			@p.noStroke()
@@ -266,10 +275,8 @@ window.Game =
 		for layer,i in @level.layers
 			if @gameMode is 'play'
 				layerUI += """
-				<div>
-					<div class="changeLayer layer#{i} #{if i is @level.currentLayerIndex then 'on'}"
-						style="background-color:#{layer.fgcolor}"/>
-					</div>
+				<div class="changeLayer layer#{i} #{if i is @level.currentLayerIndex then 'on'}"
+					style="background-color:#{layer.fgcolor}"/>
 				</div>
 				"""
 			else
@@ -344,7 +351,7 @@ window.Game =
 	bindEvents: ->
 		$('#mute').bind 'change',(e)=>
 			@mute = e.target.checked
-			true
+			return true
 		that = this
 		$('.changeLayer').live 'click',(e)->
 			layerRE = /layer(\d)+/.exec this.className

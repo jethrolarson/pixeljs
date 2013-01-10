@@ -11,14 +11,13 @@ String.times = (str, times)->
 String.prototype.replaceAt = (index, char)->
 	return this.substr(0, index) + char + this.substr(index+char.length)
 
-window.color ={
+window.color =
 	hexToRGB: (hex)->
-		{
+		return {
 			r: parseInt(hex.substr(1,2),16)
 			g: parseInt(hex.substr(3,2),16)
 			b: parseInt(hex.substr(5,2),16)
 		}
-}
 window.levelToDataURL = (level)->
 		fg = color.hexToRGB(level.fgcolor)
 		bg = color.hexToRGB(level.bgcolor)

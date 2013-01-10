@@ -4,6 +4,13 @@
 var level = {{level|jsonify}};
 </script>
 <div id="layers"></div>
+<div id="menu">
+	<div id="score">
+		<span id="faults"></span> faults
+	</div>
+	<div id="time">
+	</div>
+</div>
 {% include '../partials/grid.html'%}
 <p><a href="/level/edit/{{level.key}}">Edit this level</a></p>
 {% endblock %}
