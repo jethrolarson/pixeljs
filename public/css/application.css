@@ -80,3 +80,54 @@ button { cursor: pointer; }
 
 /* Edit form */
 .field { padding: 4px 0; }
+
+/* Buttons */
+.btn {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 4px;
+  border: 1px solid #555;
+  background: #2a2a2a;
+  color: #ccc;
+  font-size: 13px;
+  text-decoration: none;
+  cursor: pointer;
+  line-height: 1.4;
+}
+.btn:hover { background: #333; color: #eee; border-color: #777; }
+.btn:disabled { opacity: 0.5; cursor: default; }
+
+/* Level cards (My Levels) */
+.level-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.level-card { width: 160px; }
+.thumb-link {
+  display: block;
+  width: 160px;
+  height: 160px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #222;
+}
+.thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+}
+.card-info { padding: 8px 2px; }
+.card-title {
+  display: block;
+  color: #eee;
+  font-size: 13px;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 6px;
+}
+.card-actions { display: flex; gap: 4px; }
+.btn-delete:hover { color: #e44; border-color: #e44; }

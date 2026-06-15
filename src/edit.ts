@@ -16,7 +16,16 @@ const defaultLevel: LevelData = {
 async function init(): Promise<void> {
   const params = new URLSearchParams(location.search)
   let currentId: string | null = params.get('id')
+  const returnPackId: string | null = params.get('pack')
   const initialLevel: LevelData = (currentId ? await getLevelById(currentId) : null) ?? defaultLevel
+
+  if (returnPackId) {
+    const back = document.getElementById('back-link')
+    if (back) {
+      back.setAttribute('href', `/pack-edit.html?id=${returnPackId}`)
+      back.textContent = '← Back to pack'
+    }
+  }
 
   const game = new Game()
   game.init()
@@ -35,8 +44,13 @@ async function init(): Promise<void> {
     if (!user) { signIn(); return }
     const saved = await saveLevel({ ...game.getLevelData(), id: currentId ?? undefined }, user.uid)
     currentId = saved.id!
-    history.replaceState(null, '', `?id=${currentId}`)
     document.title = saved.title ?? 'Edit Level'
+    if (returnPackId) {
+      // Came from the pack editor — hand the new level back and return.
+      location.href = `/pack-edit.html?id=${returnPackId}&add=${currentId}`
+      return
+    }
+    history.replaceState(null, '', `?id=${currentId}`)
   })
 }
 

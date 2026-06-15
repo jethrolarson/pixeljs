@@ -9,7 +9,7 @@ const col = collection(db, 'levels')
 
 function docToLevel(id: string, data: Record<string, unknown>): LevelData {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { createdAt, updatedAt, ownerId, ...rest } = data
+  const { createdAt, updatedAt, ...rest } = data
   return { ...rest, id } as LevelData
 }
 

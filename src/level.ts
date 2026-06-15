@@ -7,6 +7,7 @@ export interface HintGroup {
 
 export interface LevelData {
   id?: string
+  ownerId?: string
   title?: string
   x?: number
   y?: number
