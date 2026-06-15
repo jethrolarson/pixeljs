@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Pixel Puzzle</title>
+  <link rel="stylesheet" href="/css/application.css"/>
+  <style>
+    body { padding: 0 16px 32px; }
+    header { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; border-bottom: 1px solid #444; margin-bottom: 24px; }
+    header h1 { margin: 0; font-size: 20px; color: #eee; }
+    #levels { display: flex; flex-wrap: wrap; gap: 16px; }
+    .level-card { background: #222; border-radius: 6px; overflow: hidden; width: 160px; }
+    .thumb-link { display: block; }
+    .thumb { display: block; width: 100%; image-rendering: pixelated; aspect-ratio: 1; }
+    .card-info { padding: 8px; }
+    .card-title { display: block; color: #eee; font-size: 13px; margin-bottom: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-actions { display: flex; gap: 4px; }
+    .btn { font-size: 11px; padding: 3px 8px; background: #444; color: #ccc; border: none; border-radius: 3px; cursor: pointer; text-decoration: none; }
+    .btn:hover { background: #555; color: #fff; }
+    .btn-delete { margin-left: auto; background: #522; }
+    .btn-delete:hover { background: #833; }
+    .empty { color: #888; }
+    .empty a { color: #508ced; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Pixel Puzzle</h1>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <a href="/edit.html" id="new-btn" class="btn" style="font-size:13px;padding:6px 14px;">+ New Level</a>
+      <button id="auth-btn" class="btn" style="font-size:13px;padding:6px 14px;">Sign in</button>
+    </div>
+  </header>
+  <div id="levels"></div>
+  <script type="module" src="/src/browser.ts"></script>
+</body>
+</html>

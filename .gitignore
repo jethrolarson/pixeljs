@@ -1,2 +1,4 @@
-public/js/soundmanager
-.sass-cache
+node_modules/
+dist/
+.firebase/
+*.local
