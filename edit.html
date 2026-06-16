@@ -3,52 +3,9 @@
 <head>
   <meta charset="utf-8"/>
   <title>Edit Level</title>
-  <link rel="stylesheet" href="/css/application.css"/>
-  <style>
-    html, body { overflow: hidden; height: 100%; margin: 0; }
-    #canvas { display: block; }
-    #layers label.changeLayer { position: relative; overflow: hidden; cursor: pointer; }
-    #layers label.changeLayer input[type=color] { position: absolute; top: 0; left: 0; width: 0; height: 0; opacity: 0; }
-  </style>
 </head>
 <body>
-  <div id="page">
-    <div id="body">
-      <div id="layers"></div>
-      <div id="menu">
-        <a id="back-link" href="/levels.html" style="display:block;color:#aaa;text-decoration:none;margin-bottom:8px;">&#8592; My Levels</a>
-        <div class="field">
-          <input name="title" type="text" placeholder="title"/>
-        </div>
-        <div class="field">
-          <label>
-            <input type="number" min="3" max="32" name="x" id="x" value="10"/>
-            X
-          </label>
-          <input type="number" min="3" max="32" name="y" id="y" value="10"/>
-        </div>
-        <div class="field">
-          <label>Par</label>
-          <input name="par" type="number" min="1" max="10" step="1" value="3"/>
-        </div>
-        <div class="field">
-          <label>BG</label>
-          <input name="bgcolor" type="color" value="#dddddd"/>
-        </div>
-        <div class="field">
-          <label>Grid</label>
-          <input name="gridcolor" type="color" value="#000000"/>
-        </div>
-        <label><input type="checkbox" id="mute"/> Mute</label>
-        <div class="field">
-          <button type="button" id="save-btn">Save</button>
-          <a href="/play.html">Test</a>
-        </div>
-        <p id="signin-msg" style="font-size:11px;color:#888;">Sign in to save</p>
-      </div>
-      <canvas id="canvas"></canvas>
-    </div>
-  </div>
+  <div id="root"></div>
   <script type="module" src="/src/edit.ts"></script>
 </body>
 </html>

@@ -3,27 +3,9 @@
 <head>
   <meta charset="utf-8"/>
   <title>Pixel Puzzle</title>
-  <link rel="stylesheet" href="/css/application.css"/>
-  <style>
-    html, body { overflow: hidden; height: 100%; margin: 0; }
-    #canvas { display: block; }
-    #menu { background: rgba(0,0,0,0.5); border-radius: 4px; color: #eee; }
-    #layers label.changeLayer { position: relative; overflow: hidden; cursor: pointer; }
-    #layers label.changeLayer input[type=color] { position: absolute; top: 0; left: 0; width: 0; height: 0; opacity: 0; }
-  </style>
 </head>
 <body>
-  <div id="page">
-    <div id="body">
-      <div id="layers"></div>
-      <div id="menu">
-        <a href="/index.html" style="display:block;color:#aaa;text-decoration:none;margin-bottom:8px;">&#8592; Levels</a>
-        <div id="score"><span id="faults"></span> faults</div>
-        <div id="time"></div>
-      </div>
-      <canvas id="canvas"></canvas>
-    </div>
-  </div>
+  <div id="root"></div>
   <script type="module" src="/src/play.ts"></script>
 </body>
 </html>
