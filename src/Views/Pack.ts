@@ -57,7 +57,7 @@ const levelList = (pack: PackData, levels: (LevelData | null)[]): Element =>
           h('li', { className: styles.item }, [
             h('span', { className: styles.num }, [String(i + 1)]),
             level
-              ? h('a', { href: `/play.html?id=${pack.levelIds[i]}`, className: styles.itemTitle }, [
+              ? h('a', { href: `/play.html?id=${pack.levelIds[i]}&pack=${pack.id}`, className: styles.itemTitle }, [
                   level.title ?? 'Untitled',
                 ])
               : h('span', { className: styles.itemMissing }, ['(deleted)']),

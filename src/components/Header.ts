@@ -10,11 +10,23 @@ export interface HeaderProps {
   isMod: FunState<boolean>
 }
 
+const path = location.pathname
+const isActive = (href: string): boolean =>
+  href === '/' ? path === '/' || path === '/index.html' : path === href
+
 export const Header: Component<HeaderProps> = (signal, { user, isMod }) => {
   const notSignedIn = mapRead(user, (u) => u == null)
   const notMod = mapRead(isMod, (m) => !m)
 
-  const link = (href: string, label: string, hideWhen?: FunRead<boolean>) => {
+  // Primary destinations: real routes styled as a tab bar (active = current path).
+  const tab = (href: string, label: string, hideWhen?: FunRead<boolean>) => {
+    const className = isActive(href) ? `${styles.tab} ${styles.tabActive}` : styles.tab
+    const el = h('a', { href, className }, [label])
+    return hideWhen ? enhance(el, bindClass(styles.hidden, hideWhen, signal)) : el
+  }
+
+  // Secondary actions (button-styled).
+  const action = (href: string, label: string, hideWhen?: FunRead<boolean>) => {
     const el = h('a', { href, className: btn }, [label])
     return hideWhen ? enhance(el, bindClass(styles.hidden, hideWhen, signal)) : el
   }
@@ -30,10 +42,10 @@ export const Header: Component<HeaderProps> = (signal, { user, isMod }) => {
   return h('header', { className: headerBar }, [
     h('h1', { className: styles.title }, [h('a', { href: '/' }, ['Pixel Puzzle'])]),
     h('div', { className: styles.actions }, [
-      link('/browse.html', 'Browse'),
-      link('/levels.html', 'My Levels', notSignedIn),
-      link('/admin.html', 'Admin', notMod),
-      link('/pack-edit.html', '+ New Pack', notSignedIn),
+      tab('/', 'Home'),
+      tab('/browse.html', 'Browse'),
+      tab('/workshop.html', 'Workshop', notSignedIn),
+      action('/admin.html', 'Admin', notMod),
       authButton,
     ]),
   ])

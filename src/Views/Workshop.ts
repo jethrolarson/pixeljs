@@ -1,14 +1,18 @@
 import { funState, mapRead } from '@fun-land/fun-state'
 import { Component, h, hx, bindView } from '@fun-land/fun-web'
 import { LevelData } from '../level'
+import { PackData } from '../pack'
 import { getLevels, deleteLevel } from '../store'
+import { getMyPacks } from '../packStore'
 import { levelToDataURL } from '../util'
 import { getUser } from '../services/getUser'
 import { getModerator } from '../services/getModerator'
 import { Header } from '../components/Header'
+import { packGrid } from '../components/PackGrid'
 import { Loadable, loading, loadInto, bindLoadable } from '../components/Async'
 import { btn, btnDanger, empty, page } from '../theme.css'
-import * as styles from './MyLevels.css'
+import { sectionHeader, sectionTitle } from './Home.css'
+import * as styles from './Workshop.css'
 
 const levelCard = (signal: AbortSignal, level: LevelData, reload: () => void): Element =>
   h('div', { className: styles.card }, [
@@ -38,32 +42,65 @@ const levelCard = (signal: AbortSignal, level: LevelData, reload: () => void): E
     ]),
   ])
 
-const userLevels = (signal: AbortSignal, uid: string): Element => {
+const levelsSection = (signal: AbortSignal, uid: string): Element => {
   const levels = funState<Loadable<LevelData[]>>(loading())
   const reload = (): void => loadInto(levels, getLevels().then((ls) => ls.filter((l) => l.ownerId === uid)))
   reload()
 
-  return bindLoadable(
+  const grid = bindLoadable(
     signal,
     levels,
     (regionSignal, ls) =>
       ls.length
         ? h('div', { className: styles.grid }, ls.map((l) => levelCard(regionSignal, l, reload)))
-        : h('p', { className: empty }, [
-            'No levels yet. ',
-            h('a', { href: '/edit.html' }, ['Create one!']),
-          ]),
+        : h('p', { className: empty }, ['No levels yet.']),
     { errorMsg: 'Failed to load levels.' },
   )
+
+  return h('section', {}, [
+    h('div', { className: sectionHeader }, [
+      h('h2', { className: sectionTitle }, ['My Levels']),
+      h('a', { href: '/edit.html', className: btn }, ['+ New Level']),
+    ]),
+    grid,
+  ])
 }
 
-export const MyLevels: Component = (signal) => {
+const packsSection = (signal: AbortSignal, uid: string): Element => {
+  const packs = funState<Loadable<PackData[]>>(loading())
+  loadInto(packs, getMyPacks(uid))
+
+  const grid = bindLoadable(
+    signal,
+    packs,
+    (regionSignal, ps) =>
+      ps.length
+        ? packGrid(regionSignal, ps, () => uid, true)
+        : h('p', { className: empty }, ['No packs yet.']),
+    { errorMsg: 'Failed to load packs.' },
+  )
+
+  return h('section', {}, [
+    h('div', { className: sectionHeader }, [
+      h('h2', { className: sectionTitle }, ['My Packs']),
+      h('a', { href: '/pack-edit.html', className: btn }, ['+ New Pack']),
+    ]),
+    grid,
+  ])
+}
+
+export const Workshop: Component = (signal) => {
   const user = getUser(signal)
   const uid = mapRead(user, (u) => u?.uid ?? null)
   const isMod = getModerator(signal, uid)
 
   const content = bindView(signal, user, (regionSignal, u) =>
-    u ? userLevels(regionSignal, u.uid) : h('p', { className: empty }, ['Sign in to see your levels.']),
+    u
+      ? h('div', { className: styles.sections }, [
+          levelsSection(regionSignal, u.uid),
+          packsSection(regionSignal, u.uid),
+        ])
+      : h('p', { className: empty }, ['Sign in to see your workshop.']),
   )
 
   return h('div', { className: page }, [Header(signal, { user, isMod }), content])

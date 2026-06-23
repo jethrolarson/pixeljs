@@ -1,6 +1,12 @@
 import { style } from '@vanilla-extract/css'
 import { colors } from '../theme.css'
 
+export const sections = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 40,
+})
+
 export const grid = style({
   display: 'flex',
   flexWrap: 'wrap',

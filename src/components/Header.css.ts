@@ -16,3 +16,17 @@ export const actions = style({
 export const hidden = style({
   display: 'none',
 })
+
+export const tab = style({
+  padding: '5px 14px',
+  color: colors.textDim,
+  textDecoration: 'none',
+  borderRadius: 4,
+  fontSize: 14,
+  ':hover': { color: colors.textBright, background: colors.panelHover },
+})
+
+export const tabActive = style({
+  color: colors.textBright,
+  background: colors.panel,
+})

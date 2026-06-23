@@ -126,8 +126,8 @@ export const Edit: Component = (signal) => {
     const saveBtn = hx('button', { signal, props: { type: 'button', className: btn }, on: { click: onSave } }, ['Save'])
     const signinMsg = h('p', { className: edit.signinMsg }, ['Sign in to save'])
 
-    const backHref = returnPackId ? `/pack-edit.html?id=${returnPackId}` : '/levels.html'
-    const backLabel = returnPackId ? '← Back to pack' : '← My Levels'
+    const backHref = returnPackId ? `/pack-edit.html?id=${returnPackId}` : '/workshop.html'
+    const backLabel = returnPackId ? '← Back to pack' : '← Workshop'
 
     menuSlot.replaceChildren(
       h('a', { href: backHref, className: styles.backLink }, [backLabel]),
