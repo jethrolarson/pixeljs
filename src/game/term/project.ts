@@ -129,22 +129,34 @@ export function projectPuzzle(o: ProjectOpts): CellBuffer {
     }
   }
 
-  // Hover crosshair: faint wash over empty cells in the hovered row + column.
-  if (o.hover && mode === 'play' && !o.solved && inBounds(level, o.hover)) {
-    const wash = 'rgba(80,140,255,0.18)'
-    for (let gx = 0; gx < level.x; gx++) washEmpty(buf, layout.gridCol + gx, layout.gridRow + o.hover.y, wash)
-    for (let gy = 0; gy < level.y; gy++) washEmpty(buf, layout.gridCol + o.hover.x, layout.gridRow + gy, wash)
-  }
-
-  // Keyboard cursor crosshair (the cursor cell itself is a stipple overlay drawn
-  // by the loop, so it stays see-through).
-  if (o.cursor && mode === 'play' && !o.solved && inBounds(level, o.cursor)) {
-    const wash = 'rgba(80,140,255,0.18)'
-    for (let gx = 0; gx < level.x; gx++) washEmpty(buf, layout.gridCol + gx, layout.gridRow + o.cursor.y, wash)
-    for (let gy = 0; gy < level.y; gy++) washEmpty(buf, layout.gridCol + o.cursor.x, layout.gridRow + gy, wash)
+  // Row/column crosshair for hover and the keyboard cursor (the cursor cell
+  // itself is a see-through stipple drawn by the loop).
+  if (mode === 'play' && !o.solved) {
+    if (o.hover && inBounds(level, o.hover)) crosshair(buf, layout, level, o.hover)
+    if (o.cursor && inBounds(level, o.cursor)) crosshair(buf, layout, level, o.cursor)
   }
 
   return buf
+}
+
+/** Faint wash over empty cells in the row + column, plus border markers at the
+ * ends so the selection stays visible even when the interior is filled in. */
+function crosshair(buf: CellBuffer, layout: Layout, level: Level, pos: GridPos): void {
+  const wash = 'rgba(80,140,255,0.18)'
+  for (let gx = 0; gx < level.x; gx++) washEmpty(buf, layout.gridCol + gx, layout.gridRow + pos.y, wash)
+  for (let gy = 0; gy < level.y; gy++) washEmpty(buf, layout.gridCol + pos.x, layout.gridRow + gy, wash)
+  const right = layout.gridCol + level.x
+  const bottom = layout.gridRow + level.y
+  markBorder(buf, layout.boxLeft, layout.gridRow + pos.y, wash)
+  markBorder(buf, right, layout.gridRow + pos.y, wash)
+  markBorder(buf, layout.gridCol + pos.x, layout.boxTop, wash)
+  markBorder(buf, layout.gridCol + pos.x, bottom, wash)
+}
+
+/** Light up a box-border cell (keeps its glyph) to mark a row/column end. */
+function markBorder(buf: CellBuffer, col: number, row: number, bg: string): void {
+  const c = buf.get(col, row)
+  if (c) buf.set(col, row, { ...c, fg: chrome.text, bg })
 }
 
 function inBounds(level: Level, pos: GridPos): boolean {
