@@ -22,6 +22,8 @@ export interface ProjectOpts {
   hints: Hints
   sat?: ClueSat | null
   hover?: GridPos | null
+  /** Keyboard-selected cell (play): crosshair + active-color preview. */
+  cursor?: GridPos | null
   solved: boolean
   /** Show the full solution (edit mode, or a won puzzle). */
   reveal: boolean
@@ -132,6 +134,14 @@ export function projectPuzzle(o: ProjectOpts): CellBuffer {
     const wash = 'rgba(80,140,255,0.18)'
     for (let gx = 0; gx < level.x; gx++) washEmpty(buf, layout.gridCol + gx, layout.gridRow + o.hover.y, wash)
     for (let gy = 0; gy < level.y; gy++) washEmpty(buf, layout.gridCol + o.hover.x, layout.gridRow + gy, wash)
+  }
+
+  // Keyboard cursor crosshair (the cursor cell itself is a stipple overlay drawn
+  // by the loop, so it stays see-through).
+  if (o.cursor && mode === 'play' && !o.solved && inBounds(level, o.cursor)) {
+    const wash = 'rgba(80,140,255,0.18)'
+    for (let gx = 0; gx < level.x; gx++) washEmpty(buf, layout.gridCol + gx, layout.gridRow + o.cursor.y, wash)
+    for (let gy = 0; gy < level.y; gy++) washEmpty(buf, layout.gridCol + o.cursor.x, layout.gridRow + gy, wash)
   }
 
   return buf

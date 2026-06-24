@@ -75,6 +75,22 @@ function drawCell(ctx: CanvasRenderingContext2D, cell: Cell, x: number, y: numbe
   }
 }
 
+/**
+ * A 50% checkerboard stipple (CP437 ▒ style) drawn over a cell. Used as the
+ * keyboard cursor: the gaps leave the cell behind it visible. Aligned to the
+ * 8×8 sub-grid so it stays crisp.
+ */
+export function drawStipple(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, color: string): void {
+  ctx.fillStyle = color
+  const sx = w / GLYPH_PX
+  const sy = h / GLYPH_PX
+  for (let r = 0; r < GLYPH_PX; r++) {
+    for (let c = 0; c < GLYPH_PX; c++) {
+      if ((r + c) % 2 === 0) ctx.fillRect(Math.floor(x + c * sx), Math.floor(y + r * sy), Math.ceil(sx), Math.ceil(sy))
+    }
+  }
+}
+
 /** Box-drawing + block glyphs as rectangles, sized to the cell. */
 function drawGeometric(ctx: CanvasRenderingContext2D, g: string, x: number, y: number, w: number, h: number): void {
   if (g === FULL) {

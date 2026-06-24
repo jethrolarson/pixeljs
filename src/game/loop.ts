@@ -1,11 +1,11 @@
 import { Level } from '../level'
 import { SoundGroup } from '../sound'
-import { GameMode } from './types'
+import { GameMode, GridPos } from './types'
 import { computeLayout, pixelToGrid, inGrid } from './layout'
 import { Sound, createPointer, createInteraction, applyPointer } from './input'
 import { computeScore, golfScore, formatTime, computeHints, clueSatisfaction } from './score'
 import { projectPuzzle } from './term/project'
-import { drawBuffer } from './term/termrender'
+import { drawBuffer, drawStipple } from './term/termrender'
 import { chrome } from './term/glyphs'
 
 export interface Assets {
@@ -60,9 +60,98 @@ export function createGameLoop(cfg: GameLoopConfig): GameLoop {
   let endTime: Date | null = null
   let startTime = new Date()
   let pop: { x: number; y: number; time: number } | null = null
+  // Keyboard cursor (play): a selected cell, shown once a key is used and hidden
+  // again on mouse move so whichever input you last touched is what's displayed.
+  let cursor: GridPos | null = null
+  let cursorActive = false
 
   const playSound = (sound: Sound | null): void => {
     if (sound) cfg.assets[sound].play(cfg.getMute())
+  }
+
+  if (cfg.mode === 'play') {
+    const opts = { signal: cfg.signal }
+    const { level } = cfg
+    const ensure = (): GridPos => (cursor ??= { x: (level.x / 2) | 0, y: (level.y / 2) | 0 })
+    const move = (dx: number, dy: number): void => {
+      const c = ensure()
+      c.x = Math.min(level.x - 1, Math.max(0, c.x + dx))
+      c.y = Math.min(level.y - 1, Math.max(0, c.y + dy))
+    }
+    const cycleColor = (back: boolean): void => {
+      const n = cfg.getPalette().length
+      const cur = cfg.getActiveColor()
+      cfg.setActiveColor?.(back ? ((cur - 2 + n) % n) + 1 : (cur % n) + 1)
+    }
+    const paintCursor = (): void => {
+      const c = ensure()
+      if (level.isComplete()) return
+      const prev = level.paint.getAt(c.x, c.y)
+      const v = String(cfg.getActiveColor())
+      level.paint.setAt(c.x, c.y, v)
+      if (prev === '0') {
+        playSound(level.grid.getAt(c.x, c.y) === v ? 'bing' : 'boom')
+        pop = { x: c.x, y: c.y, time: Date.now() }
+      }
+    }
+    const eraseCursor = (): void => {
+      const c = ensure()
+      if (!level.isComplete()) level.paint.setAt(c.x, c.y, '0')
+    }
+    // Known-empty mark (the right-click equivalent). The first cell of a drag
+    // decides whether we're adding or removing marks.
+    let markErasing = false
+    const markCursor = (fresh: boolean): void => {
+      const c = ensure()
+      if (level.isComplete()) return
+      if (fresh) markErasing = level.mark.getAt(c.x, c.y) === '1'
+      level.mark.setAt(c.x, c.y, markErasing ? '0' : '1')
+    }
+    // While a paint/erase/mark key is held, moving the cursor applies it to each
+    // cell it enters — keyboard drag.
+    let heldPaint = false
+    let heldErase = false
+    let heldMark = false
+    window.addEventListener(
+      'keydown',
+      (e) => {
+        let handled = true
+        switch (e.key) {
+          case 'ArrowUp': move(0, -1); break
+          case 'ArrowDown': move(0, 1); break
+          case 'ArrowLeft': move(-1, 0); break
+          case 'ArrowRight': move(1, 0); break
+          case 'Enter':
+          case ' ': heldPaint = true; paintCursor(); break
+          case 'Backspace':
+          case 'Delete': heldErase = true; eraseCursor(); break
+          case 'x':
+          case 'X': heldMark = true; markCursor(true); break
+          case 'Tab': cycleColor(e.shiftKey); break
+          default: handled = false
+        }
+        if (handled) {
+          if (e.key.startsWith('Arrow')) {
+            if (heldPaint) paintCursor()
+            else if (heldErase) eraseCursor()
+            else if (heldMark) markCursor(false)
+          }
+          cursorActive = true
+          e.preventDefault()
+        }
+      },
+      opts,
+    )
+    window.addEventListener(
+      'keyup',
+      (e) => {
+        if (e.key === 'Enter' || e.key === ' ') heldPaint = false
+        else if (e.key === 'Backspace' || e.key === 'Delete') heldErase = false
+        else if (e.key === 'x' || e.key === 'X') heldMark = false
+      },
+      opts,
+    )
+    window.addEventListener('mousemove', () => { cursorActive = false }, opts)
   }
 
   const frame = (): void => {
@@ -121,7 +210,8 @@ export function createGameLoop(cfg: GameLoopConfig): GameLoop {
       layout,
       hints,
       sat,
-      hover: within ? pos : null,
+      hover: !cursorActive && within ? pos : null,
+      cursor: cursorActive ? cursor : null,
       solved: complete || won,
       reveal: mode === 'edit' || complete || won,
       golf,
@@ -129,6 +219,15 @@ export function createGameLoop(cfg: GameLoopConfig): GameLoop {
       pop: pop ? { x: pop.x, y: pop.y, t: popT } : null,
     })
     drawBuffer(ctx, buffer, layout)
+
+    // Keyboard cursor cell: a see-through stipple in the active color, drawn over
+    // the grid so the cell behind stays visible.
+    if (cursorActive && cursor && mode === 'play' && !complete && !won && inGrid(level, cursor)) {
+      const color = palette[cfg.getActiveColor() - 1] ?? chrome.text
+      const cx = layout.originX + (layout.gridCol + cursor.x) * layout.cellW
+      const cy = layout.originY + (layout.gridRow + cursor.y) * layout.cellH
+      drawStipple(ctx, cx, cy, layout.cellW, layout.cellH, color)
+    }
 
     if (mode === 'play') {
       cfg.onHud?.({
