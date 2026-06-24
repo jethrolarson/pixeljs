@@ -7,7 +7,7 @@ import { signIn, currentUser } from '../auth'
 import { createGameLoop, createAssets } from '../game/loop'
 import { createUi, Ui } from '../game/uiState'
 import { Palette } from '../components/Palette'
-import { btn } from '../theme.css'
+import { termBtn } from './canvasPage.css'
 import * as styles from './canvasPage.css'
 import * as edit from './Edit.css'
 
@@ -17,7 +17,6 @@ const defaultLevel: LevelData = {
   y: 10,
   game: '0'.repeat(100),
   palette: ['#0000ff'],
-  bgcolor: '#dddddd',
   par: 3,
 }
 
@@ -27,8 +26,6 @@ const levelToData = (level: Level, ui: FunState<Ui>): LevelData => ({
   y: level.y,
   game: level.getGame(),
   palette: [...ui.get().palette],
-  bgcolor: level.bgcolor,
-  ...(level.gridcolor ? { gridcolor: level.gridcolor } : {}),
   par: level.par,
   levelSetName: level.levelSetName,
 })
@@ -74,17 +71,27 @@ export const Edit: Component = (signal) => {
       else if (d < 0) level.subtractRows(-d)
     }
 
-    const onSave = async (): Promise<void> => {
+    // Persist the current edits and return the level id (null if not signed in).
+    const persist = async (): Promise<string | null> => {
       const u = currentUser()
-      if (!u) { signIn(); return }
+      if (!u) { signIn(); return null }
       const saved = await saveLevel({ ...levelToData(level, ui), id: currentId ?? undefined }, u.uid)
       currentId = saved.id!
       document.title = saved.title ?? 'Edit Level'
-      if (returnPackId) {
-        location.href = `/pack-edit.html?id=${returnPackId}&add=${currentId}`
-        return
-      }
       history.replaceState(null, '', `?id=${currentId}`)
+      return currentId
+    }
+
+    const onSave = async (): Promise<void> => {
+      const id = await persist()
+      if (id && returnPackId) location.href = `/pack-edit.html?id=${returnPackId}&add=${id}`
+    }
+
+    // Test plays the level you're editing — save first so nothing is lost and
+    // play loads the current state by id.
+    const onTest = async (): Promise<void> => {
+      const id = await persist()
+      if (id) location.href = `/play.html?id=${id}`
     }
 
     const titleInput = hx('input', {
@@ -107,23 +114,18 @@ export const Edit: Component = (signal) => {
       props: { type: 'number', min: '1', max: '10', value: String(level.par), className: edit.num },
       on: { change: (e) => { level.par = parseInt(e.currentTarget.value) } },
     })
-    const bgInput = hx('input', {
-      signal,
-      props: { type: 'color', value: level.bgcolor },
-      on: { input: (e) => { level.bgcolor = e.currentTarget.value } },
-    })
-    const gridInput = hx('input', {
-      signal,
-      props: { type: 'color', value: level.gridcolor ?? '#000000' },
-      on: { input: (e) => { level.gridcolor = e.currentTarget.value } },
-    })
     const muteInput = hx('input', {
       signal,
       props: { type: 'checkbox' },
       on: { change: (e) => ui.mod((u) => ({ ...u, mute: e.currentTarget.checked })) },
     })
 
-    const saveBtn = hx('button', { signal, props: { type: 'button', className: btn }, on: { click: onSave } }, ['Save'])
+    const saveBtn = hx('button', { signal, props: { type: 'button', className: termBtn }, on: { click: onSave } }, ['Save'])
+    const testBtn = hx('a', {
+      signal,
+      props: { href: '#', className: edit.testLink },
+      on: { click: (e) => { e.preventDefault(); void onTest() } },
+    }, ['Test'])
     const signinMsg = h('p', { className: edit.signinMsg }, ['Sign in to save'])
 
     const backHref = returnPackId ? `/pack-edit.html?id=${returnPackId}` : '/workshop.html'
@@ -137,15 +139,14 @@ export const Edit: Component = (signal) => {
         yInput,
       ]),
       h('div', { className: styles.field }, [h('label', { className: edit.label }, ['Par ']), parInput]),
-      h('div', { className: styles.field }, [h('label', { className: edit.label }, ['BG ']), bgInput]),
-      h('div', { className: styles.field }, [h('label', { className: edit.label }, ['Grid ']), gridInput]),
       h('label', { className: edit.muteRow }, [muteInput, ' Mute']),
-      h('div', { className: styles.field }, [saveBtn, h('a', { href: '/play.html', className: edit.testLink }, ['Test'])]),
+      h('div', { className: styles.field }, [saveBtn, testBtn]),
       signinMsg,
     )
 
     user.watch(signal, (u) => {
       saveBtn.style.display = u ? '' : 'none'
+      testBtn.style.display = u ? '' : 'none'
       signinMsg.style.display = u ? 'none' : ''
     })
   })().catch(console.error)

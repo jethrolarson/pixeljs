@@ -1,5 +1,5 @@
 import { Level } from '../level'
-import { GameMode, GridPos } from './layout'
+import { GameMode, GridPos } from './types'
 
 export type Sound = 'bing' | 'boom' | 'win'
 

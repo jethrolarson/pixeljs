@@ -1,17 +1,12 @@
-import { Canvas2D } from '../canvas2d'
 import { Level } from '../level'
 import { SoundGroup } from '../sound'
-import { GameMode, computeLayout, pixelToGrid, inGrid } from './layout'
+import { GameMode } from './types'
+import { computeLayout, pixelToGrid, inGrid } from './layout'
 import { Sound, createPointer, createInteraction, applyPointer } from './input'
-import { computeScore, golfScore, formatTime } from './score'
-import {
-  renderBackground,
-  renderCells,
-  renderHints,
-  renderGrid,
-  renderHover,
-  renderWinText,
-} from './render'
+import { computeScore, golfScore, formatTime, computeHints, clueSatisfaction } from './score'
+import { projectPuzzle } from './term/project'
+import { drawBuffer } from './term/termrender'
+import { chrome } from './term/glyphs'
 
 export interface Assets {
   boom: SoundGroup
@@ -37,6 +32,7 @@ export interface GameLoopConfig {
   level: Level
   mode: GameMode
   getActiveColor: () => number
+  setActiveColor?: (index: number) => void
   getMute: () => boolean
   getPalette: () => string[]
   assets: Assets
@@ -51,8 +47,11 @@ export interface GameLoop {
   relayout(): void
 }
 
+/** How long a freshly-painted cell's scale-pop takes to settle. */
+const POP_MS = 220
+
 export function createGameLoop(cfg: GameLoopConfig): GameLoop {
-  const p = new Canvas2D(cfg.canvas)
+  const ctx = cfg.canvas.getContext('2d')!
   const pointer = createPointer(cfg.canvas, cfg.signal)
   const interaction = createInteraction()
 
@@ -60,27 +59,43 @@ export function createGameLoop(cfg: GameLoopConfig): GameLoop {
   let won = false
   let endTime: Date | null = null
   let startTime = new Date()
+  let pop: { x: number; y: number; time: number } | null = null
 
   const playSound = (sound: Sound | null): void => {
     if (sound) cfg.assets[sound].play(cfg.getMute())
   }
 
   const frame = (): void => {
-    const { level, mode } = cfg
+    const { level, mode, canvas } = cfg
     const palette = cfg.getPalette()
+    const now = Date.now()
 
     const w = window.innerWidth
     const h = window.innerHeight
-    if (p.width !== w || p.height !== h) p.resize(w, h)
+    if (canvas.width !== w || canvas.height !== h) {
+      canvas.width = w
+      canvas.height = h
+    }
 
-    const layout = computeLayout(level, mode, { w, h })
+    const hints = computeHints(level)
+    const layout = computeLayout(level, mode, hints, { w, h })
     const ptr = pointer.read()
     const pos = pixelToGrid(layout, ptr.x, ptr.y)
     const within = inGrid(level, pos)
     const complete = mode === 'play' && level.isComplete()
 
+    // Palette select (play): a fresh click on a swatch sets the active color.
+    if (mode === 'play' && ptr.newlyPressed) {
+      const charCol = Math.floor((ptr.x - layout.originX) / layout.cellW)
+      const charRow = Math.floor((ptr.y - layout.originY) / layout.cellH)
+      const i = charCol - layout.paletteCol
+      if (charRow === layout.paletteRow && i >= 0 && i < palette.length) cfg.setActiveColor?.(i + 1)
+    }
+
     if (!complete && ptr.pressed && within) {
-      playSound(applyPointer(level, mode, cfg.getActiveColor(), ptr, pos, interaction))
+      const sound = applyPointer(level, mode, cfg.getActiveColor(), ptr, pos, interaction)
+      playSound(sound)
+      if (sound === 'bing' || sound === 'boom') pop = { x: pos.x, y: pos.y, time: now }
     }
     pointer.afterFrame()
 
@@ -90,21 +105,37 @@ export function createGameLoop(cfg: GameLoopConfig): GameLoop {
       playSound('win')
     }
 
-    renderBackground(p, level, layout)
-    renderCells(p, level, layout, palette, mode, complete || won)
-    if (mode === 'play') renderHints(p, level, layout, palette)
-    renderGrid(p, level, layout)
+    const popT = pop ? Math.max(0, 1 - (now - pop.time) / POP_MS) : 0
+    if (pop && popT <= 0) pop = null
 
     const score = mode === 'play' ? computeScore(level) : 0
-    if (won) renderWinText(p, golfScore(score, level.par))
-    if (!complete && within) renderHover(p, level, layout, pos)
+    const sat = mode === 'play' ? clueSatisfaction(level, hints) : null
+    const golf = won ? golfScore(score, level.par) : null
+
+    ctx.fillStyle = chrome.bg
+    ctx.fillRect(0, 0, w, h)
+    const buffer = projectPuzzle({
+      level,
+      palette,
+      mode,
+      layout,
+      hints,
+      sat,
+      hover: within ? pos : null,
+      solved: complete || won,
+      reveal: mode === 'edit' || complete || won,
+      golf,
+      activeColorIndex: cfg.getActiveColor(),
+      pop: pop ? { x: pop.x, y: pop.y, t: popT } : null,
+    })
+    drawBuffer(ctx, buffer, layout)
 
     if (mode === 'play') {
       cfg.onHud?.({
         faults: score,
         par: level.par,
         time: formatTime(startTime, endTime ?? new Date()),
-        golf: won ? golfScore(score, level.par) : null,
+        golf,
       })
     }
 
@@ -115,6 +146,7 @@ export function createGameLoop(cfg: GameLoopConfig): GameLoop {
     startTime = new Date()
     won = false
     endTime = null
+    pop = null
     stop()
     const tick = (): void => {
       rafId = requestAnimationFrame(tick)

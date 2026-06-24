@@ -1,27 +1,32 @@
 import { style } from '@vanilla-extract/css'
+import { term, mono } from '../Views/canvasPage.css'
 
 export const layers = style({
   position: 'fixed',
-  left: 0,
-  bottom: 0,
-  padding: '10px 5px',
+  left: 8,
+  bottom: 8,
+  padding: 6,
+  background: term.panel,
+  border: `1px solid ${term.dim}`,
   whiteSpace: 'nowrap',
 })
 
 export const swatch = style({
-  margin: '0 0 1px',
-  width: 22,
-  height: 22,
+  margin: '0 2px 0 0',
+  width: 24,
+  height: 24,
   display: 'inline-block',
   textDecoration: 'none',
   cursor: 'pointer',
-  border: 'none',
+  border: `1px solid ${term.dim}`,
   position: 'relative',
   overflow: 'hidden',
+  verticalAlign: 'top',
 })
 
 export const on = style({
-  outline: '2px solid yellow',
+  outline: `2px solid ${term.accent}`,
+  outlineOffset: -1,
 })
 
 // The color input is wrapped by the swatch <label>; hide it so the swatch
@@ -36,10 +41,16 @@ export const hiddenColorInput = style({
 })
 
 export const addButton = style({
-  width: 22,
-  height: 22,
-  lineHeight: '20px',
+  width: 24,
+  height: 24,
+  lineHeight: '22px',
   padding: 0,
   marginLeft: 2,
   verticalAlign: 'top',
+  fontFamily: mono,
+  background: term.bg,
+  color: term.green,
+  border: `1px solid ${term.green}`,
+  borderRadius: 0,
+  cursor: 'pointer',
 })

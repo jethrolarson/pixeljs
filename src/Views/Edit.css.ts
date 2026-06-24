@@ -1,14 +1,24 @@
 import { style } from '@vanilla-extract/css'
-import { colors } from '../theme.css'
+import { term, mono } from './canvasPage.css'
 
-export const titleInput = style({ width: '100%' })
+const inputBase = {
+  fontFamily: mono,
+  background: term.bg,
+  color: term.text,
+  border: `1px solid ${term.dim}`,
+  borderRadius: 0,
+  padding: '3px 6px',
+  selectors: { '&:focus': { outline: 'none', borderColor: term.accent } },
+} as const
 
-export const num = style({ width: '4em' })
+export const titleInput = style({ ...inputBase, width: '100%' })
 
-export const label = style({ color: '#eee', fontSize: 13 })
+export const num = style({ ...inputBase, width: '4em' })
 
-export const muteRow = style({ display: 'flex', alignItems: 'center', gap: 4, fontSize: 13 })
+export const label = style({ fontFamily: mono, color: term.text, fontSize: 13 })
 
-export const signinMsg = style({ fontSize: 11, color: colors.textDim })
+export const muteRow = style({ fontFamily: mono, display: 'flex', alignItems: 'center', gap: 4, fontSize: 13 })
 
-export const testLink = style({ marginLeft: 8, fontSize: 13 })
+export const signinMsg = style({ fontFamily: mono, fontSize: 11, color: term.dim })
+
+export const testLink = style({ fontFamily: mono, marginLeft: 8, fontSize: 13, color: term.name })

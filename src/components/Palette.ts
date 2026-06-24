@@ -1,7 +1,7 @@
 import { FunState, mapRead } from '@fun-land/fun-state'
 import { Component, h, hx, enhance, attr, on, bindClass, bindView } from '@fun-land/fun-web'
 import { Ui } from '../game/uiState'
-import { GameMode } from '../game/layout'
+import { GameMode } from '../game/types'
 import * as styles from './Palette.css'
 
 export interface PaletteProps {

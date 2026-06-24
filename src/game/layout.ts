@@ -1,83 +1,107 @@
-import { Level } from '../level'
-
-export type GameMode = 'play' | 'edit'
+import { Level, HintGroup } from '../level'
+import { GameMode, GridPos } from './types'
+import { Hints } from './score'
+import { GLYPH_PX } from './term/font8x8'
 
 export interface Viewport {
   w: number
   h: number
 }
 
-export interface GridBounds {
-  x1: number
-  y1: number
-  x2: number
-  y2: number
-}
-
+/**
+ * Char-grid layout for the terminal renderer. Everything is measured in
+ * character cells; `originX/Y` + `cellW/H` map char coords to pixels (and double
+ * as `TermMetrics` for `drawBuffer`). `gridCol/gridRow` is the first puzzle cell
+ * (inside the box border). The projection consumes the char fields; input uses
+ * the pixel mapping via `pixelToGrid`.
+ *
+ * Quadrant layout: a fixed CHROME×CHROME block in the upper-left holds the brand
+ * + dimensions; column clues sit above the grid (upper-right), row clues left of
+ * it (lower-left), and the grid + box fill the lower-right. The puzzle title is
+ * a single cyan line under the grid.
+ */
 export interface Layout {
-  cw: number
-  offset: { x: number; y: number }
-  gridBounds: GridBounds
-  /** Largest hint stack width/height (in cells) reserved around the grid. */
-  rowHintCells: number
-  colHintCells: number
+  cellW: number
+  cellH: number
+  originX: number
+  originY: number
+  cols: number
+  rows: number
+  /** First interior (puzzle) cell, just inside the box border. */
+  gridCol: number
+  gridRow: number
+  /** Box border top-left. */
+  boxLeft: number
+  boxTop: number
+  /** Reserved clue gutters (0 in edit mode). */
+  rowHintCols: number
+  colHintRows: number
+  /** Title line under the grid. */
+  nameRow: number
+  /** Play-mode palette swatch strip, inside the chrome quadrant. */
+  paletteRow: number
+  paletteCol: number
 }
 
-/** Reserved screen margins for the grid area, by mode. */
-function gridBoundsFor(mode: GameMode, viewport: Viewport): GridBounds {
+/** Size of the reserved upper-left chrome quadrant, in cells. */
+export const CHROME = 7
+
+function maxLen(groups: HintGroup[][]): number {
+  let m = 0
+  for (const g of groups) m = Math.max(m, g.length)
+  return m
+}
+
+/** Pure: derive the char-grid structure and its pixel placement. */
+export function computeLayout(level: Level, mode: GameMode, hints: Hints, viewport: Viewport): Layout {
+  const showClues = mode === 'play'
+  const rowHintCols = showClues ? Math.max(1, maxLen(hints.row)) : 0
+  const colHintRows = showClues ? Math.max(1, maxLen(hints.col)) : 0
+
+  // Grid is pushed past the chrome quadrant and the clue gutters, whichever is
+  // larger — so chrome (upper-left), clues (gutters), and grid never collide.
+  const boxLeft = Math.max(CHROME, rowHintCols)
+  const boxTop = Math.max(CHROME, colHintRows)
+  const gridCol = boxLeft + 1
+  const gridRow = boxTop + 1
+  const boxRight = gridCol + level.x // box right border col
+  const boxBottom = gridRow + level.y // box bottom border row
+  const nameRow = boxBottom + 1
+
+  const cols = Math.max(boxRight + 1, boxLeft + level.title.length + 1, CHROME)
+  const rows = nameRow + 1
+
+  // Snap to a multiple of the glyph size so bitmap glyphs scale by an integer
+  // factor (clean, even pixels).
+  const raw = Math.min(Math.floor(viewport.w / cols), Math.floor(viewport.h / rows))
+  const cell = Math.max(GLYPH_PX, Math.floor(raw / GLYPH_PX) * GLYPH_PX)
+  const usedW = cols * cell
+  const usedH = rows * cell
+
   return {
-    x1: mode === 'edit' ? 140 : 10,
-    y1: 10,
-    x2: mode === 'play' ? viewport.w - 10 : viewport.w - 80,
-    y2: viewport.h - 30,
+    cellW: cell,
+    cellH: cell,
+    originX: Math.floor((viewport.w - usedW) / 2),
+    originY: Math.floor((viewport.h - usedH) / 2),
+    cols,
+    rows,
+    gridCol,
+    gridRow,
+    boxLeft,
+    boxTop,
+    rowHintCols,
+    colHintRows,
+    nameRow,
+    paletteRow: 4,
+    paletteCol: 0,
   }
 }
 
-/** Largest hint group counts, used to reserve space for hint columns/rows (play only). */
-function hintReservation(level: Level, mode: GameMode): { rowHintCells: number; colHintCells: number } {
-  if (mode !== 'play') return { rowHintCells: 0, colHintCells: 0 }
-  let rowHintCells = 2
-  let colHintCells = 2
-  for (const row of level.getRowHints()) rowHintCells = Math.max(rowHintCells, row.length)
-  for (const col of level.getColHints()) colHintCells = Math.max(colHintCells, col.length)
-  return { rowHintCells, colHintCells }
-}
-
-/** Pure: derive cell size + grid offset from the level, mode, and viewport. */
-export function computeLayout(level: Level, mode: GameMode, viewport: Viewport): Layout {
-  const gridBounds = gridBoundsFor(mode, viewport)
-  const { rowHintCells, colHintCells } = hintReservation(level, mode)
-
-  const gridAreaW = gridBounds.x2 - gridBounds.x1
-  const gridAreaH = gridBounds.y2 - gridBounds.y1
-  const cw = Math.min(
-    Math.floor(gridAreaW / (level.x + rowHintCells)),
-    Math.floor(gridAreaH / (level.y + colHintCells)),
-  )
-
-  return {
-    cw,
-    offset: {
-      x: gridBounds.x1 + rowHintCells * cw,
-      y: gridBounds.y1 + colHintCells * cw,
-    },
-    gridBounds,
-    rowHintCells,
-    colHintCells,
-  }
-}
-
-export interface GridPos {
-  x: number
-  y: number
-}
-
-/** Convert a screen pixel to a grid cell coordinate (may be out of bounds). */
+/** Convert a screen pixel to a puzzle cell coordinate (may be out of bounds). */
 export function pixelToGrid(layout: Layout, px: number, py: number): GridPos {
-  return {
-    x: Math.floor((px - layout.offset.x) / layout.cw),
-    y: Math.floor((py - layout.offset.y) / layout.cw),
-  }
+  const col = Math.floor((px - layout.originX) / layout.cellW)
+  const row = Math.floor((py - layout.originY) / layout.cellH)
+  return { x: col - layout.gridCol, y: row - layout.gridRow }
 }
 
 export function inGrid(level: Level, pos: GridPos): boolean {

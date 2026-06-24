@@ -1,4 +1,58 @@
-import { Level } from '../level'
+import { Level, HintGroup } from '../level'
+
+/** Solution-derived clue numbers for every row and column. */
+export interface Hints {
+  row: HintGroup[][]
+  col: HintGroup[][]
+}
+
+/** Per-clue-number satisfaction flags, parallel to `Hints`. */
+export interface ClueSat {
+  row: boolean[][]
+  col: boolean[][]
+}
+
+export function computeHints(level: Level): Hints {
+  return { row: level.getRowHints(), col: level.getColHints() }
+}
+
+/**
+ * Which individual clue numbers the current paint satisfies, left-to-right /
+ * top-to-bottom. Optimistic by design: clue j is "satisfied" when the j-th run
+ * in the player's paint matches the j-th solution clue (count + color), even if
+ * cells further along are still wrong. Perpendicular clues cross-validate.
+ */
+export function clueSatisfaction(level: Level, hints: Hints): ClueSat {
+  // Per-clue satisfaction checked against the actual solution position: a run
+  // resolves exactly when its cells are painted the right color and it isn't
+  // over-extended into a neighbor. Each clue is independent, so one color's run
+  // can resolve while the rest of the line (other colors) is still unsolved.
+  const line = (sol: string[], paint: string[]): boolean[] => {
+    const res: boolean[] = []
+    const n = sol.length
+    let i = 0
+    while (i < n) {
+      const color = sol[i]
+      if (color === '0') {
+        i++
+        continue
+      }
+      let j = i
+      while (j < n && sol[j] === color) j++ // solution run is [i, j)
+      let ok = true
+      for (let k = i; k < j; k++) if (paint[k] !== color) ok = false
+      if (i > 0 && paint[i - 1] === color) ok = false // bleeds left
+      if (j < n && paint[j] === color) ok = false // bleeds right
+      res.push(ok)
+      i = j
+    }
+    return res
+  }
+  return {
+    row: hints.row.map((_g, y) => line(level.grid.getRow(y), level.paint.getRow(y))),
+    col: hints.col.map((_g, x) => line(level.grid.getCol(x), level.paint.getCol(x))),
+  }
+}
 
 /**
  * Number of "faults": painted cells that are wrong — either a wrong color, or

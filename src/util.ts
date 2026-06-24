@@ -6,7 +6,7 @@ export function levelToDataURL(level: LevelData): string {
   const y = level.y ?? 10
   const game = level.game ?? ''
   const palette = level.palette ?? ['#0000ff']
-  const bg = hexToRGB(level.bgcolor ?? '#dddddd')
+  const bg = hexToRGB('#dddddd')
 
   const canvas = document.createElement('canvas')
   canvas.width = x

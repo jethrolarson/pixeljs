@@ -4,8 +4,7 @@ import { getLevelById } from '../store'
 import { getPackById } from '../packStore'
 import { createGameLoop, createAssets } from '../game/loop'
 import { createUi } from '../game/uiState'
-import { Palette } from '../components/Palette'
-import { btn } from '../theme.css'
+import { termBtn } from './canvasPage.css'
 import * as styles from './canvasPage.css'
 
 const fallback: LevelData = {
@@ -14,7 +13,6 @@ const fallback: LevelData = {
   y: 5,
   game: '0100001110011100010000100',
   palette: ['#0000ff'],
-  bgcolor: '#dddddd',
   par: 3,
 }
 
@@ -22,7 +20,6 @@ export const Play: Component = (signal) => {
   const canvas = h('canvas', { id: 'canvas', className: styles.canvas }) as HTMLCanvasElement
   const faults = h('span', {}, [])
   const time = h('div', {}, [])
-  const paletteSlot = h('div', {}, [])
   const backLink = h('a', { href: '/', className: styles.backLink }, ['← Home'])
   const nextSlot = h('div', {}, [])
 
@@ -44,20 +41,20 @@ export const Play: Component = (signal) => {
         if (idx >= 0 && idx < pack.levelIds.length - 1) {
           const nextId = pack.levelIds[idx + 1]
           nextSlot.replaceChildren(
-            h('a', { href: `/play.html?id=${nextId}&pack=${pack.id}`, className: btn }, ['Next →']),
+            h('a', { href: `/play.html?id=${nextId}&pack=${pack.id}`, className: termBtn }, ['Next →']),
           )
         }
       }
     }
 
     const ui = createUi(level.palette)
-    paletteSlot.replaceChildren(Palette(signal, { ui, mode: 'play' }))
 
     const loop = createGameLoop({
       canvas,
       level,
       mode: 'play',
       getActiveColor: () => ui.get().activeColorIndex,
+      setActiveColor: (i) => ui.prop('activeColorIndex').set(i),
       getMute: () => ui.get().mute,
       getPalette: () => ui.get().palette,
       assets: createAssets(),
@@ -77,7 +74,6 @@ export const Play: Component = (signal) => {
       time,
       nextSlot,
     ]),
-    paletteSlot,
     canvas,
   ])
 }

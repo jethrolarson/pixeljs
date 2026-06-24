@@ -13,8 +13,6 @@ export interface LevelData {
   y?: number
   game?: string       // column-major color indices: "012120..."
   palette?: string[]  // hex colors for index 1..n
-  bgcolor?: string
-  gridcolor?: string | null
   par?: number
   levelSetName?: string
   key?: string
@@ -24,8 +22,6 @@ export class Level {
   title: string
   x: number
   y: number
-  bgcolor: string
-  gridcolor: string | null
   par: number
   levelSetName: string
   palette: string[]
@@ -37,8 +33,6 @@ export class Level {
     this.title = data.title ?? 'untitled'
     this.x = data.x ?? 10
     this.y = data.y ?? 10
-    this.bgcolor = data.bgcolor ?? '#ddd'
-    this.gridcolor = data.gridcolor ?? null
     this.par = data.par ?? 3
     this.levelSetName = data.levelSetName ?? 'My Levels'
     this.palette = data.palette?.length ? [...data.palette] : ['#0000ff']
