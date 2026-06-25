@@ -19,8 +19,9 @@ export const thumbLink = style({
   display: 'block',
   width: 160,
   height: 160,
-  borderRadius: 8,
+  borderRadius: 0,
   overflow: 'hidden',
+  border: `1px solid ${colors.border}`,
   background: colors.panel,
 })
 

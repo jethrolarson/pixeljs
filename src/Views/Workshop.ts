@@ -10,7 +10,7 @@ import { getModerator } from '../services/getModerator'
 import { Header } from '../components/Header'
 import { packGrid } from '../components/PackGrid'
 import { Loadable, loading, loadInto, bindLoadable } from '../components/Async'
-import { btn, btnDanger, empty, page } from '../theme.css'
+import { btn, btnDanger, btnPrimary, empty, page } from '../theme.css'
 import { sectionHeader, sectionTitle } from './Home.css'
 import * as styles from './Workshop.css'
 
@@ -60,7 +60,7 @@ const levelsSection = (signal: AbortSignal, uid: string): Element => {
   return h('section', {}, [
     h('div', { className: sectionHeader }, [
       h('h2', { className: sectionTitle }, ['My Levels']),
-      h('a', { href: '/edit.html', className: btn }, ['+ New Level']),
+      h('a', { href: '/edit.html', className: `${btn} ${btnPrimary}` }, ['+ New Level']),
     ]),
     grid,
   ])
@@ -83,7 +83,7 @@ const packsSection = (signal: AbortSignal, uid: string): Element => {
   return h('section', {}, [
     h('div', { className: sectionHeader }, [
       h('h2', { className: sectionTitle }, ['My Packs']),
-      h('a', { href: '/pack-edit.html', className: btn }, ['+ New Pack']),
+      h('a', { href: '/pack-edit.html', className: `${btn} ${btnPrimary}` }, ['+ New Pack']),
     ]),
     grid,
   ])

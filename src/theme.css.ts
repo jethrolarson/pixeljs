@@ -1,20 +1,29 @@
 import { globalStyle, style } from '@vanilla-extract/css'
 
+// Terminal/ANSI palette — sampled from the canvas `chrome` (game/term/glyphs.ts)
+// so the DOM website reads as the same high-contrast character-grid surface as
+// the in-game canvas. Shared with `canvasPage.css.ts` via the same values.
 export const colors = {
-  bg: '#333',
-  panel: '#222',
-  panelHover: '#262626',
-  text: '#aaa',
-  textBright: '#eee',
-  textDim: '#777',
-  textFaint: '#666',
-  border: '#444',
-  borderInput: '#666',
-  link: '#508ced',
-  linkHover: '#75a4f0',
-  accent: '#508ced',
-  danger: '#e44',
+  bg: '#0d0d0d',
+  panel: '#121212',
+  panelHover: '#1a1a1a',
+  text: '#cccccc',
+  textBright: '#ffffff',
+  textDim: '#888888',
+  textFaint: '#555555',
+  border: '#333333',
+  borderInput: '#4d4d4d',
+  link: '#00d9d9', // cyan — matches puzzle-name text in the canvas
+  linkHover: '#7af6f6',
+  accent: '#00d9d9',
+  green: '#59b200', // title/action accent
+  greenHover: '#7ad400',
+  danger: '#ff5555',
 }
+
+// Monospace stack — the single source of truth for the website chrome, mirrored
+// from the canvas FONT_STACK.
+export const mono = 'Menlo, Monaco, Consolas, "DejaVu Sans Mono", monospace'
 
 globalStyle('*, *::before, *::after', { boxSizing: 'border-box' })
 
@@ -25,8 +34,8 @@ globalStyle('html', {
 
 globalStyle('body', {
   margin: 0,
-  fontSize: 16,
-  fontFamily: 'Arial, Helvetica, sans-serif',
+  fontSize: 15,
+  fontFamily: mono,
   lineHeight: 1.4,
   color: colors.text,
 })
@@ -40,10 +49,10 @@ globalStyle('button, input, select, textarea', {
 })
 
 globalStyle('input[type="text"], input[type="number"], textarea, select', {
-  borderRadius: 4,
+  borderRadius: 0,
   border: `1px solid ${colors.borderInput}`,
   padding: '4px 8px',
-  background: colors.panel,
+  background: colors.bg,
   color: colors.textBright,
 })
 
@@ -55,18 +64,26 @@ globalStyle('input:focus, textarea:focus, select:focus', {
 export const btn = style({
   display: 'inline-block',
   padding: '5px 12px',
-  borderRadius: 4,
-  border: '1px solid #555',
-  background: '#2a2a2a',
-  color: '#ccc',
+  borderRadius: 0,
+  border: `1px solid ${colors.borderInput}`,
+  background: colors.panel,
+  color: colors.text,
+  fontFamily: mono,
   fontSize: 13,
   lineHeight: 1.4,
   textDecoration: 'none',
   cursor: 'pointer',
-  ':hover': { background: '#333', color: colors.textBright, borderColor: colors.textDim },
+  ':hover': { background: colors.panelHover, color: colors.textBright, borderColor: colors.text },
   selectors: {
     '&:disabled': { opacity: 0.5, cursor: 'default' },
   },
+})
+
+// Primary/affirmative action — green-on-dark, matching the canvas action accent.
+export const btnPrimary = style({
+  color: colors.green,
+  borderColor: colors.green,
+  ':hover': { background: '#16240a', color: colors.greenHover, borderColor: colors.greenHover },
 })
 
 export const btnDanger = style({

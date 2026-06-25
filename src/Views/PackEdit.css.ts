@@ -27,7 +27,7 @@ export const colorInput = style({
   height: 34,
   padding: 2,
   border: `1px solid ${colors.border}`,
-  borderRadius: 4,
+  borderRadius: 0,
   background: colors.panel,
   cursor: 'pointer',
 })
@@ -37,19 +37,19 @@ export const presets = style({ display: 'flex', gap: 6, flexWrap: 'wrap' })
 export const preset = style({
   width: 24,
   height: 24,
-  borderRadius: 4,
+  borderRadius: 0,
   cursor: 'pointer',
   border: '2px solid transparent',
   transition: 'border-color 0.1s',
-  ':hover': { borderColor: '#fff' },
+  ':hover': { borderColor: colors.textBright },
 })
 
-export const presetSelected = style({ borderColor: '#fff' })
+export const presetSelected = style({ borderColor: colors.textBright })
 
 export const levelResults = style({
-  background: '#1a1a1a',
-  border: '1px solid #333',
-  borderRadius: 4,
+  background: colors.panelHover,
+  border: `1px solid ${colors.border}`,
+  borderRadius: 0,
   maxHeight: 200,
   overflowY: 'auto',
 })
@@ -57,7 +57,7 @@ export const levelResults = style({
 export const levelResult = style({
   padding: '8px 12px',
   cursor: 'pointer',
-  color: '#ccc',
+  color: colors.text,
   fontSize: 13,
   display: 'flex',
   justifyContent: 'space-between',
@@ -75,18 +75,18 @@ export const packLevels = style({
 
 export const packLevelItem = style({
   background: colors.panel,
-  borderRadius: 4,
+  border: `1px solid ${colors.border}`,
   padding: '6px 10px',
   display: 'flex',
   alignItems: 'center',
   gap: 8,
 })
 
-export const dragHandle = style({ cursor: 'grab', color: '#555', fontSize: 16 })
+export const dragHandle = style({ cursor: 'grab', color: colors.textFaint, fontSize: 16 })
 
-export const levTitle = style({ flex: 1, color: '#ccc', fontSize: 13 })
+export const levTitle = style({ flex: 1, color: colors.text, fontSize: 13 })
 
-export const addLabel = style({ color: '#555' })
+export const addLabel = style({ color: colors.textFaint })
 
 export const removeBtn = style({
   background: 'none',
@@ -110,7 +110,7 @@ export const previewLabel = style({
 
 export const publishRow = style({ display: 'flex', alignItems: 'center', gap: 10 })
 
-export const publishLabel = style({ textTransform: 'none', fontSize: 14, color: '#ccc', letterSpacing: 0, margin: 0, cursor: 'pointer' })
+export const publishLabel = style({ textTransform: 'none', fontSize: 14, color: colors.text, letterSpacing: 0, margin: 0, cursor: 'pointer' })
 
 export const status = style({ fontSize: 13, color: colors.textDim })
 
@@ -124,4 +124,4 @@ export const heading = style({
 
 export const hint = style({ fontSize: 12, color: colors.textDim, marginLeft: 8 })
 
-export const emptyLevels = style({ color: '#555', fontStyle: 'italic', fontSize: 13, padding: '4px 0' })
+export const emptyLevels = style({ color: colors.textFaint, fontStyle: 'italic', fontSize: 13, padding: '4px 0' })

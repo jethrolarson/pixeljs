@@ -12,7 +12,7 @@ export const row = style({
   alignItems: 'center',
   gap: 12,
   background: colors.panel,
-  borderRadius: 6,
+  border: `1px solid ${colors.border}`,
   padding: '8px 12px',
   marginBottom: 6,
 })
@@ -20,7 +20,7 @@ export const row = style({
 export const cover = style({
   width: 40,
   height: 40,
-  borderRadius: 6,
+  border: `1px solid ${colors.border}`,
   flexShrink: 0,
   display: 'flex',
   alignItems: 'center',
@@ -31,7 +31,7 @@ export const cover = style({
 export const titleBox = style({ flex: 1, minWidth: 0 })
 
 export const titleLink = style({
-  color: '#ccc',
+  color: colors.text,
   textDecoration: 'none',
   fontSize: 14,
   fontWeight: 'bold',

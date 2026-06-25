@@ -11,7 +11,7 @@ export const hero = style({
 export const heroCover = style({
   width: 120,
   height: 120,
-  borderRadius: 12,
+  border: `1px solid ${colors.border}`,
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -26,7 +26,7 @@ export const heroTitle = style({ margin: '0 0 4px', color: colors.textBright, fo
 
 export const heroMeta = style({ color: colors.textDim, fontSize: 13, marginBottom: 12 })
 
-export const description = style({ color: '#ccc', fontSize: 14, marginBottom: 16 })
+export const description = style({ color: colors.text, fontSize: 14, marginBottom: 16 })
 
 export const heroActions = style({ display: 'flex', gap: 8 })
 
@@ -49,18 +49,18 @@ export const list = style({
 
 export const item = style({
   background: colors.panel,
-  borderRadius: 6,
+  border: `1px solid ${colors.border}`,
   display: 'flex',
   alignItems: 'center',
   gap: 12,
   padding: '10px 14px',
 })
 
-export const num = style({ color: '#555', fontSize: 13, minWidth: 24 })
+export const num = style({ color: colors.textFaint, fontSize: 13, minWidth: 24 })
 
 export const itemTitle = style({
   flex: 1,
-  color: '#ccc',
+  color: colors.text,
   textDecoration: 'none',
   fontSize: 14,
   selectors: { '&:hover': { color: colors.textBright } },

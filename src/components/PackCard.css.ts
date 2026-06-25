@@ -9,7 +9,7 @@ export const cover = style({
   justifyContent: 'center',
   width: 160,
   height: 160,
-  borderRadius: 8,
+  border: `1px solid ${colors.border}`,
   textDecoration: 'none',
   transition: 'opacity 0.15s',
   ':hover': { opacity: 0.85 },

@@ -1,4 +1,7 @@
 import { globalStyle, style } from '@vanilla-extract/css'
+import { mono } from '../theme.css'
+
+export { mono }
 
 // Canvas pages fill the viewport with no scroll.
 globalStyle('html, body', { overflow: 'hidden', height: '100%', margin: 0 })
@@ -15,8 +18,6 @@ export const term = {
   green: '#59b200',
   accent: '#00d9d9',
 } as const
-
-export const mono = 'Menlo, Monaco, Consolas, "DejaVu Sans Mono", monospace'
 
 export const canvas = style({ display: 'block', background: term.bg })
 

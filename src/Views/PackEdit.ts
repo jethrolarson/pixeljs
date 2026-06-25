@@ -10,7 +10,7 @@ import { getModerator } from '../services/getModerator'
 import { PackCard } from '../components/PackCard'
 import { Header } from '../components/Header'
 import { hidden } from '../components/Header.css'
-import { btn, btnDanger, empty, page } from '../theme.css'
+import { btn, btnDanger, btnPrimary, empty, page } from '../theme.css'
 import * as styles from './PackEdit.css'
 
 const PRESET_COLORS = ['#2a6496', '#1a6b3a', '#7a2a2a', '#5a2a7a', '#7a5a1a', '#1a5a6b', '#333']
@@ -201,7 +201,7 @@ const editor = (signal: AbortSignal, user: User): Element => {
   })
 
   // --- Buttons ---
-  const saveBtn = hx('button', { signal, props: { className: btn }, on: { click: async () => { status.set('Saving…'); await persist(); status.set('Saved!'); setTimeout(() => status.set(''), 2000) } } }, ['Save'])
+  const saveBtn = hx('button', { signal, props: { className: `${btn} ${btnPrimary}` }, on: { click: async () => { status.set('Saving…'); await persist(); status.set('Saved!'); setTimeout(() => status.set(''), 2000) } } }, ['Save'])
   const newLevelBtn = hx('button', { signal, props: { className: btn }, on: { click: async () => { if (form.get().levelIds.length >= MAX_PACK_LEVELS) { status.set(`Pack is full (${MAX_PACK_LEVELS} max).`); return } status.set('Saving pack…'); await persist(); location.href = `/edit.html?pack=${currentId}` } } }, ['+ Create new level'])
   const deleteBtn = enhance(
     hx('button', { signal, props: { className: `${btn} ${btnDanger}` }, on: { click: async () => { if (currentId && confirm('Delete this pack?')) { await deletePack(currentId); location.href = '/browse.html' } } } }, ['Delete']),
