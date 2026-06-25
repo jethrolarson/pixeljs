@@ -1,4 +1,4 @@
-import { TL, TR, BL, BR, H, V } from './glyphs'
+import { TL, TR, BL, BR, H, V, DH, DV, DTL, DTR, DBL, DBR } from './glyphs'
 
 /** One character cell. `glyph` is rendered on top of an optional `bg` fill.
  * The animation fields perturb only how the cell is drawn, never game state:
@@ -65,6 +65,26 @@ export class CellBuffer {
     for (let r = row + 1; r < bottom; r++) {
       this.set(col, r, { glyph: V, fg, bg })
       this.set(right, r, { glyph: V, fg, bg })
+    }
+  }
+
+  /** Draw a double-line box border of size w×h with its top-left at (col, row).
+   * Only the border cells are written; the interior is left untouched. */
+  doubleBox(col: number, row: number, w: number, h: number, fg: string, bg?: string): void {
+    if (w < 2 || h < 2) return
+    const right = col + w - 1
+    const bottom = row + h - 1
+    this.set(col, row, { glyph: DTL, fg, bg })
+    this.set(right, row, { glyph: DTR, fg, bg })
+    this.set(col, bottom, { glyph: DBL, fg, bg })
+    this.set(right, bottom, { glyph: DBR, fg, bg })
+    for (let c = col + 1; c < right; c++) {
+      this.set(c, row, { glyph: DH, fg, bg })
+      this.set(c, bottom, { glyph: DH, fg, bg })
+    }
+    for (let r = row + 1; r < bottom; r++) {
+      this.set(col, r, { glyph: DV, fg, bg })
+      this.set(right, r, { glyph: DV, fg, bg })
     }
   }
 

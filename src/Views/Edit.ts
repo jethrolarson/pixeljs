@@ -46,36 +46,67 @@ export const Edit: Component = (signal) => {
     document.title = level.title
 
     const ui = createUi(level.palette)
-    paletteSlot.replaceChildren(Palette(signal, { ui, mode: 'edit' }))
+    const assets = createAssets()
 
-    const loop = createGameLoop({
-      canvas,
-      level,
-      mode: 'edit',
-      getActiveColor: () => ui.get().activeColorIndex,
-      getMute: () => ui.get().mute,
-      getPalette: () => ui.get().palette,
-      assets: createAssets(),
-      signal,
-    })
-    loop.start()
+    // Solved-art authoring: an optional reward grid on its own palette + 1×/2×
+    // resolution, edited on the same canvas with the puzzle shown faintly behind.
+    let artEnabled = !!data.art
+    let artScale = data.art?.scale ?? 1
+    let artUi: FunState<Ui> | null = null
+    let artLevel: Level | null = null
+    let target: 'puzzle' | 'art' = 'puzzle'
+
+    const initArt = (): void => {
+      artUi = createUi(data.art?.palette ?? [...ui.get().palette])
+      artLevel = new Level({ title: level.title, x: level.x * artScale, y: level.y * artScale, game: data.art?.data, palette: artUi.get().palette })
+    }
+    if (artEnabled) initArt()
+
+    // Each editing target (puzzle vs. art) runs its own loop under a child signal,
+    // so swapping tears the previous one's listeners down.
+    let loopCtl: AbortController | null = null
+    signal.addEventListener('abort', () => loopCtl?.abort())
+    const mountLoop = (): void => {
+      loopCtl?.abort()
+      loopCtl = new AbortController()
+      const s = loopCtl.signal
+      const onArt = target === 'art' && artEnabled && !!artLevel && !!artUi
+      const activeUi = onArt ? artUi! : ui
+      const activeLevel = onArt ? artLevel! : level
+      createGameLoop({
+        canvas,
+        level: activeLevel,
+        mode: 'edit',
+        getActiveColor: () => activeUi.get().activeColorIndex,
+        getMute: () => ui.get().mute,
+        getPalette: () => activeUi.get().palette,
+        assets,
+        underlay: onArt ? { level, scale: artScale } : undefined,
+        signal: s,
+      }).start()
+      paletteSlot.replaceChildren(Palette(s, { ui: activeUi, mode: 'edit' }))
+    }
+    mountLoop()
 
     const setCols = (n: number): void => {
       const d = n - level.x
-      if (d > 0) level.addCols(d)
-      else if (d < 0) level.subtractCols(-d)
+      if (d > 0) { level.addCols(d); artLevel?.addCols(d * artScale) }
+      else if (d < 0) { level.subtractCols(-d); artLevel?.subtractCols(-d * artScale) }
     }
     const setRows = (n: number): void => {
       const d = n - level.y
-      if (d > 0) level.addRows(d)
-      else if (d < 0) level.subtractRows(-d)
+      if (d > 0) { level.addRows(d); artLevel?.addRows(d * artScale) }
+      else if (d < 0) { level.subtractRows(-d); artLevel?.subtractRows(-d * artScale) }
     }
 
     // Persist the current edits and return the level id (null if not signed in).
     const persist = async (): Promise<string | null> => {
       const u = currentUser()
       if (!u) { signIn(); return null }
-      const saved = await saveLevel({ ...levelToData(level, ui), id: currentId ?? undefined }, u.uid)
+      const art = artEnabled && artLevel && artUi
+        ? { scale: artScale, palette: [...artUi.get().palette], data: artLevel.getGame() }
+        : null
+      const saved = await saveLevel({ ...levelToData(level, ui), id: currentId ?? undefined, art }, u.uid)
       currentId = saved.id!
       document.title = saved.title ?? 'Edit Level'
       history.replaceState(null, '', `?id=${currentId}`)
@@ -120,6 +151,54 @@ export const Edit: Component = (signal) => {
       on: { change: (e) => ui.mod((u) => ({ ...u, mute: e.currentTarget.checked })) },
     })
 
+    // Solved-art controls: enable + switch target + scale, all wired to mountLoop.
+    const targetBtn = hx('button', { signal, props: { type: 'button', className: termBtn }, on: { click: () => { target = target === 'puzzle' ? 'art' : 'puzzle'; mountLoop(); updateArtControls() } } }, ['Edit: Puzzle'])
+    const scaleBtn = hx('button', { signal, props: { type: 'button', className: termBtn }, on: { click: () => setScale((artScale % 4) + 1) } }, ['Art 1×'])
+    const artControls = h('div', { className: styles.field }, [targetBtn, scaleBtn])
+    const updateArtControls = (): void => {
+      artControls.style.display = artEnabled ? '' : 'none'
+      targetBtn.textContent = `Edit: ${target === 'art' ? 'Art' : 'Puzzle'}`
+      scaleBtn.textContent = `Art ${artScale}×`
+    }
+    const setArtEnabled = (on: boolean): void => {
+      artEnabled = on
+      if (on && !artLevel) initArt()
+      if (!on) target = 'puzzle'
+      mountLoop()
+      updateArtControls()
+    }
+    const setScale = (s: number): void => {
+      const from = artScale
+      artScale = s
+      if (artEnabled && artUi) {
+        const nx = level.x * s
+        const ny = level.y * s
+        // Resample existing art into the new resolution: cells map by their puzzle
+        // fraction (oldIdx = floor(newIdx * from / s)). Scaling up by an integer
+        // factor (1→2, 1→3) is lossless block-duplication; scaling down or by a
+        // non-integer ratio (3→2, 2→1) samples and loses detail.
+        let game = '0'.repeat(nx * ny)
+        if (artLevel) {
+          const old = artLevel
+          const cells: string[] = new Array(nx * ny)
+          for (let cx = 0; cx < nx; cx++) {
+            for (let cy = 0; cy < ny; cy++) {
+              const ox = Math.min(old.x - 1, Math.floor((cx * from) / s))
+              const oy = Math.min(old.y - 1, Math.floor((cy * from) / s))
+              cells[cx * ny + cy] = old.grid.getAt(ox, oy)
+            }
+          }
+          game = cells.join('')
+        }
+        artLevel = new Level({ title: level.title, x: nx, y: ny, game, palette: artUi.get().palette })
+      }
+      if (target === 'art') mountLoop()
+      updateArtControls()
+    }
+    const artCheck = hx('input', { signal, props: { type: 'checkbox' }, on: { change: (e) => setArtEnabled(e.currentTarget.checked) } })
+    artCheck.checked = artEnabled
+    updateArtControls()
+
     const saveBtn = hx('button', { signal, props: { type: 'button', className: termBtn }, on: { click: onSave } }, ['Save'])
     const testBtn = hx('a', {
       signal,
@@ -140,6 +219,8 @@ export const Edit: Component = (signal) => {
       ]),
       h('div', { className: styles.field }, [h('label', { className: edit.label }, ['Par ']), parInput]),
       h('label', { className: edit.muteRow }, [muteInput, ' Mute']),
+      h('label', { className: edit.muteRow }, [artCheck, ' Solved art']),
+      artControls,
       h('div', { className: styles.field }, [saveBtn, testBtn]),
       signinMsg,
     )

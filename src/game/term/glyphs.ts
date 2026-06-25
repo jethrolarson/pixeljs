@@ -15,15 +15,21 @@ export const BR = '┘'
 export const H = '─'
 export const V = '│'
 
-// Double horizontal rule (CP437 0xCD) — the divider under the title.
+// Double-line box drawing (CP437 ═║╔╗╚╝ family) — the outer game frame and the
+// divider under the title.
 export const DH = '═'
+export const DV = '║'
+export const DTL = '╔'
+export const DTR = '╗'
+export const DBL = '╚'
+export const DBR = '╝'
 
 // Player annotations on the play grid.
 export const MARK = 'O' // right-click "known empty"
 export const WRONG = 'X' // painted-but-incorrect indicator
 
 /** Glyphs that `termrender` draws as geometry rather than text. */
-export const GEOMETRIC = new Set([FULL, TL, TR, BL, BR, H, V, DH])
+export const GEOMETRIC = new Set([FULL, TL, TR, BL, BR, H, V, DH, DV, DTL, DTR, DBL, DBR])
 
 /** ANSI/chrome palette, sampled from docs/PixelPuzMock.xp. */
 export const chrome = {

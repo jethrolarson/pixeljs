@@ -1,5 +1,5 @@
 import { CellBuffer, Cell } from './cellbuffer'
-import { FULL, TL, TR, BL, BR, H, V, DH, GEOMETRIC } from './glyphs'
+import { FULL, TL, TR, BL, BR, H, V, DH, DV, DTL, DTR, DBL, DBR, GEOMETRIC } from './glyphs'
 import { tintedGlyph, glyphInk, GLYPH_PX } from './glyphatlas'
 
 /** Where the character grid lands on the canvas. */
@@ -104,6 +104,18 @@ function drawGeometric(ctx: CanvasRenderingContext2D, g: string, x: number, y: n
   const vBar = (y0: number, y1: number): void => ctx.fillRect(midX - th / 2, y0, th, y1 - y0)
   const right = x + w
   const bottom = y + h
+
+  // Double-line glyphs: two parallel strokes offset by ±sep from the center, so
+  // the corners line up with the neighbouring ═/║ runs.
+  const t2 = Math.max(1, Math.round(th * 0.7))
+  const sep = Math.max(t2, Math.round(h * 0.16))
+  const xL = midX - sep
+  const xR = midX + sep
+  const yT = midY - sep
+  const yB = midY + sep
+  const dh = (x0: number, x1: number, yc: number): void => ctx.fillRect(x0, yc - t2 / 2, x1 - x0, t2)
+  const dv = (y0: number, y1: number, xc: number): void => ctx.fillRect(xc - t2 / 2, y0, t2, y1 - y0)
+
   switch (g) {
     case H:
       hBar(x, right)
@@ -127,11 +139,37 @@ function drawGeometric(ctx: CanvasRenderingContext2D, g: string, x: number, y: n
       hBar(x, midX + th / 2)
       vBar(y, midY + th / 2)
       break
-    case DH: {
-      const t2 = Math.max(1, Math.round(th * 0.6))
-      ctx.fillRect(x, y + h * 0.4 - t2 / 2, w, t2)
-      ctx.fillRect(x, y + h * 0.6 - t2 / 2, w, t2)
+    case DH:
+      dh(x, right, yT)
+      dh(x, right, yB)
       break
-    }
+    case DV:
+      dv(y, bottom, xL)
+      dv(y, bottom, xR)
+      break
+    case DTL:
+      dh(xL, right, yT)
+      dv(yT, bottom, xL)
+      dh(xR, right, yB)
+      dv(yB, bottom, xR)
+      break
+    case DTR:
+      dh(x, xR, yT)
+      dv(yT, bottom, xR)
+      dh(x, xL, yB)
+      dv(yB, bottom, xL)
+      break
+    case DBL:
+      dh(xL, right, yB)
+      dv(y, yB, xL)
+      dh(xR, right, yT)
+      dv(y, yT, xR)
+      break
+    case DBR:
+      dh(x, xR, yB)
+      dv(y, yB, xR)
+      dh(x, xL, yT)
+      dv(y, yT, xL)
+      break
   }
 }

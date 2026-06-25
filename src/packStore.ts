@@ -4,7 +4,7 @@ import {
   increment, QueryDocumentSnapshot, DocumentData
 } from 'firebase/firestore'
 import { db } from './firebase'
-import { PackData } from './pack'
+import { PackData, MAX_PACK_LEVELS } from './pack'
 
 const col = collection(db, 'packs')
 const PAGE_SIZE = 12
@@ -50,6 +50,9 @@ function stripUndefined(obj: Record<string, unknown>): Record<string, unknown> {
 }
 
 export async function savePack(data: PackData): Promise<PackData> {
+  if (data.levelIds.length > MAX_PACK_LEVELS) {
+    throw new Error(`A pack can hold at most ${MAX_PACK_LEVELS} levels.`)
+  }
   const id = data.id ?? doc(col).id
   const ref = doc(col, id)
   const payload = stripUndefined({

@@ -5,6 +5,14 @@ export interface HintGroup {
   colorIndex: number  // 1-based index into palette; 0 means empty row/col
 }
 
+/** Optional reward art shown in place of the puzzle once solved. Its own palette
+ * (more/other colors than the puzzle) and optionally higher resolution. */
+export interface SolvedArt {
+  scale: number       // 1–4: art grid is (scale·x) × (scale·y)
+  palette: string[]
+  data: string        // column-major color indices, '0' = blank
+}
+
 export interface LevelData {
   id?: string
   ownerId?: string
@@ -16,6 +24,7 @@ export interface LevelData {
   par?: number
   levelSetName?: string
   key?: string
+  art?: SolvedArt | null
 }
 
 export class Level {
@@ -28,6 +37,7 @@ export class Level {
   grid: Matrix   // solution: '0'=empty, '1'=palette[0], '2'=palette[1], ...
   paint: Matrix  // player's painting, same encoding as grid
   mark: Matrix   // right-click X marks: '0' or '1'
+  art: SolvedArt | null  // optional reward art shown once solved
 
   constructor(data: LevelData = {}) {
     this.title = data.title ?? 'untitled'
@@ -41,6 +51,7 @@ export class Level {
     this.grid = new Matrix(this.x, this.y, game.split(''))
     this.paint = new Matrix(this.x, this.y)
     this.mark = new Matrix(this.x, this.y)
+    this.art = data.art ?? null
   }
 
   getRowHints(): HintGroup[][] {
@@ -95,6 +106,21 @@ export class Level {
   isComplete(): boolean {
     for (let x = 0; x < this.x; x++) {
       if (!this.isColComplete(x)) return false
+    }
+    return true
+  }
+
+  /**
+   * Exact-match completion: every cell's paint equals the solution, including
+   * blank cells having no paint. Stricter than `isComplete`, which ignores stray
+   * paint on should-be-blank cells. Zen mode uses this — with errors hidden, the
+   * red-X that discourages painting blanks is gone, so the win must be exact.
+   */
+  isSolvedExactly(): boolean {
+    for (let x = 0; x < this.x; x++) {
+      const col = this.grid.getCol(x)
+      const paintCol = this.paint.getCol(x)
+      if (!col.every((cell, i) => paintCol[i] === cell)) return false
     }
     return true
   }

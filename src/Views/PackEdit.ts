@@ -1,7 +1,7 @@
 import { User } from 'firebase/auth'
 import { funState, FunState, mapRead } from '@fun-land/fun-state'
 import { Component, h, hx, enhance, bindView, bindClass, bindProperty } from '@fun-land/fun-web'
-import { PackData } from '../pack'
+import { PackData, MAX_PACK_LEVELS } from '../pack'
 import { LevelData } from '../level'
 import { getPackById, savePack, deletePack } from '../packStore'
 import { getLevels } from '../store'
@@ -116,8 +116,21 @@ const editor = (signal: AbortSignal, user: User): Element => {
     on: { change: (e) => form.prop('published').set(e.currentTarget.checked) },
   })
 
-  // --- Level list ---
-  const levelList = bindView(signal, form.prop('levelIds'), (_s, ids) =>
+  // --- Level list (drag to reorder) ---
+  let dragIndex = -1
+  // Move the dragged item to just before the drop target; consistent whichever
+  // direction you drag.
+  const reorder = (from: number, to: number): void => {
+    if (from < 0 || from === to) return
+    form.prop('levelIds').mod((arr) => {
+      const a = [...arr]
+      const [moved] = a.splice(from, 1)
+      a.splice(from < to ? to - 1 : to, 0, moved)
+      return a
+    })
+  }
+
+  const levelList = bindView(signal, form.prop('levelIds'), (s, ids) =>
     ids.length === 0
       ? h('ul', { className: styles.packLevels }, [h('li', { className: styles.emptyLevels }, ['No levels added yet.'])])
       : h(
@@ -125,11 +138,33 @@ const editor = (signal: AbortSignal, user: User): Element => {
           { className: styles.packLevels },
           ids.map((id, i) => {
             const lvl = allMyLevels.find((l) => l.id === id)
-            return h('li', { className: styles.packLevelItem }, [
-              h('span', { className: styles.dragHandle }, ['⠿']),
-              h('span', { className: styles.levTitle }, [lvl?.title ?? id]),
-              hx('button', { signal, props: { className: styles.removeBtn }, on: { click: () => form.prop('levelIds').mod((arr) => arr.filter((_, j) => j !== i)) } }, ['✕']),
-            ])
+            return hx(
+              'li',
+              {
+                signal: s,
+                props: { className: styles.packLevelItem, draggable: true },
+                on: {
+                  dragstart: (e) => {
+                    dragIndex = i
+                    if (e.dataTransfer) e.dataTransfer.effectAllowed = 'move'
+                  },
+                  dragover: (e) => e.preventDefault(),
+                  drop: (e) => {
+                    e.preventDefault()
+                    reorder(dragIndex, i)
+                    dragIndex = -1
+                  },
+                  dragend: () => {
+                    dragIndex = -1
+                  },
+                },
+              },
+              [
+                h('span', { className: styles.dragHandle }, ['⠿']),
+                h('span', { className: styles.levTitle }, [lvl?.title ?? id]),
+                hx('button', { signal: s, props: { className: styles.removeBtn }, on: { click: () => form.prop('levelIds').mod((arr) => arr.filter((_, j) => j !== i)) } }, ['✕']),
+              ],
+            )
           }),
         ),
   )
@@ -145,6 +180,10 @@ const editor = (signal: AbortSignal, user: User): Element => {
   const searchResults = bindView(signal, query, (s, q) => {
     const term = q.trim().toLowerCase()
     const taken = form.get().levelIds
+    if (taken.length >= MAX_PACK_LEVELS)
+      return h('div', { className: styles.levelResults }, [
+        h('div', { className: styles.emptyLevels }, [`Pack is full (${MAX_PACK_LEVELS} levels max).`]),
+      ])
     const matches = term
       ? allMyLevels.filter((l) => !taken.includes(l.id!) && (l.title ?? '').toLowerCase().includes(term)).slice(0, 10)
       : []
@@ -163,7 +202,7 @@ const editor = (signal: AbortSignal, user: User): Element => {
 
   // --- Buttons ---
   const saveBtn = hx('button', { signal, props: { className: btn }, on: { click: async () => { status.set('Saving…'); await persist(); status.set('Saved!'); setTimeout(() => status.set(''), 2000) } } }, ['Save'])
-  const newLevelBtn = hx('button', { signal, props: { className: btn }, on: { click: async () => { status.set('Saving pack…'); await persist(); location.href = `/edit.html?pack=${currentId}` } } }, ['+ Create new level'])
+  const newLevelBtn = hx('button', { signal, props: { className: btn }, on: { click: async () => { if (form.get().levelIds.length >= MAX_PACK_LEVELS) { status.set(`Pack is full (${MAX_PACK_LEVELS} max).`); return } status.set('Saving pack…'); await persist(); location.href = `/edit.html?pack=${currentId}` } } }, ['+ Create new level'])
   const deleteBtn = enhance(
     hx('button', { signal, props: { className: `${btn} ${btnDanger}` }, on: { click: async () => { if (currentId && confirm('Delete this pack?')) { await deletePack(currentId); location.href = '/browse.html' } } } }, ['Delete']),
     bindClass(hidden, mapRead(showDelete, (v) => !v), signal),
@@ -202,7 +241,7 @@ const editor = (signal: AbortSignal, user: User): Element => {
         showDelete.set(true)
       }
     }
-    if (addLevelId && !form.get().levelIds.includes(addLevelId)) {
+    if (addLevelId && !form.get().levelIds.includes(addLevelId) && form.get().levelIds.length < MAX_PACK_LEVELS) {
       form.prop('levelIds').mod((ids) => [...ids, addLevelId])
       await persist()
     }
@@ -221,7 +260,9 @@ const editor = (signal: AbortSignal, user: User): Element => {
       h('div', { className: styles.formGroup }, [
         h('div', { className: styles.publishRow }, [publishCheck, h('label', { className: styles.publishLabel }, ['Published (visible to others)'])]),
       ]),
-      h('h3', { className: styles.heading }, ['Levels']),
+      bindView(signal, form.prop('levelIds'), (_s, ids) =>
+        h('h3', { className: styles.heading }, [`Levels  ${ids.length} / ${MAX_PACK_LEVELS}`]),
+      ),
       levelList,
       group('Add an existing level', searchInput, searchResults),
       h('div', { className: styles.formGroup }, [newLevelBtn]),

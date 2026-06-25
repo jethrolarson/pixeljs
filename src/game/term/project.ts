@@ -1,12 +1,33 @@
 import { CellBuffer } from './cellbuffer'
-import { FULL, MARK, WRONG, chrome } from './glyphs'
-import { Level } from '../../level'
+import { FULL, MARK, WRONG, H, chrome } from './glyphs'
+import { Level, SolvedArt } from '../../level'
 import { hexToRGB, rgbToCSS } from '../../color'
 import { GameMode, GridPos } from '../types'
 import { Layout } from '../layout'
 import { Hints, ClueSat } from '../score'
 
-const PP = 'pp·wf'
+/** Faint puzzle-solution tracing guide drawn behind solved-art editing. */
+export interface Underlay {
+  level: Level
+  scale: number
+}
+
+/** The `pp·wf` brand, per-character colors sampled from PixelPuzMock.xp. */
+const BRAND: ReadonlyArray<readonly [string, string]> = [
+  ['p', '#00FFFF'],
+  ['p', chrome.purple],
+  ['·', chrome.solved],
+  ['w', chrome.green],
+  ['f', '#FF8000'],
+]
+
+/** Hotkey footer slots (columns) on `layout.menuRow`, styled like the dialog
+ * footers. Each slot is `key␠label` (6 chars); slots are 7 apart so they never
+ * touch. Positions are shared with the loop's click hit-testing. */
+export const MENU_HELP_COL = 0
+export const MENU_BACK_COL = 7
+export const MENU_PREV_COL = 14
+export const MENU_NEXT_COL = 21
 
 /** CSS color for a 1-based palette index (0 → dim fallback). */
 function paletteColor(palette: string[], index: number): string {
@@ -27,11 +48,22 @@ export interface ProjectOpts {
   solved: boolean
   /** Show the full solution (edit mode, or a won puzzle). */
   reveal: boolean
+  /** Faults mode: render wrong paint as a red X. Zen mode (false) shows the
+   *  painted color regardless, so errors are never revealed. */
+  revealErrors?: boolean
   golf?: string | null
   /** Currently selected paint color (1-based), for the play-mode palette strip. */
   activeColorIndex?: number
   /** Most-recently painted cell + its pop progress (1 = fresh, 0 = settled). */
   pop?: { x: number; y: number; t: number } | null
+  /** Show the `>` next-puzzle hotkey (only when a next level exists). */
+  hasNext?: boolean
+  /** Show the `<` previous-puzzle hotkey (only when a previous level exists). */
+  hasPrev?: boolean
+  /** `~` opens the pack picker (label `pack`) vs. plain back-out (label `back`). */
+  hasPack?: boolean
+  /** Faint puzzle guide behind the art grid (solved-art editing). */
+  underlay?: Underlay | null
 }
 
 /**
@@ -43,9 +75,29 @@ export function projectPuzzle(o: ProjectOpts): CellBuffer {
   const { level, palette, mode, layout, hints } = o
   const buf = new CellBuffer(layout.cols, layout.rows)
 
+  // Outer double-line frame around the whole game.
+  buf.doubleBox(0, 0, layout.cols, layout.rows, o.solved ? chrome.solved : chrome.dim)
+
   // Chrome quadrant (upper-left): brand + dimensions.
-  buf.text(0, 0, PP, chrome.green)
-  buf.text(0, 2, `${level.x}x${level.y}`, chrome.dim)
+  BRAND.forEach(([ch, color], i) => buf.set(layout.chromeCol + i, layout.chromeRow, { glyph: ch, fg: color }))
+  buf.text(layout.chromeCol, layout.chromeRow + 2, `${level.x}x${level.y}`, chrome.dim)
+
+  // Hotkey footer along the bottom (play only): `key label` pairs, key in cyan,
+  // label dim — same vocabulary as the dialog footers.
+  if (mode === 'play') {
+    // Divider rule on the blank row above the footer, inside the frame.
+    for (let c = layout.chromeCol; c < layout.cols - layout.chromeCol; c++)
+      buf.set(c, layout.menuRow - 1, { glyph: H, fg: chrome.dim })
+    const slot = (offset: number, key: string, label: string): void => {
+      const col = layout.menuCol + offset
+      buf.set(col, layout.menuRow, { glyph: key, fg: chrome.name })
+      buf.text(col + 2, layout.menuRow, label, chrome.dim)
+    }
+    slot(MENU_HELP_COL, '?', 'help')
+    slot(MENU_BACK_COL, '~', o.hasPack ? 'pack' : 'back')
+    if (o.hasPrev) slot(MENU_PREV_COL, '<', 'prev')
+    if (o.hasNext) slot(MENU_NEXT_COL, '>', 'next')
+  }
 
   // Palette selector (play mode): a swatch strip with a caret under the active.
   if (mode === 'play') {
@@ -62,8 +114,9 @@ export function projectPuzzle(o: ProjectOpts): CellBuffer {
   // Grid box; border color signals solved state.
   buf.box(layout.boxLeft, layout.boxTop, level.x + 2, level.y + 2, o.solved ? chrome.solved : chrome.dim)
 
-  // Clues (play mode only): per-column above, per-row to the left.
-  if (mode === 'play') {
+  // Clues (play mode only): per-column above, per-row to the left. Hidden once
+  // solved — the picture speaks for itself.
+  if (mode === 'play' && !o.solved) {
     const clueCell = (count: number, colorIndex: number, satisfied: boolean) => {
       // Empty line: a plain grey 0.
       if (count === 0) return { glyph: '0', fg: chrome.dim }
@@ -97,9 +150,11 @@ export function projectPuzzle(o: ProjectOpts): CellBuffer {
     }
   }
 
-  // Interior puzzle cells.
+  // Interior puzzle cells. When solved with reward art, leave the interior empty
+  // — the loop draws the art (possibly 2×) over it.
+  const showArt = mode === 'play' && o.solved && !!level.art
   const popScale = o.pop ? 1 + 0.45 * o.pop.t : 1
-  for (let gx = 0; gx < level.x; gx++) {
+  for (let gx = 0; gx < level.x && !showArt; gx++) {
     for (let gy = 0; gy < level.y; gy++) {
       const col = layout.gridCol + gx
       const row = layout.gridRow + gy
@@ -110,6 +165,11 @@ export function projectPuzzle(o: ProjectOpts): CellBuffer {
         if (solVal !== '0') {
           const c = paletteColor(palette, parseInt(solVal))
           buf.set(col, row, { glyph: FULL, fg: c, bg: c, scale: fresh })
+        } else if (o.underlay) {
+          // Faint puzzle solution behind the (empty) art cell, for tracing.
+          const u = o.underlay
+          const pv = u.level.grid.getAt(Math.floor(gx / u.scale), Math.floor(gy / u.scale))
+          if (pv !== '0') buf.set(col, row, { glyph: FULL, fg: paletteColor(u.level.palette, parseInt(pv)), alpha: 0.22 })
         }
         continue
       }
@@ -117,7 +177,8 @@ export function projectPuzzle(o: ProjectOpts): CellBuffer {
       const paintVal = level.paint.getAt(gx, gy)
       const markVal = level.mark.getAt(gx, gy)
       if (paintVal !== '0') {
-        if (paintVal === solVal) {
+        if (paintVal === solVal || !o.revealErrors) {
+          // Correct, or zen mode (errors hidden): show the painted color.
           const c = paletteColor(palette, parseInt(paintVal))
           buf.set(col, row, { glyph: FULL, fg: c, bg: c, scale: fresh })
         } else {
@@ -136,6 +197,26 @@ export function projectPuzzle(o: ProjectOpts): CellBuffer {
     if (o.cursor && inBounds(level, o.cursor)) crosshair(buf, layout, level, o.cursor)
   }
 
+  return buf
+}
+
+/**
+ * Build the reward-art buffer (its own palette, possibly 2× the puzzle). Each
+ * non-blank cell is a FULL block; '0' stays empty so the bg shows. The loop
+ * draws this at `cellW / scale` over the solved grid interior.
+ */
+export function projectSolvedArt(art: SolvedArt, artX: number, artY: number): CellBuffer {
+  const buf = new CellBuffer(artX, artY)
+  const cells = art.data.split('')
+  for (let cx = 0; cx < artX; cx++) {
+    for (let cy = 0; cy < artY; cy++) {
+      const v = cells[cx * artY + cy]
+      if (v && v !== '0') {
+        const c = paletteColor(art.palette, parseInt(v))
+        buf.set(cx, cy, { glyph: FULL, fg: c, bg: c })
+      }
+    }
+  }
   return buf
 }
 

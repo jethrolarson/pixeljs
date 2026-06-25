@@ -1,11 +1,13 @@
 import { Level } from '../level'
 import { SoundGroup } from '../sound'
-import { GameMode, GridPos } from './types'
+import { GameMode, GridPos, ScoreMode } from './types'
 import { computeLayout, pixelToGrid, inGrid } from './layout'
 import { Sound, createPointer, createInteraction, applyPointer } from './input'
 import { computeScore, golfScore, formatTime, computeHints, clueSatisfaction } from './score'
-import { projectPuzzle } from './term/project'
-import { drawBuffer, drawStipple } from './term/termrender'
+import { projectPuzzle, projectSolvedArt, Underlay, MENU_HELP_COL, MENU_BACK_COL, MENU_PREV_COL, MENU_NEXT_COL } from './term/project'
+import { projectHelp } from './term/help'
+import { projectPackMenu, PackMenuItem } from './term/packmenu'
+import { drawBuffer, drawStipple, TermMetrics } from './term/termrender'
 import { chrome } from './term/glyphs'
 
 export interface Assets {
@@ -31,13 +33,40 @@ export interface GameLoopConfig {
   canvas: HTMLCanvasElement
   level: Level
   mode: GameMode
+  /** Play-mode feedback model; ignored in edit. Defaults to `zen`. */
+  scoreMode?: ScoreMode
+  /** Edit mode: faint puzzle guide behind the art grid (solved-art authoring). */
+  underlay?: Underlay
   getActiveColor: () => number
   setActiveColor?: (index: number) => void
   getMute: () => boolean
   getPalette: () => string[]
   assets: Assets
   onHud?: (hud: Hud) => void
+  /** Invoked by the `~` menu hotkey (play) when no `packMenu` is set: navigate
+   * back to the pack/home. With `packMenu`, `~` opens the picker instead. */
+  onBack?: () => void
+  /** Invoked by the `>` menu hotkey (play); when set, the hotkey is shown. */
+  onNext?: () => void
+  /** Invoked by the `<` menu hotkey (play); when set, the hotkey is shown. */
+  onPrev?: () => void
+  /** In-session pack picker (play); when set, `~` opens it. */
+  packMenu?: PackMenu
+  /** Leave the session entirely (the picker's `q`/leave action). */
+  onExit?: () => void
+  /** Fired once when the puzzle is first solved. */
+  onSolved?: () => void
   signal: AbortSignal
+}
+
+/** The in-session pack picker opened by `~`. When provided, `~` opens the
+ * picker instead of calling `onBack`; `getItems` is read live so solved state
+ * stays current. */
+export interface PackMenu {
+  title: string
+  current: number
+  getItems: () => PackMenuItem[]
+  onPick: (index: number) => void
 }
 
 export interface GameLoop {
@@ -50,10 +79,17 @@ export interface GameLoop {
 /** How long a freshly-painted cell's scale-pop takes to settle. */
 const POP_MS = 220
 
+/** A footer hotkey slot spans its start column plus `key␠label` (6 chars). */
+const inSlot = (col: number, start: number): boolean => col >= start && col <= start + 5
+
 export function createGameLoop(cfg: GameLoopConfig): GameLoop {
   const ctx = cfg.canvas.getContext('2d')!
   const pointer = createPointer(cfg.canvas, cfg.signal)
   const interaction = createInteraction()
+  const scoreMode: ScoreMode = cfg.scoreMode ?? 'zen'
+  // Zen hides errors, so the win must be an exact match (no stray paint on
+  // blanks); faults mode keeps the looser solution-cells-only completion.
+  const isDone = (): boolean => (scoreMode === 'zen' ? cfg.level.isSolvedExactly() : cfg.level.isComplete())
 
   let rafId: number | null = null
   let won = false
@@ -64,6 +100,25 @@ export function createGameLoop(cfg: GameLoopConfig): GameLoop {
   // again on mouse move so whichever input you last touched is what's displayed.
   let cursor: GridPos | null = null
   let cursorActive = false
+  // Help guide modal (play): when open, the puzzle freezes behind a dim overlay
+  // and game input is swallowed. A press just after closing is also swallowed so
+  // dismissing the modal doesn't paint the cell underneath.
+  let helpOpen = false
+  let suppressPaintUntilRelease = false
+  // Pack picker (play, in a session): selection cursor + last-rendered geometry
+  // for click hit-testing. Modal like the help guide.
+  let pickerOpen = false
+  let pickerSel = 0
+  let pickerGeom: { metrics: TermMetrics; itemRows: number[]; footerRow: number; cols: number; rows: number } | null = null
+  const openPicker = (): void => {
+    if (!cfg.packMenu) return
+    pickerSel = cfg.packMenu.current
+    pickerOpen = true
+  }
+  const pickSelected = (): void => {
+    pickerOpen = false
+    cfg.packMenu?.onPick(pickerSel)
+  }
 
   const playSound = (sound: Sound | null): void => {
     if (sound) cfg.assets[sound].play(cfg.getMute())
@@ -85,25 +140,27 @@ export function createGameLoop(cfg: GameLoopConfig): GameLoop {
     }
     const paintCursor = (): void => {
       const c = ensure()
-      if (level.isComplete()) return
+      if (isDone()) return
       const prev = level.paint.getAt(c.x, c.y)
       const v = String(cfg.getActiveColor())
       level.paint.setAt(c.x, c.y, v)
       if (prev === '0') {
-        playSound(level.grid.getAt(c.x, c.y) === v ? 'bing' : 'boom')
+        const correct = level.grid.getAt(c.x, c.y) === v
+        // Zen: a single neutral tone so audio can't leak correctness either.
+        playSound(scoreMode === 'zen' ? 'bing' : correct ? 'bing' : 'boom')
         pop = { x: c.x, y: c.y, time: Date.now() }
       }
     }
     const eraseCursor = (): void => {
       const c = ensure()
-      if (!level.isComplete()) level.paint.setAt(c.x, c.y, '0')
+      if (!isDone()) level.paint.setAt(c.x, c.y, '0')
     }
     // Known-empty mark (the right-click equivalent). The first cell of a drag
     // decides whether we're adding or removing marks.
     let markErasing = false
     const markCursor = (fresh: boolean): void => {
       const c = ensure()
-      if (level.isComplete()) return
+      if (isDone()) return
       if (fresh) markErasing = level.mark.getAt(c.x, c.y) === '1'
       level.mark.setAt(c.x, c.y, markErasing ? '0' : '1')
     }
@@ -115,6 +172,58 @@ export function createGameLoop(cfg: GameLoopConfig): GameLoop {
     window.addEventListener(
       'keydown',
       (e) => {
+        // Menu hotkeys, independent of the cursor and intercepted first. The
+        // unshifted key works too (`/` shares `?`, backtick shares `~`, etc).
+        if (e.key === '?' || e.key === '/') {
+          if (!pickerOpen) helpOpen = !helpOpen
+          e.preventDefault()
+          return
+        }
+        if (e.key === 'Escape') {
+          if (helpOpen) {
+            helpOpen = false
+            e.preventDefault()
+          } else if (pickerOpen) {
+            pickerOpen = false
+            e.preventDefault()
+          }
+          return
+        }
+        if (helpOpen) {
+          e.preventDefault() // swallow game input while the guide is open
+          return
+        }
+        if (e.key === '~' || e.key === '`') {
+          if (cfg.packMenu) pickerOpen ? (pickerOpen = false) : openPicker()
+          else cfg.onBack?.()
+          e.preventDefault()
+          return
+        }
+        if (pickerOpen && cfg.packMenu) {
+          const n = cfg.packMenu.getItems().length
+          if (e.key === 'ArrowUp') pickerSel = (pickerSel - 1 + n) % n
+          else if (e.key === 'ArrowDown') pickerSel = (pickerSel + 1) % n
+          else if (e.key === 'Enter' || e.key === ' ') pickSelected()
+          else if (e.key === 'q' || e.key === 'Q') {
+            pickerOpen = false
+            cfg.onExit?.()
+          } else if (/^[1-9]$/.test(e.key)) {
+            const idx = +e.key - 1
+            if (idx < n) pickerSel = idx
+          }
+          e.preventDefault()
+          return
+        }
+        if ((e.key === '>' || e.key === '.') && cfg.onNext) {
+          cfg.onNext()
+          e.preventDefault()
+          return
+        }
+        if ((e.key === '<' || e.key === ',') && cfg.onPrev) {
+          cfg.onPrev()
+          e.preventDefault()
+          return
+        }
         let handled = true
         switch (e.key) {
           case 'ArrowUp': move(0, -1); break
@@ -171,19 +280,62 @@ export function createGameLoop(cfg: GameLoopConfig): GameLoop {
     const ptr = pointer.read()
     const pos = pixelToGrid(layout, ptr.x, ptr.y)
     const within = inGrid(level, pos)
-    const complete = mode === 'play' && level.isComplete()
+    const complete = mode === 'play' && isDone()
 
-    // Palette select (play): a fresh click on a swatch sets the active color.
+    if (!ptr.pressed) suppressPaintUntilRelease = false
+
+    // Click handling for chrome (play): the menu hotkeys, dismissing the help
+    // modal, and palette swatches. Any of these suppress paint for this press.
     if (mode === 'play' && ptr.newlyPressed) {
       const charCol = Math.floor((ptr.x - layout.originX) / layout.cellW)
       const charRow = Math.floor((ptr.y - layout.originY) / layout.cellH)
       const i = charCol - layout.paletteCol
-      if (charRow === layout.paletteRow && i >= 0 && i < palette.length) cfg.setActiveColor?.(i + 1)
+      if (pickerOpen) {
+        // Click a picker row to open it; click outside the panel to dismiss.
+        suppressPaintUntilRelease = true
+        const g = pickerGeom
+        if (g) {
+          const pc = Math.floor((ptr.x - g.metrics.originX) / g.metrics.cellW)
+          const pr = Math.floor((ptr.y - g.metrics.originY) / g.metrics.cellH)
+          const idx = g.itemRows.indexOf(pr)
+          if (idx >= 0) {
+            pickerSel = idx
+            pickSelected()
+          } else if (pr === g.footerRow && pc >= 0 && pc < g.cols) {
+            pickerOpen = false
+            cfg.onExit?.()
+          } else if (pc < 0 || pc >= g.cols || pr < 0 || pr >= g.rows) {
+            pickerOpen = false
+          }
+        } else {
+          pickerOpen = false
+        }
+      } else if (helpOpen) {
+        helpOpen = false
+        suppressPaintUntilRelease = true
+      } else if (charRow === layout.menuRow && inSlot(charCol, layout.menuCol + MENU_HELP_COL)) {
+        helpOpen = true
+        suppressPaintUntilRelease = true
+      } else if (charRow === layout.menuRow && inSlot(charCol, layout.menuCol + MENU_BACK_COL)) {
+        if (cfg.packMenu) openPicker()
+        else cfg.onBack?.()
+        suppressPaintUntilRelease = true
+      } else if (charRow === layout.menuRow && inSlot(charCol, layout.menuCol + MENU_PREV_COL) && cfg.onPrev) {
+        cfg.onPrev()
+        suppressPaintUntilRelease = true
+      } else if (charRow === layout.menuRow && inSlot(charCol, layout.menuCol + MENU_NEXT_COL) && cfg.onNext) {
+        cfg.onNext()
+        suppressPaintUntilRelease = true
+      } else if (charRow === layout.paletteRow && i >= 0 && i < palette.length) {
+        cfg.setActiveColor?.(i + 1)
+        suppressPaintUntilRelease = true
+      }
     }
 
-    if (!complete && ptr.pressed && within) {
+    if (!helpOpen && !pickerOpen && !suppressPaintUntilRelease && !complete && ptr.pressed && within) {
       const sound = applyPointer(level, mode, cfg.getActiveColor(), ptr, pos, interaction)
-      playSound(sound)
+      // Zen: collapse the correct/wrong tones into one neutral tap.
+      playSound(scoreMode === 'zen' && sound === 'boom' ? 'bing' : sound)
       if (sound === 'bing' || sound === 'boom') pop = { x: pos.x, y: pos.y, time: now }
     }
     pointer.afterFrame()
@@ -192,6 +344,7 @@ export function createGameLoop(cfg: GameLoopConfig): GameLoop {
       won = true
       endTime = new Date()
       playSound('win')
+      cfg.onSolved?.()
     }
 
     const popT = pop ? Math.max(0, 1 - (now - pop.time) / POP_MS) : 0
@@ -199,7 +352,8 @@ export function createGameLoop(cfg: GameLoopConfig): GameLoop {
 
     const score = mode === 'play' ? computeScore(level) : 0
     const sat = mode === 'play' ? clueSatisfaction(level, hints) : null
-    const golf = won ? golfScore(score, level.par) : null
+    // Golf is a faults concept; zen has no fault label.
+    const golf = won && scoreMode === 'faults' ? golfScore(score, level.par) : null
 
     ctx.fillStyle = chrome.bg
     ctx.fillRect(0, 0, w, h)
@@ -214,11 +368,29 @@ export function createGameLoop(cfg: GameLoopConfig): GameLoop {
       cursor: cursorActive ? cursor : null,
       solved: complete || won,
       reveal: mode === 'edit' || complete || won,
+      revealErrors: scoreMode === 'faults',
       golf,
       activeColorIndex: cfg.getActiveColor(),
       pop: pop ? { x: pop.x, y: pop.y, t: popT } : null,
+      hasNext: !!cfg.onNext,
+      hasPrev: !!cfg.onPrev,
+      hasPack: !!cfg.packMenu,
+      underlay: cfg.underlay,
     })
     drawBuffer(ctx, buffer, layout)
+
+    // Reward art replaces the puzzle interior once solved (its own palette, drawn
+    // at cellW/scale so a 2× grid fits the same area).
+    if (mode === 'play' && (complete || won) && level.art) {
+      const art = level.art
+      const artBuf = projectSolvedArt(art, level.x * art.scale, level.y * art.scale)
+      drawBuffer(ctx, artBuf, {
+        cellW: layout.cellW / art.scale,
+        cellH: layout.cellH / art.scale,
+        originX: layout.originX + layout.gridCol * layout.cellW,
+        originY: layout.originY + layout.gridRow * layout.cellH,
+      })
+    }
 
     // Keyboard cursor cell: a see-through stipple in the active color, drawn over
     // the grid so the cell behind stays visible.
@@ -227,6 +399,31 @@ export function createGameLoop(cfg: GameLoopConfig): GameLoop {
       const cx = layout.originX + (layout.gridCol + cursor.x) * layout.cellW
       const cy = layout.originY + (layout.gridRow + cursor.y) * layout.cellH
       drawStipple(ctx, cx, cy, layout.cellW, layout.cellH, color)
+    }
+
+    // Help guide: dim the puzzle and draw the ANSI panel over it.
+    if (helpOpen && mode === 'play') {
+      ctx.fillStyle = 'rgba(13,13,13,0.82)'
+      ctx.fillRect(0, 0, w, h)
+      const help = projectHelp({ w, h })
+      drawBuffer(ctx, help.buffer, help.metrics)
+    }
+
+    // Pack picker: dim the puzzle and draw the selectable list over it.
+    if (pickerOpen && mode === 'play' && cfg.packMenu) {
+      ctx.fillStyle = 'rgba(13,13,13,0.82)'
+      ctx.fillRect(0, 0, w, h)
+      const pm = projectPackMenu({
+        title: cfg.packMenu.title,
+        items: cfg.packMenu.getItems(),
+        current: cfg.packMenu.current,
+        selected: pickerSel,
+        viewport: { w, h },
+      })
+      drawBuffer(ctx, pm.buffer, pm.metrics)
+      pickerGeom = { metrics: pm.metrics, itemRows: pm.itemRows, footerRow: pm.footerRow, cols: pm.buffer.cols, rows: pm.buffer.rows }
+    } else {
+      pickerGeom = null
     }
 
     if (mode === 'play') {

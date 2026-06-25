@@ -27,6 +27,11 @@ export interface Layout {
   originY: number
   cols: number
   rows: number
+  /** Top-left of the content, just inside the outer double frame. */
+  chromeCol: number
+  chromeRow: number
+  /** Left column of the bottom hotkey footer. */
+  menuCol: number
   /** First interior (puzzle) cell, just inside the box border. */
   gridCol: number
   gridRow: number
@@ -38,6 +43,8 @@ export interface Layout {
   colHintRows: number
   /** Title line under the grid. */
   nameRow: number
+  /** Hotkey footer line along the bottom (play mode). */
+  menuRow: number
   /** Play-mode palette swatch strip, inside the chrome quadrant. */
   paletteRow: number
   paletteCol: number
@@ -45,6 +52,17 @@ export interface Layout {
 
 /** Size of the reserved upper-left chrome quadrant, in cells. */
 export const CHROME = 7
+
+/** One-cell margin reserved for the outer double-line game frame. */
+const FRAME = 1
+
+/** Columns reserved for the bottom hotkey footer (4 slots, 7 apart). */
+const MENU_COLS = 27
+
+/** Max cell size (px), a multiple of GLYPH_PX. Caps zoom so small puzzles don't
+ * balloon to fill the screen and cell sizes stay stable when switching puzzles
+ * in a pack. Only ever shrinks the cell, so the footer always still fits. */
+const MAX_CELL = GLYPH_PX * 4
 
 function maxLen(groups: HintGroup[][]): number {
   let m = 0
@@ -58,23 +76,32 @@ export function computeLayout(level: Level, mode: GameMode, hints: Hints, viewpo
   const rowHintCols = showClues ? Math.max(1, maxLen(hints.row)) : 0
   const colHintRows = showClues ? Math.max(1, maxLen(hints.col)) : 0
 
-  // Grid is pushed past the chrome quadrant and the clue gutters, whichever is
-  // larger — so chrome (upper-left), clues (gutters), and grid never collide.
-  const boxLeft = Math.max(CHROME, rowHintCols)
-  const boxTop = Math.max(CHROME, colHintRows)
+  // Everything is inset by FRAME for the outer double-line border. The grid is
+  // pushed past the chrome quadrant and the clue gutters, whichever is larger —
+  // so chrome (upper-left), clues (gutters), and grid never collide.
+  const boxLeft = FRAME + Math.max(CHROME, rowHintCols)
+  const boxTop = FRAME + Math.max(CHROME, colHintRows)
   const gridCol = boxLeft + 1
   const gridRow = boxTop + 1
   const boxRight = gridCol + level.x // box right border col
   const boxBottom = gridRow + level.y // box bottom border row
   const nameRow = boxBottom + 1
+  // Footer sits a blank line below the title (play only); edit has no footer.
+  const menuRow = showClues ? nameRow + 2 : nameRow
 
-  const cols = Math.max(boxRight + 1, boxLeft + level.title.length + 1, CHROME)
-  const rows = nameRow + 1
+  const inner = Math.max(
+    boxRight + 1,
+    boxLeft + level.title.length + 1,
+    showClues ? FRAME + MENU_COLS : 0,
+    FRAME + CHROME,
+  )
+  const cols = inner + FRAME // right frame column
+  const rows = (showClues ? menuRow : nameRow) + 1 + FRAME // bottom frame row
 
   // Snap to a multiple of the glyph size so bitmap glyphs scale by an integer
   // factor (clean, even pixels).
   const raw = Math.min(Math.floor(viewport.w / cols), Math.floor(viewport.h / rows))
-  const cell = Math.max(GLYPH_PX, Math.floor(raw / GLYPH_PX) * GLYPH_PX)
+  const cell = Math.min(MAX_CELL, Math.max(GLYPH_PX, Math.floor(raw / GLYPH_PX) * GLYPH_PX))
   const usedW = cols * cell
   const usedH = rows * cell
 
@@ -85,6 +112,9 @@ export function computeLayout(level: Level, mode: GameMode, hints: Hints, viewpo
     originY: Math.floor((viewport.h - usedH) / 2),
     cols,
     rows,
+    chromeCol: FRAME,
+    chromeRow: FRAME,
+    menuCol: FRAME,
     gridCol,
     gridRow,
     boxLeft,
@@ -92,8 +122,9 @@ export function computeLayout(level: Level, mode: GameMode, hints: Hints, viewpo
     rowHintCols,
     colHintRows,
     nameRow,
-    paletteRow: 4,
-    paletteCol: 0,
+    menuRow,
+    paletteRow: FRAME + 4,
+    paletteCol: FRAME,
   }
 }
 
