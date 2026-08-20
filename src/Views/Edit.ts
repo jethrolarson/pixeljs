@@ -10,6 +10,8 @@ import { createArtAuthoring } from "../game/artAuthoring";
 import { Palette } from "../components/Palette";
 import { ArtControls } from "../components/ArtControls";
 import { NumField } from "../components/NumField";
+import { ToastHost } from "../components/ToastHost";
+import { showToast } from "../services/toast";
 import { termBtn } from "./canvasPage.css";
 import * as styles from "./canvasPage.css";
 import * as edit from "./Edit.css";
@@ -127,7 +129,9 @@ export const Edit: Component = (signal) => {
 
     const onSave = async (): Promise<void> => {
       const id = await persist();
-      if (id && returnPackId)
+      if (!id) return;
+      showToast("Saved");
+      if (returnPackId)
         location.href = `/pack-edit.html?id=${returnPackId}&add=${id}`;
     };
 
@@ -232,5 +236,5 @@ export const Edit: Component = (signal) => {
     });
   })().catch(console.error);
 
-  return h("div", {}, [menuSlot, paletteSlot, canvas]);
+  return h("div", {}, [menuSlot, paletteSlot, canvas, ToastHost(signal, {})]);
 };
