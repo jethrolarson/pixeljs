@@ -1,3 +1,4 @@
+import { funState } from '@fun-land/fun-state'
 import { Component, h } from '@fun-land/fun-web'
 import { Level, LevelData } from '../level'
 import { getLevelById } from '../store'
@@ -19,6 +20,7 @@ const fallback: LevelData = {
 function startSingle(signal: AbortSignal, canvas: HTMLCanvasElement, assets: Assets, level: Level): void {
   document.title = level.title
   const ui = createUi(level.palette)
+  const mute = funState(false)
   createGameLoop({
     canvas,
     level,
@@ -26,7 +28,7 @@ function startSingle(signal: AbortSignal, canvas: HTMLCanvasElement, assets: Ass
     scoreMode: 'zen',
     getActiveColor: () => ui.get().activeColorIndex,
     setActiveColor: (i) => ui.prop('activeColorIndex').set(i),
-    getMute: () => ui.get().mute,
+    getMute: () => mute.get(),
     getPalette: () => ui.get().palette,
     assets,
     onBack: () => location.assign('/'),
@@ -75,6 +77,9 @@ async function startPackSession(
   let current = Math.max(0, pack.levelIds.indexOf(initialId ?? ''))
   let child: AbortController | null = null
   signal.addEventListener('abort', () => child?.abort())
+  // Mute is session-wide, not per-level — keep it outside `mount` so switching
+  // puzzles doesn't reset it.
+  const mute = funState(false)
 
   const mount = (index: number, pushUrl: boolean): void => {
     const level = getLevel(index)
@@ -96,7 +101,7 @@ async function startPackSession(
       scoreMode: 'zen',
       getActiveColor: () => ui.get().activeColorIndex,
       setActiveColor: (i) => ui.prop('activeColorIndex').set(i),
-      getMute: () => ui.get().mute,
+      getMute: () => mute.get(),
       getPalette: () => ui.get().palette,
       assets,
       onPrev: index > 0 ? () => mount(index - 1, true) : undefined,

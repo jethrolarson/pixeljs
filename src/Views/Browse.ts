@@ -20,6 +20,24 @@ interface CommunityState {
   error: boolean
 }
 
+// Reset discards the current page (new sort/first load); "load more" keeps
+// it and appends once the fetch lands.
+const startLoad = (reset: boolean) => (st: CommunityState): CommunityState => ({
+  ...st,
+  loading: true,
+  error: false,
+  ...(reset ? { packs: [], lastDoc: null } : {}),
+})
+
+const applyPage = (reset: boolean, res: Awaited<ReturnType<typeof getCommunityPacks>>) => (st: CommunityState): CommunityState => ({
+  packs: reset ? res.packs : [...st.packs, ...res.packs],
+  lastDoc: res.lastDoc,
+  loading: false,
+  error: false,
+})
+
+const applyLoadError = (st: CommunityState): CommunityState => ({ ...st, loading: false, error: true })
+
 export const Browse: Component = (signal) => {
   const user = getUser(signal)
   const getUid = () => user.get()?.uid ?? null
@@ -31,20 +49,24 @@ export const Browse: Component = (signal) => {
   const sort = funState<Sort>('upvotes')
   const community = funState<CommunityState>({ packs: [], lastDoc: null, loading: false, error: false })
 
+  // Sort-change and "load more" can both be in flight at once; a stale response
+  // arriving after a newer one would otherwise clobber it (e.g. an in-flight
+  // "load more" resolving after a sort reset would append last page's packs onto
+  // the new sort's freshly-reset list). requestId tags each call so only the
+  // most recent one's response is applied.
+  let requestId = 0
   const loadCommunity = async (reset: boolean): Promise<void> => {
-    community.mod((st) => ({ ...st, loading: true, error: false, ...(reset ? { packs: [], lastDoc: null } : {}) }))
+    const id = ++requestId
+    const after = reset ? undefined : community.get().lastDoc ?? undefined
+    community.mod(startLoad(reset))
     try {
-      const after = reset ? undefined : community.get().lastDoc ?? undefined
       const res = await getCommunityPacks(sort.get(), after)
-      community.mod((st) => ({
-        packs: reset ? res.packs : [...st.packs, ...res.packs],
-        lastDoc: res.lastDoc,
-        loading: false,
-        error: false,
-      }))
+      if (id !== requestId) return
+      community.mod(applyPage(reset, res))
     } catch (e) {
+      if (id !== requestId) return
       console.error(e)
-      community.mod((st) => ({ ...st, loading: false, error: true }))
+      community.mod(applyLoadError)
     }
   }
 

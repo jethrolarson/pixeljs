@@ -133,6 +133,14 @@ export class Level {
     return s
   }
 
+  /** True if every cell is blank ('0') — no color has been painted anywhere. */
+  isEmpty(): boolean {
+    for (let x = 0; x < this.x; x++) {
+      if (this.grid.getCol(x).some((cell) => cell !== '0')) return false
+    }
+    return true
+  }
+
   addCols(num: number): void {
     this.x += num
     this.grid.addCols(num)
@@ -159,5 +167,25 @@ export class Level {
     this.grid.subtractRows(num)
     this.paint.subtractRows(num)
     this.mark.subtractRows(num)
+  }
+
+  /**
+   * Drop palette color at 0-based `index`. Cells painted with that color clear
+   * to blank ('0'); cells above it shift down to follow the palette splice.
+   * Caller is responsible for removing the color from `this.palette` itself.
+   */
+  removeColor(index: number): void {
+    const colorIndex = index + 1
+    const remap = (cell: string): string => {
+      const n = parseInt(cell, 10)
+      if (n === colorIndex) return '0'
+      return n > colorIndex ? String(n - 1) : cell
+    }
+    for (let x = 0; x < this.x; x++) {
+      for (let y = 0; y < this.y; y++) {
+        this.grid.setAt(x, y, remap(this.grid.getAt(x, y)))
+        this.paint.setAt(x, y, remap(this.paint.getAt(x, y)))
+      }
+    }
   }
 }

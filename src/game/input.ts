@@ -28,13 +28,23 @@ export interface PointerSource {
 export function createPointer(canvas: HTMLCanvasElement, signal: AbortSignal): PointerSource {
   const state: Pointer = { x: 0, y: 0, pressed: false, button: 'left', newlyPressed: false }
   const opts = { signal }
-  canvas.addEventListener('mousemove', (e) => { state.x = e.clientX; state.y = e.clientY }, opts)
-  canvas.addEventListener('mousedown', (e) => {
+  // Pointer events unify mouse and touch. touch-action: none keeps the browser
+  // from claiming touch drags for pan/zoom, so they arrive as pointermove and
+  // paint cells instead of scrolling the page.
+  canvas.style.touchAction = 'none'
+  canvas.addEventListener('pointermove', (e) => { state.x = e.clientX; state.y = e.clientY }, opts)
+  canvas.addEventListener('pointerdown', (e) => {
+    // Touch has no hover: the press itself must establish the position.
+    state.x = e.clientX
+    state.y = e.clientY
     state.pressed = true
     state.button = e.button === 2 ? 'right' : 'left'
     state.newlyPressed = true
+    canvas.setPointerCapture(e.pointerId)
   }, opts)
-  canvas.addEventListener('mouseup', () => { state.pressed = false }, opts)
+  const release = (): void => { state.pressed = false }
+  canvas.addEventListener('pointerup', release, opts)
+  canvas.addEventListener('pointercancel', release, opts)
   canvas.addEventListener('contextmenu', (e) => e.preventDefault(), opts)
 
   return {

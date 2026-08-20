@@ -40,6 +40,24 @@ export const hiddenColorInput = style({
   opacity: 0,
 })
 
+// Small "×" overlaid on the top-right corner of an edit-mode swatch.
+export const removeButton = style({
+  position: 'absolute',
+  top: -1,
+  right: -1,
+  width: 12,
+  height: 12,
+  lineHeight: '10px',
+  fontSize: 10,
+  padding: 0,
+  fontFamily: mono,
+  background: term.bg,
+  color: '#ff4d4d',
+  border: '1px solid #ff4d4d',
+  borderRadius: 0,
+  cursor: 'pointer',
+})
+
 export const addButton = style({
   width: 24,
   height: 24,

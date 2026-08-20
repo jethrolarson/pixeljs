@@ -54,8 +54,9 @@ export interface ProjectOpts {
   golf?: string | null
   /** Currently selected paint color (1-based), for the play-mode palette strip. */
   activeColorIndex?: number
-  /** Most-recently painted cell + its pop progress (1 = fresh, 0 = settled). */
-  pop?: { x: number; y: number; t: number } | null
+  /** Mark tool engaged: presses mark cells as known-empty (the touch-friendly
+   *  stand-in for right-click). Shown as an X swatch beside the palette. */
+  markTool?: boolean
   /** Show the `>` next-puzzle hotkey (only when a next level exists). */
   hasNext?: boolean
   /** Show the `<` previous-puzzle hotkey (only when a previous level exists). */
@@ -105,8 +106,12 @@ export function projectPuzzle(o: ProjectOpts): CellBuffer {
       const color = paletteColor(palette, i + 1)
       const col = layout.paletteCol + i
       buf.set(col, layout.paletteRow, { glyph: FULL, fg: color, bg: color })
-      if (i + 1 === o.activeColorIndex) buf.set(col, layout.paletteRow + 1, { glyph: '^', fg: chrome.text })
+      if (!o.markTool && i + 1 === o.activeColorIndex) buf.set(col, layout.paletteRow + 1, { glyph: '^', fg: chrome.text })
     }
+    // Mark tool swatch: one gap after the colors; caret moves here when engaged.
+    const markCol = layout.paletteCol + palette.length + 1
+    buf.set(markCol, layout.paletteRow, { glyph: MARK, fg: o.markTool ? chrome.text : chrome.dim })
+    if (o.markTool) buf.set(markCol, layout.paletteRow + 1, { glyph: '^', fg: chrome.text })
   }
   // Puzzle title under the grid; golf result replaces it once solved.
   buf.text(layout.boxLeft, layout.nameRow, o.solved && o.golf ? o.golf : level.title, o.solved ? chrome.solved : chrome.name)
@@ -153,18 +158,16 @@ export function projectPuzzle(o: ProjectOpts): CellBuffer {
   // Interior puzzle cells. When solved with reward art, leave the interior empty
   // — the loop draws the art (possibly 2×) over it.
   const showArt = mode === 'play' && o.solved && !!level.art
-  const popScale = o.pop ? 1 + 0.45 * o.pop.t : 1
   for (let gx = 0; gx < level.x && !showArt; gx++) {
     for (let gy = 0; gy < level.y; gy++) {
       const col = layout.gridCol + gx
       const row = layout.gridRow + gy
       const solVal = level.grid.getAt(gx, gy)
-      const fresh = o.pop && o.pop.x === gx && o.pop.y === gy ? popScale : undefined
 
       if (mode === 'edit' || o.reveal) {
         if (solVal !== '0') {
           const c = paletteColor(palette, parseInt(solVal))
-          buf.set(col, row, { glyph: FULL, fg: c, bg: c, scale: fresh })
+          buf.set(col, row, { glyph: FULL, fg: c, bg: c })
         } else if (o.underlay) {
           // Faint puzzle solution behind the (empty) art cell, for tracing.
           const u = o.underlay
@@ -180,9 +183,9 @@ export function projectPuzzle(o: ProjectOpts): CellBuffer {
         if (paintVal === solVal || !o.revealErrors) {
           // Correct, or zen mode (errors hidden): show the painted color.
           const c = paletteColor(palette, parseInt(paintVal))
-          buf.set(col, row, { glyph: FULL, fg: c, bg: c, scale: fresh })
+          buf.set(col, row, { glyph: FULL, fg: c, bg: c })
         } else {
-          buf.set(col, row, { glyph: WRONG, fg: chrome.red, scale: fresh })
+          buf.set(col, row, { glyph: WRONG, fg: chrome.red })
         }
       } else if (markVal !== '0') {
         buf.set(col, row, { glyph: MARK, fg: chrome.dim })

@@ -8,6 +8,8 @@ import { projectPuzzle, projectSolvedArt, Underlay, MENU_HELP_COL, MENU_BACK_COL
 import { projectHelp } from './term/help'
 import { projectPackMenu, PackMenuItem } from './term/packmenu'
 import { drawBuffer, drawStipple, TermMetrics } from './term/termrender'
+import { winChaseAnim } from './term/winfx'
+import { play, tick, clearAnims, easings } from './term/anim'
 import { chrome } from './term/glyphs'
 
 export interface Assets {
@@ -95,7 +97,9 @@ export function createGameLoop(cfg: GameLoopConfig): GameLoop {
   let won = false
   let endTime: Date | null = null
   let startTime = new Date()
-  let pop: { x: number; y: number; time: number } | null = null
+  // Latest freshly-painted cell; frame() edge-spawns a scale-pop anim for it.
+  let lastPaint: { x: number; y: number; time: number } | null = null
+  let popSpawned = 0
   // Keyboard cursor (play): a selected cell, shown once a key is used and hidden
   // again on mouse move so whichever input you last touched is what's displayed.
   let cursor: GridPos | null = null
@@ -105,6 +109,10 @@ export function createGameLoop(cfg: GameLoopConfig): GameLoop {
   // dismissing the modal doesn't paint the cell underneath.
   let helpOpen = false
   let suppressPaintUntilRelease = false
+  // Mark tool (play): presses mark cells as known-empty — the touch-friendly
+  // right-click. Toggled by the X swatch beside the palette; picking a color
+  // switches back to painting.
+  let markTool = false
   // Pack picker (play, in a session): selection cursor + last-rendered geometry
   // for click hit-testing. Modal like the help guide.
   let pickerOpen = false
@@ -148,7 +156,7 @@ export function createGameLoop(cfg: GameLoopConfig): GameLoop {
         const correct = level.grid.getAt(c.x, c.y) === v
         // Zen: a single neutral tone so audio can't leak correctness either.
         playSound(scoreMode === 'zen' ? 'bing' : correct ? 'bing' : 'boom')
-        pop = { x: c.x, y: c.y, time: Date.now() }
+        lastPaint = { x: c.x, y: c.y, time: Date.now() }
       }
     }
     const eraseCursor = (): void => {
@@ -328,15 +336,21 @@ export function createGameLoop(cfg: GameLoopConfig): GameLoop {
         suppressPaintUntilRelease = true
       } else if (charRow === layout.paletteRow && i >= 0 && i < palette.length) {
         cfg.setActiveColor?.(i + 1)
+        markTool = false
+        suppressPaintUntilRelease = true
+      } else if (charRow === layout.paletteRow && i === palette.length + 1) {
+        markTool = !markTool
         suppressPaintUntilRelease = true
       }
     }
 
     if (!helpOpen && !pickerOpen && !suppressPaintUntilRelease && !complete && ptr.pressed && within) {
-      const sound = applyPointer(level, mode, cfg.getActiveColor(), ptr, pos, interaction)
+      // Mark tool routes presses through the right-button (mark) path.
+      const effective = mode === 'play' && markTool ? { ...ptr, button: 'right' as const } : ptr
+      const sound = applyPointer(level, mode, cfg.getActiveColor(), effective, pos, interaction)
       // Zen: collapse the correct/wrong tones into one neutral tap.
       playSound(scoreMode === 'zen' && sound === 'boom' ? 'bing' : sound)
-      if (sound === 'bing' || sound === 'boom') pop = { x: pos.x, y: pos.y, time: now }
+      if (sound === 'bing' || sound === 'boom') lastPaint = { x: pos.x, y: pos.y, time: now }
     }
     pointer.afterFrame()
 
@@ -344,11 +358,23 @@ export function createGameLoop(cfg: GameLoopConfig): GameLoop {
       won = true
       endTime = new Date()
       playSound('win')
+      play(winChaseAnim())
       cfg.onSolved?.()
     }
 
-    const popT = pop ? Math.max(0, 1 - (now - pop.time) / POP_MS) : 0
-    if (pop && popT <= 0) pop = null
+    // Edge-spawn a scale-pop anim for the most recent paint (grid → buffer coords).
+    if (lastPaint && lastPaint.time !== popSpawned) {
+      popSpawned = lastPaint.time
+      const c = layout.gridCol + lastPaint.x
+      const r = layout.gridRow + lastPaint.y
+      play({
+        key: 'pop',
+        dur: POP_MS,
+        ease: easings.outCubic,
+        cells: [{ c, r }],
+        apply: (_cell, { u }) => ({ scale: 1 + 0.45 * (1 - u) }),
+      })
+    }
 
     const score = mode === 'play' ? computeScore(level) : 0
     const sat = mode === 'play' ? clueSatisfaction(level, hints) : null
@@ -371,12 +397,13 @@ export function createGameLoop(cfg: GameLoopConfig): GameLoop {
       revealErrors: scoreMode === 'faults',
       golf,
       activeColorIndex: cfg.getActiveColor(),
-      pop: pop ? { x: pop.x, y: pop.y, t: popT } : null,
+      markTool,
       hasNext: !!cfg.onNext,
       hasPrev: !!cfg.onPrev,
       hasPack: !!cfg.packMenu,
       underlay: cfg.underlay,
     })
+    tick(buffer, now)
     drawBuffer(ctx, buffer, layout)
 
     // Reward art replaces the puzzle interior once solved (its own palette, drawn
@@ -442,13 +469,15 @@ export function createGameLoop(cfg: GameLoopConfig): GameLoop {
     startTime = new Date()
     won = false
     endTime = null
-    pop = null
+    lastPaint = null
+    popSpawned = 0
+    clearAnims()
     stop()
-    const tick = (): void => {
-      rafId = requestAnimationFrame(tick)
+    const frameTick = (): void => {
+      rafId = requestAnimationFrame(frameTick)
       frame()
     }
-    rafId = requestAnimationFrame(tick)
+    rafId = requestAnimationFrame(frameTick)
   }
 
   const stop = (): void => {
