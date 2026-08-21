@@ -16,12 +16,16 @@ import { btn, empty, page } from '../theme.css'
 import * as cardStyles from '../components/PackCard.css'
 import * as styles from './Pack.css'
 
-// Solved art is spoiler-free by design: only shown once the level is beaten,
-// so browsing a pack never gives away an unsolved puzzle's answer.
+// Spoiler-free: only shown once the level is beaten, so browsing a pack
+// never gives away an unsolved puzzle's answer. Prefers the level's reward
+// art; falls back to the finished puzzle grid itself when there is none.
 const levelThumb = (level: LevelData | null, solved: boolean): PackIcon | null => {
-  if (!level?.art || !solved) return null
-  const { scale, palette, data } = level.art
-  return { x: (level.x ?? 0) * scale, y: (level.y ?? 0) * scale, game: data, palette }
+  if (!level || !solved) return null
+  if (level.art) {
+    const { scale, palette, data } = level.art
+    return { x: (level.x ?? 0) * scale, y: (level.y ?? 0) * scale, game: data, palette }
+  }
+  return { x: level.x ?? 0, y: level.y ?? 0, game: level.game ?? '', palette: level.palette ?? [] }
 }
 
 const hero = (signal: AbortSignal, pack: PackData, user: User | null): Element => {
