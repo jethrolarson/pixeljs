@@ -93,7 +93,9 @@ export const Pack: Component = (signal) => {
         (async () => {
           const ls = await Promise.all(pack.levelIds.map((lid) => getLevelById(lid)))
           const uid = currentUser()?.uid
-          const solvedIds = uid ? await getSolvedLevelIds(pack.levelIds, uid) : new Set<string>()
+          // Solved status is a nice-to-have overlay on the level list, not part
+          // of it — a lookup failure here must never take the list down with it.
+          const solvedIds = uid ? await getSolvedLevelIds(pack.levelIds, uid).catch(() => new Set<string>()) : new Set<string>()
           return { levels: ls, solvedIds }
         })(),
       )

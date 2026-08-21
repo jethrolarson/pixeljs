@@ -5,7 +5,7 @@ import { globalStyle, style } from '@vanilla-extract/css'
 // the in-game canvas. Shared with `canvasPage.css.ts` via the same values.
 export const colors = {
   bg: "#0d0d0d",
-  textInverse: "000",
+  textInverse: "#000",
   panel: "#121212",
   panelHover: "#1a1a1a",
   text: "#cccccc",
