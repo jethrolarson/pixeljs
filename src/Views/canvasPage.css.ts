@@ -21,52 +21,61 @@ export const term = {
 
 export const canvas = style({ display: 'block', background: term.bg })
 
+// Positions the DOM Palette (a plain in-flow panel by itself) as a floating
+// overlay in the corner of the fullscreen canvas — canvas-page-specific, so
+// it lives here rather than in Palette's own stylesheet.
+export const paletteOverlay = style({ position: 'fixed', left: 8, bottom: 8 })
+
 export const menu = style({
-  position: 'fixed',
+  position: "fixed",
   left: 8,
   top: 8,
-  padding: '8px 10px',
+  padding: "8px 10px",
   width: 160,
   background: term.panel,
-  border: `1px solid ${term.dim}`,
-  fontFamily: mono,
-  fontSize: 13,
+  border: `4px solid ${term.dim}`,
+  fontFamily: "inherit",
+  fontSize: 20,
   color: term.text,
-})
+});
 
 export const backLink = style({
-  display: 'block',
-  fontFamily: mono,
+  display: "block",
+  fontFamily: "inherit",
   color: term.name,
-  textDecoration: 'none',
+  textDecoration: "none",
   marginBottom: 8,
-  selectors: { '&:hover': { color: '#aef6f6' } },
-})
+  selectors: { "&:hover": { color: "#aef6f6" } },
+});
 
 export const field = style({ padding: '4px 0' })
 
 // Terminal-styled form controls for the editor chrome.
 export const termInput = style({
-  fontFamily: mono,
+  fontFamily: "inherit",
   background: term.bg,
   color: term.text,
-  border: `1px solid ${term.dim}`,
+  border: `4px solid ${term.dim}`,
   borderRadius: 0,
-  padding: '3px 6px',
-  selectors: { '&:focus': { outline: 'none', borderColor: term.accent } },
-})
+  padding: "3px 6px",
+  selectors: { "&:focus": { outline: "none", borderColor: term.accent } },
+});
 
-export const termLabel = style({ fontFamily: mono, color: term.dim, fontSize: 12 })
+export const termLabel = style({
+  fontFamily: "inherit",
+  color: term.dim,
+  fontSize: 20,
+});
 
 export const termBtn = style({
-  fontFamily: mono,
-  display: 'inline-block',
+  fontFamily: "inherit",
+  display: "inline-block",
   background: term.bg,
   color: term.green,
-  border: `1px solid ${term.green}`,
+  border: `4px solid ${term.green}`,
   borderRadius: 0,
-  padding: '3px 10px',
-  cursor: 'pointer',
-  textDecoration: 'none',
-  selectors: { '&:hover': { background: '#16240a', color: '#7ad400' } },
-})
+  padding: "3px 10px",
+  cursor: "pointer",
+  textDecoration: "none",
+  selectors: { "&:hover": { background: "#16240a", color: "#7ad400" } },
+});

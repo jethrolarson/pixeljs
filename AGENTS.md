@@ -18,6 +18,8 @@ Avoid type assertions in typescript where practical. Be a good dev.
 
 Prefer arrow functions, drop blocks where unneeded.
 
+Comments: Express meaning through decomposition and names--not narrative comments. Document only unobvious "why".
+
 ## Prompting
 
 1. Prompt is _for_ an agent. Write for and understand intended agent's knowledge and capability and _trust_ them appropriately.

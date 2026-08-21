@@ -16,14 +16,14 @@ export const grid = style({
 export const card = style({ width: 160 })
 
 export const thumbLink = style({
-  display: 'block',
+  display: "block",
   width: 160,
   height: 160,
   borderRadius: 0,
-  overflow: 'hidden',
-  border: `1px solid ${colors.border}`,
+  overflow: "hidden",
+  border: `4px solid ${colors.border}`,
   background: colors.panel,
-})
+});
 
 export const thumb = style({
   width: '100%',

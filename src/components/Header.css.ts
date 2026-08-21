@@ -18,13 +18,13 @@ export const hidden = style({
 })
 
 export const tab = style({
-  padding: '5px 14px',
+  padding: "5px 14px",
   color: colors.textDim,
-  textDecoration: 'none',
+  textDecoration: "none",
   borderRadius: 0,
-  fontSize: 14,
-  ':hover': { color: colors.textBright, background: colors.panelHover },
-})
+  fontSize: 20,
+  ":hover": { color: colors.textBright, background: colors.panelHover },
+});
 
 export const tabActive = style({
   color: colors.textBright,

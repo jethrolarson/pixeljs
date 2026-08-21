@@ -1,18 +1,17 @@
 import { funState, FunState, mapRead } from '@fun-land/fun-state'
-import { Component, h, hx, enhance, attr, bindView } from '@fun-land/fun-web'
+import { Component, h, hx, bindView } from '@fun-land/fun-web'
 import { PackData } from '../pack'
 import { getPublishedPacks, setPackFeatured, isModerator } from '../packStore'
 import { getUser } from '../services/getUser'
 import { getModerator } from '../services/getModerator'
 import { Header } from '../components/Header'
+import { renderPixelIcon } from '../components/PixelIcon'
 import { empty, page } from '../theme.css'
 import * as styles from './Admin.css'
 
 type Apply = (id: string, featured: boolean, order: number) => Promise<void>
 
 const row = (signal: AbortSignal, pack: PackData, apply: Apply): Element => {
-  const icons = pack.icons.slice(0, 4).join('') || '🧩'
-
   const orderInput = hx('input', {
     signal,
     props: { type: 'number', value: String(pack.featuredOrder ?? 0), disabled: !pack.featured, className: styles.orderInput },
@@ -25,7 +24,7 @@ const row = (signal: AbortSignal, pack: PackData, apply: Apply): Element => {
     on: { change: (e) => void apply(pack.id!, e.currentTarget.checked, parseInt(orderInput.value || '0', 10)) },
   })
 
-  const cover = enhance(h('div', { className: styles.cover }, [icons]), attr('style', `background:${pack.color}`))
+  const cover = h('div', { className: styles.cover }, [renderPixelIcon(pack.icon, 40)])
 
   return h('div', { className: styles.row }, [
     cover,

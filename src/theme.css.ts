@@ -27,18 +27,20 @@ export const mono = 'Menlo, Monaco, Consolas, "DejaVu Sans Mono", monospace'
 
 globalStyle('*, *::before, *::after', { boxSizing: 'border-box' })
 
-globalStyle('html', {
+globalStyle("html", {
   backgroundColor: colors.bg,
-  minHeight: '100%',
-})
+  minHeight: "100%",
+});
 
-globalStyle('body', {
+globalStyle("body", {
   margin: 0,
-  fontSize: 15,
-  fontFamily: mono,
+  fontSize: 20,
   lineHeight: 1.4,
   color: colors.text,
-})
+  fontFamily: '"Tiny5", sans-serif',
+  fontWeight: 400,
+  fontStyle: "normal",
+});
 
 globalStyle('a', { color: colors.link, textDecoration: 'none' })
 globalStyle('a:hover', { color: colors.linkHover })
@@ -50,11 +52,11 @@ globalStyle('button, input, select, textarea', {
 
 globalStyle('input[type="text"], input[type="number"], textarea, select', {
   borderRadius: 0,
-  border: `1px solid ${colors.borderInput}`,
-  padding: '4px 8px',
+  border: `4px solid ${colors.borderInput}`,
+  padding: "4px 8px",
   background: colors.bg,
   color: colors.textBright,
-})
+});
 
 globalStyle('input:focus, textarea:focus, select:focus', {
   outline: 'none',
@@ -62,22 +64,26 @@ globalStyle('input:focus, textarea:focus, select:focus', {
 })
 
 export const btn = style({
-  display: 'inline-block',
-  padding: '5px 12px',
+  display: "inline-block",
+  padding: "5px 12px",
   borderRadius: 0,
-  border: `1px solid ${colors.borderInput}`,
+  border: `4px solid ${colors.borderInput}`,
   background: colors.panel,
   color: colors.text,
-  fontFamily: mono,
-  fontSize: 13,
+  fontFamily: "inherit",
+  fontSize: 20,
   lineHeight: 1.4,
-  textDecoration: 'none',
-  cursor: 'pointer',
-  ':hover': { background: colors.panelHover, color: colors.textBright, borderColor: colors.text },
-  selectors: {
-    '&:disabled': { opacity: 0.5, cursor: 'default' },
+  textDecoration: "none",
+  cursor: "pointer",
+  ":hover": {
+    background: colors.panelHover,
+    color: colors.textBright,
+    borderColor: colors.text,
   },
-})
+  selectors: {
+    "&:disabled": { opacity: 0.5, cursor: "default" },
+  },
+});
 
 // Primary/affirmative action — green-on-dark, matching the canvas action accent.
 export const btnPrimary = style({
@@ -101,10 +107,10 @@ export const page = style({
 })
 
 export const headerBar = style({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  padding: '16px 0',
-  borderBottom: `1px solid ${colors.border}`,
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  padding: "16px 0",
+  borderBottom: `4px solid ${colors.border}`,
   marginBottom: 24,
-})
+});

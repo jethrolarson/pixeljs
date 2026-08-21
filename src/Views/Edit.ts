@@ -11,7 +11,7 @@ import { Palette } from "../components/Palette";
 import { ArtControls } from "../components/ArtControls";
 import { NumField } from "../components/NumField";
 import { ToastHost } from "../components/ToastHost";
-import { showToast } from "../services/toast";
+import { showToast } from "../toast";
 import { termBtn } from "./canvasPage.css";
 import * as styles from "./canvasPage.css";
 import * as edit from "./Edit.css";
@@ -38,12 +38,21 @@ const levelToData = (level: Level, ui: FunState<Ui>): LevelData => ({
 export const Edit: Component = (signal) => {
   const canvas = h("canvas", { id: "canvas", className: styles.canvas });
   const menuSlot = h("div", { className: styles.menu }, []);
-  const paletteSlot = h("div", {}, []);
+  const paletteSlot = h("div", { className: styles.paletteOverlay }, []);
 
   const params = new URLSearchParams(location.search);
   let currentId: string | null = params.get("id");
   const returnPackId = params.get("pack");
   const user = getUser(signal);
+
+  // Levels are only ever created from inside a pack (PackEdit's "+ Create new
+  // level" saves the pack first, then links here with ?pack=). Editing an
+  // existing level (?id=) is always fine, pack or not — this only blocks
+  // creating new loose ones.
+  if (!currentId && !returnPackId) {
+    location.href = "/pack-edit.html";
+    return h("div", {}, []);
+  }
 
   (async () => {
     const data =

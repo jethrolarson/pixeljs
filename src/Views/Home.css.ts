@@ -9,7 +9,7 @@ export const sectionHeader = style({
 })
 
 export const sectionTitle = style({
-  fontSize: 16,
+  fontSize: 20,
   color: colors.textBright,
   margin: 0,
-})
+});

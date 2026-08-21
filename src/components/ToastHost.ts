@@ -1,5 +1,5 @@
 import { Component, h, bindView } from '@fun-land/fun-web'
-import { toastState } from '../services/toast'
+import { toastState } from '../toast'
 import * as styles from './ToastHost.css'
 
 /** Renders the current toast stack. Mount once per page; `showToast` (from

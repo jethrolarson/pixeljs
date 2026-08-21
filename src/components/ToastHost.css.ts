@@ -13,13 +13,13 @@ export const host = style({
 })
 
 export const toast = style({
-  padding: '8px 12px',
+  padding: "8px 12px",
   background: colors.panel,
-  border: `1px solid ${colors.borderInput}`,
+  border: `4px solid ${colors.borderInput}`,
   color: colors.text,
-  fontFamily: mono,
-  fontSize: 13,
-})
+  fontFamily: "inherit",
+  fontSize: 20,
+});
 
 export const info = style({ borderColor: colors.green, color: colors.greenHover })
 

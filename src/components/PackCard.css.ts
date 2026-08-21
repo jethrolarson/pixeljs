@@ -4,44 +4,38 @@ import { colors } from '../theme.css'
 export const card = style({ width: 160 })
 
 export const cover = style({
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
   width: 160,
   height: 160,
-  border: `1px solid ${colors.border}`,
-  textDecoration: 'none',
-  transition: 'opacity 0.15s',
-  ':hover': { opacity: 0.85 },
-})
-
-export const icons = style({
-  fontSize: 48,
-  lineHeight: 1,
-  textAlign: 'center',
-  filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.4))',
-})
+  background: colors.bg,
+  border: `8px solid ${colors.border}`,
+  textDecoration: "none",
+  transition: "opacity 0.15s",
+  ":hover": { opacity: 0.85 },
+});
 
 export const info = style({ padding: '8px 2px' })
 
 export const titleLink = style({
-  display: 'block',
+  display: "block",
   color: colors.textBright,
-  fontSize: 13,
-  fontWeight: 'bold',
-  textDecoration: 'none',
-  whiteSpace: 'nowrap',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
+  fontSize: 20,
+  fontWeight: "bold",
+  textDecoration: "none",
+  whiteSpace: "nowrap",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
   marginBottom: 2,
-  ':hover': { color: '#fff' },
-})
+  ":hover": { color: "#fff" },
+});
 
 export const meta = style({
-  fontSize: 11,
+  fontSize: 20,
   color: colors.textDim,
   marginBottom: 6,
-})
+});
 
 export const cardActions = style({ display: 'flex', gap: 4 })
 

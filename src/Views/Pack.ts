@@ -1,6 +1,6 @@
 import { User } from 'firebase/auth'
 import { funState, mapRead } from '@fun-land/fun-state'
-import { Component, h, enhance, attr, bindView } from '@fun-land/fun-web'
+import { Component, h, bindView } from '@fun-land/fun-web'
 import { PackData } from '../pack'
 import { LevelData } from '../level'
 import { getPackById, upvotePack, hasUpvoted } from '../packStore'
@@ -9,13 +9,13 @@ import { getUser } from '../services/getUser'
 import { getModerator } from '../services/getModerator'
 import { signIn } from '../auth'
 import { Header } from '../components/Header'
+import { renderPixelIcon } from '../components/PixelIcon'
 import { upvoteButton } from '../components/UpvoteButton'
 import { Loadable, loading, loadInto, bindLoadable } from '../components/Async'
 import { btn, empty, page } from '../theme.css'
 import * as styles from './Pack.css'
 
 const hero = (signal: AbortSignal, pack: PackData, user: User | null): Element => {
-  const iconStr = pack.icons.slice(0, 4).join('') || '🧩'
   const isOwner = user?.uid === pack.ownerId
 
   const voted = funState(false)
@@ -32,10 +32,7 @@ const hero = (signal: AbortSignal, pack: PackData, user: User | null): Element =
   ]
   if (isOwner) actions.push(h('a', { href: `/pack-edit.html?id=${pack.id}`, className: btn }, ['Edit']))
 
-  const cover = enhance(
-    h('div', { className: styles.heroCover }, [iconStr]),
-    attr('style', `background:${pack.color}`),
-  )
+  const cover = h('div', { className: styles.heroCover }, [renderPixelIcon(pack.icon, 120)])
 
   const infoChildren: Element[] = [
     h('h2', { className: styles.heroTitle }, [pack.title]),
