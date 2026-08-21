@@ -1,4 +1,5 @@
 import { FONT8X8, GLYPH_PX } from './font8x8'
+import { COMPACT_DIGIT_ROWS } from './digitsCompact'
 
 /**
  * Crisp 8×8 bitmap glyphs from the public-domain IBM-VGA/CP437 ROM font. Masks
@@ -23,6 +24,8 @@ export interface InkBounds {
 /** Rows for chars we use that fall outside ASCII 0x00–0x7F. */
 function syntheticRows(ch: string): number[] | null {
   if (ch === '·') return [0, 0, 0, 0x18, 0x18, 0, 0, 0] // centered 2×2 dot
+  const code = ch.charCodeAt(0)
+  if (code >= 0xe030 && code <= 0xe039) return COMPACT_DIGIT_ROWS[String(code - 0xe030)]
   return null
 }
 

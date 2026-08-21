@@ -1,6 +1,7 @@
 import { CellBuffer, Cell } from './cellbuffer'
 import { FULL, TL, TR, BL, BR, H, V, DH, DV, DTL, DTR, DBL, DBR, GEOMETRIC } from './glyphs'
 import { tintedGlyph, glyphInk, GLYPH_PX } from './glyphatlas'
+import { compactDigitChar } from './digitsCompact'
 
 /** Where the character grid lands on the canvas. */
 export interface TermMetrics {
@@ -56,19 +57,39 @@ function drawCell(ctx: CanvasRenderingContext2D, cell: Cell, x: number, y: numbe
     drawGeometric(ctx, g, x, y, cellW, cellH)
     return
   }
+  const n = g.length
+  const vRef = 3.5 // cap/digit band center, in 0..8 glyph coords
+
+  // A multi-digit clue count (e.g. "12") gets its own narrower glyph set
+  // (see digitsCompact.ts) so both digits draw at full single-glyph height,
+  // packed edge-to-edge by ink width, instead of being squeezed to fit one
+  // 8px-wide cell and stretched vertically to compensate.
+  if (n > 1 && /^[0-9]+$/.test(g)) {
+    const dh = cellH * 0.8
+    const scale = dh / GLYPH_PX
+    const gap = scale // 1 source px of spacing between digits
+    const chars = [...g].map(compactDigitChar)
+    const inks = chars.map(glyphInk)
+    const totalW = inks.reduce((sum, ink) => sum + (ink.x1 - ink.x0 + 1) * scale, 0) + gap * (chars.length - 1)
+    let cx = x + (cellW - totalW) / 2
+    const dy = y + cellH / 2 - (vRef / GLYPH_PX) * dh
+    for (let k = 0; k < chars.length; k++) {
+      const ink = inks[k]
+      const dx = cx - ink.x0 * scale
+      ctx.drawImage(tintedGlyph(chars[k], cell.fg), 0, 0, GLYPH_PX, GLYPH_PX, dx, dy, GLYPH_PX * scale, dh)
+      cx += (ink.x1 - ink.x0 + 1) * scale + gap
+    }
+    return
+  }
+
   // Text: blit one bitmap glyph per char at ~80% cell size. Glyph ink widths
   // vary (e.g. "0" is 7px, "5" is 6px), so center each by its ink box for true
   // horizontal centering; keep a fixed vertical reference (the cap band, rows
   // 0–6) so letters in a word share a baseline instead of bouncing.
-  const n = g.length
   const cw = cellW / n
-  // Square glyph box, capped by whichever axis is tighter — when a multi-char
-  // glyph (e.g. a two-digit clue) is squeezed into one cell, cw shrinks below
-  // cellH and both dims must shrink together or the glyph stretches vertically.
   const size = Math.min(cw, cellH) * 0.8
   const dw = size
   const dh = size
-  const vRef = 3.5 // cap/digit band center, in 0..8 glyph coords
   for (let k = 0; k < n; k++) {
     const ch = g[k]
     const ink = glyphInk(ch)
