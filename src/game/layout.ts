@@ -70,8 +70,11 @@ function maxLen(groups: HintGroup[][]): number {
   return m
 }
 
-/** Pure: derive the char-grid structure and its pixel placement. */
-export function computeLayout(level: Level, mode: GameMode, hints: Hints, viewport: Viewport): Layout {
+/** Pure: derive the char-grid structure and its pixel placement.
+ * `leftInset` reserves screen space (e.g. edit mode's DOM menu overlay,
+ * which the canvas itself has no notion of) so the centered board is never
+ * placed underneath it. */
+export function computeLayout(level: Level, mode: GameMode, hints: Hints, viewport: Viewport, leftInset = 0): Layout {
   const showClues = mode === 'play'
   const rowHintCols = showClues ? Math.max(1, maxLen(hints.row)) : 0
   const colHintRows = showClues ? Math.max(1, maxLen(hints.col)) : 0
@@ -100,7 +103,8 @@ export function computeLayout(level: Level, mode: GameMode, hints: Hints, viewpo
 
   // Snap to a multiple of the glyph size so bitmap glyphs scale by an integer
   // factor (clean, even pixels).
-  const raw = Math.min(Math.floor(viewport.w / cols), Math.floor(viewport.h / rows))
+  const usableW = viewport.w - leftInset
+  const raw = Math.min(Math.floor(usableW / cols), Math.floor(viewport.h / rows))
   const cell = Math.min(MAX_CELL, Math.max(GLYPH_PX, Math.floor(raw / GLYPH_PX) * GLYPH_PX))
   const usedW = cols * cell
   const usedH = rows * cell
@@ -108,7 +112,7 @@ export function computeLayout(level: Level, mode: GameMode, hints: Hints, viewpo
   return {
     cellW: cell,
     cellH: cell,
-    originX: Math.floor((viewport.w - usedW) / 2),
+    originX: leftInset + Math.floor((usableW - usedW) / 2),
     originY: Math.floor((viewport.h - usedH) / 2),
     cols,
     rows,

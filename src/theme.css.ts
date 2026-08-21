@@ -4,22 +4,24 @@ import { globalStyle, style } from '@vanilla-extract/css'
 // so the DOM website reads as the same high-contrast character-grid surface as
 // the in-game canvas. Shared with `canvasPage.css.ts` via the same values.
 export const colors = {
-  bg: '#0d0d0d',
-  panel: '#121212',
-  panelHover: '#1a1a1a',
-  text: '#cccccc',
-  textBright: '#ffffff',
-  textDim: '#888888',
-  textFaint: '#555555',
-  border: '#333333',
-  borderInput: '#4d4d4d',
-  link: '#00d9d9', // cyan — matches puzzle-name text in the canvas
-  linkHover: '#7af6f6',
-  accent: '#00d9d9',
-  green: '#59b200', // title/action accent
-  greenHover: '#7ad400',
-  danger: '#ff5555',
-}
+  bg: "#0d0d0d",
+  textInverse: "000",
+  panel: "#121212",
+  panelHover: "#1a1a1a",
+  text: "#cccccc",
+  textBright: "#ffffff",
+  textDim: "#888888",
+  textFaint: "#555555",
+  border: "#333333",
+  borderInput: "#4d4d4d",
+  link: "#00d9d9", // cyan — matches puzzle-name text in the canvas
+  linkHover: "#7af6f6",
+  accent: "#00d9d9",
+  green: "#59b200", // title/action accent
+  greenHover: "#7ad400",
+  danger: "#f94848",
+  dangerHover: "#f98f7a",
+};
 
 // Monospace stack — the single source of truth for the website chrome, mirrored
 // from the canvas FONT_STACK.
@@ -67,17 +69,17 @@ export const btn = style({
   display: "inline-block",
   padding: "5px 12px",
   borderRadius: 0,
-  border: `4px solid ${colors.borderInput}`,
-  background: colors.panel,
-  color: colors.text,
+  border: 0,
+  background: colors.link,
+  color: colors.textInverse,
   fontFamily: "inherit",
   fontSize: 20,
   lineHeight: 1.4,
   textDecoration: "none",
   cursor: "pointer",
   ":hover": {
-    background: colors.panelHover,
-    color: colors.textBright,
+    background: colors.linkHover,
+    color: colors.textInverse,
     borderColor: colors.text,
   },
   selectors: {
@@ -87,15 +89,18 @@ export const btn = style({
 
 // Primary/affirmative action — green-on-dark, matching the canvas action accent.
 export const btnPrimary = style({
-  color: colors.green,
-  borderColor: colors.green,
-  ':hover': { background: '#16240a', color: colors.greenHover, borderColor: colors.greenHover },
-})
+  background: colors.green,
+  ":hover": {
+    background: colors.greenHover,
+  },
+});
 
 export const btnDanger = style({
-  color: colors.danger,
-  borderColor: colors.danger,
-})
+  background: colors.danger,
+  ":hover": {
+    background: colors.dangerHover,
+  },
+});
 
 export const empty = style({
   color: colors.textFaint,

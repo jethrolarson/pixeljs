@@ -18,6 +18,11 @@ export interface Assets {
   win: SoundGroup
 }
 
+// Right edge of edit mode's fixed DOM menu overlay (canvasPage.css `menu`:
+// left 8 + width 176 + border 4*2) plus a breathing-room gap, so the board
+// never centers underneath it.
+const EDIT_MENU_INSET = 208
+
 export const createAssets = (): Assets => ({
   boom: new SoundGroup('boom.wav'),
   bing: new SoundGroup('bing.wav'),
@@ -284,7 +289,7 @@ export function createGameLoop(cfg: GameLoopConfig): GameLoop {
     }
 
     const hints = computeHints(level)
-    const layout = computeLayout(level, mode, hints, { w, h })
+    const layout = computeLayout(level, mode, hints, { w, h }, mode === 'edit' ? EDIT_MENU_INSET : 0)
     const ptr = pointer.read()
     const pos = pixelToGrid(layout, ptr.x, ptr.y)
     const within = inGrid(level, pos)

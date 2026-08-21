@@ -39,14 +39,16 @@ export const Header: Component<HeaderProps> = (signal, { user, isMod }) => {
     ),
   )
 
-  return h('header', { className: headerBar }, [
-    h('h1', { className: styles.title }, [h('a', { href: '/' }, ['Pixel Puzzle'])]),
-    h('div', { className: styles.actions }, [
-      tab('/', 'Home'),
-      tab('/browse.html', 'Browse'),
-      tab('/workshop.html', 'Workshop', notSignedIn),
-      action('/admin.html', 'Admin', notMod),
+  return h("header", { className: headerBar }, [
+    h("h1", { className: styles.title }, [
+      h("a", { href: "/" }, ["Pixel Puzzle"]),
+    ]),
+    h("div", { className: styles.actions }, [
+      tab("/", "Home"),
+      tab("/browse.html", "Browse"),
+      tab("/workshop.html", "Workshop", notSignedIn),
+      tab("/admin.html", "Admin", notMod),
       authButton,
     ]),
-  ])
+  ]);
 }

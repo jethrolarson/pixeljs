@@ -45,3 +45,14 @@ export async function saveLevel(data: LevelData, ownerId: string): Promise<Level
 export async function deleteLevel(id: string): Promise<void> {
   await deleteDoc(doc(col, id))
 }
+
+export async function markLevelSolved(levelId: string, userId: string): Promise<void> {
+  await setDoc(doc(db, 'levels', levelId, 'solves', userId), { at: serverTimestamp() })
+}
+
+export async function getSolvedLevelIds(levelIds: string[], userId: string): Promise<Set<string>> {
+  const hits = await Promise.all(
+    levelIds.map((id) => getDoc(doc(db, 'levels', id, 'solves', userId)).then((snap) => (snap.exists() ? id : null))),
+  )
+  return new Set(hits.filter((id): id is string => id !== null))
+}

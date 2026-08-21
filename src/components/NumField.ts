@@ -1,5 +1,5 @@
 import { Component, hx } from "@fun-land/fun-web";
-import * as edit from "../Views/Edit.css";
+import * as styles from "./NumField.css";
 
 /** A plain get/set unit — shaped like `FunState`'s `.get()`/`.set()` without
  * requiring the reactive machinery, for values (e.g. `Level` fields) that
@@ -32,7 +32,7 @@ export const NumField: Component<NumFieldProps> = (
       min: String(min),
       max: String(max),
       value: String(value.get()),
-      className: edit.num,
+      className: styles.NumField,
     },
     on: {
       change: (e) => {

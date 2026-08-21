@@ -1,23 +1,12 @@
 import { globalStyle, style } from '@vanilla-extract/css'
 import { mono } from '../theme.css'
+import { term } from "../common/inputBase";
 
 export { mono }
 
 // Canvas pages fill the viewport with no scroll.
 globalStyle('html, body', { overflow: 'hidden', height: '100%', margin: 0 })
 globalStyle('#root', { height: '100%' })
-
-// Terminal/ANSI chrome palette — mirrors `game/term/glyphs.ts` `chrome` so the
-// DOM menu reads as part of the same character-grid surface.
-export const term = {
-  bg: '#0d0d0d',
-  panel: '#121212',
-  dim: '#4d4d4d',
-  text: '#cccccc',
-  name: '#00d9d9',
-  green: '#59b200',
-  accent: '#00d9d9',
-} as const
 
 export const canvas = style({ display: 'block', background: term.bg })
 
@@ -31,7 +20,7 @@ export const menu = style({
   left: 8,
   top: 8,
   padding: "8px 10px",
-  width: 160,
+  width: 176,
   background: term.panel,
   border: `4px solid ${term.dim}`,
   fontFamily: "inherit",

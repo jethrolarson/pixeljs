@@ -40,9 +40,8 @@ export const meta = style({
 export const cardActions = style({ display: 'flex', gap: 4 })
 
 export const voted = style({
-  color: '#f90',
-  borderColor: '#f90',
-})
+  color: "#c17606",
+});
 
 export const grid = style({
   display: 'flex',

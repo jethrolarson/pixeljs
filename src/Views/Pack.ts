@@ -1,19 +1,28 @@
 import { User } from 'firebase/auth'
 import { funState, mapRead } from '@fun-land/fun-state'
 import { Component, h, bindView } from '@fun-land/fun-web'
-import { PackData } from '../pack'
+import { PackData, PackIcon } from '../pack'
 import { LevelData } from '../level'
 import { getPackById, upvotePack, hasUpvoted } from '../packStore'
-import { getLevelById } from '../store'
+import { getLevelById, getSolvedLevelIds } from '../store'
 import { getUser } from '../services/getUser'
 import { getModerator } from '../services/getModerator'
-import { signIn } from '../auth'
+import { signIn, currentUser } from '../auth'
 import { Header } from '../components/Header'
 import { renderPixelIcon } from '../components/PixelIcon'
 import { upvoteButton } from '../components/UpvoteButton'
 import { Loadable, loading, loadInto, bindLoadable } from '../components/Async'
 import { btn, empty, page } from '../theme.css'
+import * as cardStyles from '../components/PackCard.css'
 import * as styles from './Pack.css'
+
+// Solved art is spoiler-free by design: only shown once the level is beaten,
+// so browsing a pack never gives away an unsolved puzzle's answer.
+const levelThumb = (level: LevelData | null, solved: boolean): PackIcon | null => {
+  if (!level?.art || !solved) return null
+  const { scale, palette, data } = level.art
+  return { x: (level.x ?? 0) * scale, y: (level.y ?? 0) * scale, game: data, palette }
+}
 
 const hero = (signal: AbortSignal, pack: PackData, user: User | null): Element => {
   const isOwner = user?.uid === pack.ownerId
@@ -44,23 +53,22 @@ const hero = (signal: AbortSignal, pack: PackData, user: User | null): Element =
   return h('div', { className: styles.hero }, [cover, h('div', { className: styles.heroInfo }, infoChildren)])
 }
 
-const levelList = (pack: PackData, levels: (LevelData | null)[]): Element =>
+const levelCard = (pack: PackData, level: LevelData | null, index: number, solvedIds: Set<string>): Element => {
+  if (!level) return h('div', { className: cardStyles.card }, [h('div', { className: styles.itemMissing }, ['(deleted)'])])
+  const href = `/play.html?id=${pack.levelIds[index]}&pack=${pack.id}`
+  const solved = solvedIds.has(pack.levelIds[index])
+  return h('div', { className: cardStyles.card }, [
+    h('a', { href, className: cardStyles.cover }, [renderPixelIcon(levelThumb(level, solved), 160)]),
+    h('div', { className: cardStyles.info }, [
+      h('a', { href, className: cardStyles.titleLink }, [`${index + 1}. ${level.title ?? 'Untitled'}`]),
+    ]),
+  ])
+}
+
+const levelList = (pack: PackData, levels: (LevelData | null)[], solvedIds: Set<string>): Element =>
   pack.levelIds.length === 0
     ? h('p', { className: empty }, ['No levels in this pack yet.'])
-    : h(
-        'ol',
-        { className: styles.list },
-        levels.map((level, i) =>
-          h('li', { className: styles.item }, [
-            h('span', { className: styles.num }, [String(i + 1)]),
-            level
-              ? h('a', { href: `/play.html?id=${pack.levelIds[i]}&pack=${pack.id}`, className: styles.itemTitle }, [
-                  level.title ?? 'Untitled',
-                ])
-              : h('span', { className: styles.itemMissing }, ['(deleted)']),
-          ]),
-        ),
-      )
+    : h('div', { className: cardStyles.grid }, levels.map((level, i) => levelCard(pack, level, i, solvedIds)))
 
 export const Pack: Component = (signal) => {
   const user = getUser(signal)
@@ -79,11 +87,19 @@ export const Pack: Component = (signal) => {
       if (!pack) return h('p', { className: empty }, ['Pack not found.'])
       document.title = `${pack.title} · Pixel Puzzle`
 
-      const levels = funState<Loadable<(LevelData | null)[]>>(loading())
-      loadInto(levels, Promise.all(pack.levelIds.map((lid) => getLevelById(lid))))
+      const levels = funState<Loadable<{ levels: (LevelData | null)[]; solvedIds: Set<string> }>>(loading())
+      loadInto(
+        levels,
+        (async () => {
+          const ls = await Promise.all(pack.levelIds.map((lid) => getLevelById(lid)))
+          const uid = currentUser()?.uid
+          const solvedIds = uid ? await getSolvedLevelIds(pack.levelIds, uid) : new Set<string>()
+          return { levels: ls, solvedIds }
+        })(),
+      )
 
       const heroEl = bindView(regionSignal, user, (s, u) => hero(s, pack, u))
-      const listEl = bindLoadable(regionSignal, levels, (_s, ls) => levelList(pack, ls))
+      const listEl = bindLoadable(regionSignal, levels, (_s, v) => levelList(pack, v.levels, v.solvedIds))
 
       return h('div', {}, [heroEl, h('h3', { className: styles.listHeading }, ['Levels']), listEl])
     },

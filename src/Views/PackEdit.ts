@@ -204,58 +204,6 @@ const editor = (signal: AbortSignal, user: User): Element => {
         ),
   );
 
-  // --- Level search ---
-  const searchInput = hx("input", {
-    signal,
-    props: { className: styles.input, placeholder: "Search your levels…" },
-    bind: { value: query },
-    on: { input: (e) => query.set(e.currentTarget.value) },
-  });
-
-  const searchResults = bindView(signal, query, (s, q) => {
-    const term = q.trim().toLowerCase();
-    const taken = form.get().levelIds;
-    if (taken.length >= MAX_PACK_LEVELS)
-      return h("div", { className: styles.levelResults }, [
-        h("div", { className: styles.emptyLevels }, [
-          `Pack is full (${MAX_PACK_LEVELS} levels max).`,
-        ]),
-      ]);
-    const matches = term
-      ? allMyLevels
-          .filter(
-            (l) =>
-              !taken.includes(l.id!) &&
-              (l.title ?? "").toLowerCase().includes(term),
-          )
-          .slice(0, 10)
-      : [];
-    if (matches.length === 0) return h("div", {});
-    return h(
-      "div",
-      { className: styles.levelResults },
-      matches.map((l) =>
-        hx(
-          "div",
-          {
-            signal: s,
-            props: { className: styles.levelResult },
-            on: {
-              click: () => {
-                form.prop("levelIds").mod((ids) => [...ids, l.id!]);
-                query.set("");
-              },
-            },
-          },
-          [
-            h("span", {}, [l.title ?? "Untitled"]),
-            h("span", { className: styles.addLabel }, ["+ Add"]),
-          ],
-        ),
-      ),
-    );
-  });
-
   // --- Buttons ---
   const saveBtn = hx(
     "button",
@@ -408,7 +356,6 @@ const editor = (signal: AbortSignal, user: User): Element => {
         ]),
       ),
       levelList,
-      group("Add an existing level", searchInput, searchResults),
       h("div", { className: styles.formGroup }, [newLevelBtn]),
       h("div", { className: styles.formActions }, [
         saveBtn,

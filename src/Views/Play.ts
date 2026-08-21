@@ -1,11 +1,17 @@
 import { funState } from '@fun-land/fun-state'
 import { Component, h } from '@fun-land/fun-web'
 import { Level, LevelData } from '../level'
-import { getLevelById } from '../store'
+import { getLevelById, markLevelSolved } from '../store'
 import { getPackById } from '../packStore'
 import { createGameLoop, createAssets, Assets } from '../game/loop'
 import { createUi } from '../game/uiState'
+import { currentUser } from '../auth'
 import * as styles from './canvasPage.css'
+
+const persistSolve = (levelId: string | undefined): void => {
+  const uid = currentUser()?.uid
+  if (levelId && uid) markLevelSolved(levelId, uid).catch(console.error)
+}
 
 const fallback: LevelData = {
   title: 'Plus',
@@ -17,7 +23,7 @@ const fallback: LevelData = {
 }
 
 /** A single puzzle with no pack context: `~` just goes home. */
-function startSingle(signal: AbortSignal, canvas: HTMLCanvasElement, assets: Assets, level: Level): void {
+function startSingle(signal: AbortSignal, canvas: HTMLCanvasElement, assets: Assets, level: Level, levelId?: string): void {
   document.title = level.title
   const ui = createUi(level.palette)
   const mute = funState(false)
@@ -32,6 +38,7 @@ function startSingle(signal: AbortSignal, canvas: HTMLCanvasElement, assets: Ass
     getPalette: () => ui.get().palette,
     assets,
     onBack: () => location.assign('/'),
+    onSolved: () => persistSolve(levelId),
     signal,
   }).start()
 }
@@ -54,7 +61,7 @@ async function startPackSession(
   const pack = await getPackById(packId).catch(() => null)
   if (!pack) {
     const data = (initialId ? await getLevelById(initialId) : null) ?? fallback
-    startSingle(signal, canvas, assets, new Level(data))
+    startSingle(signal, canvas, assets, new Level(data), data.id)
     return
   }
 
@@ -109,6 +116,7 @@ async function startPackSession(
       onExit: () => location.assign(`/pack.html?id=${pack.id}`),
       onSolved: () => {
         solved[index] = true
+        persistSolve(pack.levelIds[index])
       },
       packMenu: {
         title: pack.title,
@@ -151,7 +159,7 @@ export const Play: Component = (signal) => {
       await startPackSession(signal, canvas, assets, packId, id)
     } else {
       const data = (id ? await getLevelById(id) : null) ?? fallback
-      startSingle(signal, canvas, assets, new Level(data))
+      startSingle(signal, canvas, assets, new Level(data), data.id)
     }
   })().catch(console.error)
 
