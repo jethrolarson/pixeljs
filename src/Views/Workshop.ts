@@ -7,8 +7,8 @@ import { getModerator } from '../services/getModerator'
 import { Header } from '../components/Header'
 import { packGrid } from '../components/PackGrid'
 import { Loadable, loading, loadInto, bindLoadable } from '../components/Async'
-import { btn, btnPrimary, empty, page } from '../theme.css'
-import { sectionHeader, sectionTitle } from './Home.css'
+import { btn, btnPrimary, empty, page, pageBody } from '../theme.css'
+import { sectionHeader } from "./Home.css";
 import * as styles from './Workshop.css'
 
 const packsSection = (signal: AbortSignal, uid: string): Element => {
@@ -25,13 +25,15 @@ const packsSection = (signal: AbortSignal, uid: string): Element => {
     { errorMsg: 'Failed to load packs.' },
   )
 
-  return h('section', {}, [
-    h('div', { className: sectionHeader }, [
-      h('h2', { className: sectionTitle }, ['My Packs']),
-      h('a', { href: '/pack-edit.html', className: `${btn} ${btnPrimary}` }, ['+ New Pack']),
+  return h("section", {}, [
+    h("div", { className: sectionHeader }, [
+      h("h2", {}, ["My Packs"]),
+      h("a", { href: "/pack-edit.html", className: `${btn} ${btnPrimary}` }, [
+        "+ New Pack",
+      ]),
     ]),
     grid,
-  ])
+  ]);
 }
 
 export const Workshop: Component = (signal) => {
@@ -43,5 +45,5 @@ export const Workshop: Component = (signal) => {
     u ? h('div', { className: styles.sections }, [packsSection(regionSignal, u.uid)]) : h('p', { className: empty }, ['Sign in to see your workshop.']),
   )
 
-  return h('div', { className: page }, [Header(signal, { user, isMod }), content])
+  return h('div', { className: page }, [Header(signal, { user, isMod }), h('div', { className: pageBody }, [content])])
 }

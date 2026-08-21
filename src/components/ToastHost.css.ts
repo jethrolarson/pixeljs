@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css'
-import { colors, mono } from '../theme.css'
+import { colors } from "../theme.css";
 
 export const host = style({
   position: 'fixed',
@@ -18,7 +18,6 @@ export const toast = style({
   border: `4px solid ${colors.borderInput}`,
   color: colors.text,
   fontFamily: "inherit",
-  fontSize: 20,
 });
 
 export const info = style({ borderColor: colors.green, color: colors.greenHover })

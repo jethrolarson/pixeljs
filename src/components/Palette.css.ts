@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css'
-import { colors, mono } from "../theme.css";
+import { colors } from "../theme.css";
 
 // Deliberately not importing from canvasPage.css: that module's global
 // overflow:hidden (meant for fullscreen canvas game pages) would leak onto
@@ -48,7 +48,7 @@ export const removeButton = style({
   width: 16,
   height: 16,
   lineHeight: "10px",
-  fontSize: 20,
+
   padding: 0,
   border: 0,
   fontFamily: "inherit",

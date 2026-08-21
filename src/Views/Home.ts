@@ -7,8 +7,8 @@ import { getModerator } from '../services/getModerator'
 import { Header } from '../components/Header'
 import { packGrid } from '../components/PackGrid'
 import { Loadable, loading, loadInto, bindLoadable } from '../components/Async'
-import { empty, page } from '../theme.css'
-import { sectionHeader, sectionTitle } from './Home.css'
+import { empty, page, pageBody } from "../theme.css";
+import { sectionHeader } from "./Home.css";
 
 export const Home: Component = (signal) => {
   const user = getUser(signal)
@@ -28,12 +28,14 @@ export const Home: Component = (signal) => {
     { errorMsg: 'Failed to load packs.' },
   )
 
-  return h('div', { className: page }, [
+  return h("div", { className: page }, [
     Header(signal, { user, isMod }),
-    h('div', { className: sectionHeader }, [
-      h('h2', { className: sectionTitle }, ['Featured Packs']),
-      h('a', { href: '/browse.html' }, ['Browse community packs →']),
+    h("div", { className: pageBody }, [
+      h("div", { className: sectionHeader }, [
+        h("h2", {}, ["Featured Packs"]),
+        h("a", { href: "/browse.html" }, ["Browse community packs →"]),
+      ]),
+      gridEl,
     ]),
-    gridEl,
-  ])
+  ]);
 }

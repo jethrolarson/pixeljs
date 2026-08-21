@@ -1,19 +1,16 @@
-import { globalStyle, style } from '@vanilla-extract/css'
-import { mono } from '../theme.css'
+import { globalStyle, style } from "@vanilla-extract/css";
 import { term } from "../common/inputBase";
 
-export { mono }
-
 // Canvas pages fill the viewport with no scroll.
-globalStyle('html, body', { overflow: 'hidden', height: '100%', margin: 0 })
-globalStyle('#root', { height: '100%' })
+globalStyle("html, body", { overflow: "hidden", height: "100%", margin: 0 });
+globalStyle("#root", { height: "100%" });
 
-export const canvas = style({ display: 'block', background: term.bg })
+export const canvas = style({ display: "block", background: term.bg });
 
 // Positions the DOM Palette (a plain in-flow panel by itself) as a floating
 // overlay in the corner of the fullscreen canvas — canvas-page-specific, so
 // it lives here rather than in Palette's own stylesheet.
-export const paletteOverlay = style({ position: 'fixed', left: 8, bottom: 8 })
+export const paletteOverlay = style({ position: "fixed", left: 8, bottom: 8 });
 
 export const menu = style({
   position: "fixed",
@@ -24,7 +21,7 @@ export const menu = style({
   background: term.panel,
   border: `4px solid ${term.dim}`,
   fontFamily: "inherit",
-  fontSize: 20,
+
   color: term.text,
 });
 
@@ -37,7 +34,7 @@ export const backLink = style({
   selectors: { "&:hover": { color: "#aef6f6" } },
 });
 
-export const field = style({ padding: '4px 0' })
+export const field = style({ padding: "4px 0" });
 
 // Terminal-styled form controls for the editor chrome.
 export const termInput = style({
@@ -47,13 +44,14 @@ export const termInput = style({
   border: `4px solid ${term.dim}`,
   borderRadius: 0,
   padding: "3px 6px",
-  selectors: { "&:focus": { outline: "none", borderColor: term.accent } },
+  selectors: {
+    "&:focus-visible": { outline: "none", borderColor: term.accent },
+  },
 });
 
 export const termLabel = style({
   fontFamily: "inherit",
   color: term.dim,
-  fontSize: 20,
 });
 
 export const termBtn = style({

@@ -7,8 +7,8 @@ import { getUser } from '../services/getUser'
 import { getModerator } from '../services/getModerator'
 import { Header } from '../components/Header'
 import { packGrid } from '../components/PackGrid'
-import { btn, empty, page } from '../theme.css'
-import { sectionHeader, sectionTitle } from './Home.css'
+import { btn, empty, page, pageBody } from "../theme.css";
+import { sectionHeader } from "./Home.css";
 import * as styles from './Browse.css'
 
 type Sort = 'upvotes' | 'createdAt'
@@ -102,12 +102,17 @@ export const Browse: Component = (signal) => {
 
   void loadCommunity(true)
 
-  return h('div', { className: page }, [
+  return h("div", { className: page }, [
     Header(signal, { user, isMod }),
-    h('div', { className: sectionHeader }, [
-      h('h2', { className: sectionTitle }, ['Community Packs']),
-      h('div', { className: styles.sortBar }, ['Sort by:', sortSelect]),
+    h("div", { className: pageBody }, [
+      h("div", { className: sectionHeader }, [
+        h("h2", {}, ["Community Packs"]),
+        h("label", { className: [styles.sortBar, "deem"].join(" ") }, [
+          "Sort by:",
+          sortSelect,
+        ]),
+      ]),
+      body,
     ]),
-    body,
-  ])
+  ]);
 }

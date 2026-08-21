@@ -1,7 +1,7 @@
 import { style } from '@vanilla-extract/css'
 import { colors } from '../theme.css'
 
-export const card = style({ width: 160 })
+export const card = style({});
 
 export const cover = style({
   display: "flex",
@@ -12,8 +12,8 @@ export const cover = style({
   background: colors.bg,
   border: `8px solid ${colors.border}`,
   textDecoration: "none",
-  transition: "opacity 0.15s",
-  ":hover": { opacity: 0.85 },
+  ":hover": { borderColor: colors.borderHover },
+  boxSizing: "content-box",
 });
 
 export const info = style({ padding: '8px 2px' })
@@ -21,7 +21,7 @@ export const info = style({ padding: '8px 2px' })
 export const titleLink = style({
   display: "block",
   color: colors.textBright,
-  fontSize: 20,
+
   fontWeight: "bold",
   textDecoration: "none",
   whiteSpace: "nowrap",
@@ -32,7 +32,6 @@ export const titleLink = style({
 });
 
 export const meta = style({
-  fontSize: 20,
   color: colors.textDim,
   marginBottom: 6,
 });

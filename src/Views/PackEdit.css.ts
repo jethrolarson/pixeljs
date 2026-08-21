@@ -10,7 +10,7 @@ export const formGroup = style({ marginBottom: 16 })
 export const label = style({
   display: "block",
   color: colors.text,
-  fontSize: 20,
+
   textTransform: "uppercase",
   letterSpacing: "0.05em",
 });
@@ -20,7 +20,6 @@ export const input = style({ width: '100%' })
 export const textarea = style({ width: '100%', minHeight: 80, resize: 'vertical' })
 
 export const levelResults = style({
-  background: colors.panelHover,
   border: `4px solid ${colors.border}`,
   borderRadius: 0,
   maxHeight: 200,
@@ -31,10 +30,9 @@ export const levelResult = style({
   padding: "8px 12px",
   cursor: "pointer",
   color: colors.text,
-  fontSize: 20,
+
   display: "flex",
   justifyContent: "space-between",
-  ":hover": { background: colors.panelHover },
 });
 
 export const packLevels = style({
@@ -58,7 +56,6 @@ export const packLevelItem = style({
 export const dragHandle = style({
   cursor: "grab",
   color: colors.textFaint,
-  fontSize: 20,
 });
 
 export const levTitle = style({ flex: 1, color: colors.text, fontSize: 20 });
@@ -80,7 +77,7 @@ export const removeBtn = style({
   border: "none",
   color: colors.textFaint,
   cursor: "pointer",
-  fontSize: 20,
+
   padding: "0 4px",
   ":hover": { color: colors.danger },
 });
@@ -89,7 +86,7 @@ export const formActions = style({ display: 'flex', gap: 8, marginTop: 24, align
 
 export const previewLabel = style({
   color: colors.text,
-  fontSize: 20,
+
   textTransform: "uppercase",
   letterSpacing: "0.05em",
   marginBottom: 4,
@@ -99,24 +96,23 @@ export const publishRow = style({ display: 'flex', alignItems: 'center', gap: 10
 
 export const publishLabel = style({
   textTransform: "none",
-  fontSize: 20,
+
   color: colors.text,
   margin: 0,
   cursor: "pointer",
 });
 
-export const status = style({ fontSize: 20, color: colors.textDim });
+export const status = style({ color: colors.textDim });
 
 export const heading = style({
   color: colors.text,
-  fontSize: 20,
+
   textTransform: "uppercase",
   letterSpacing: "0.05em",
   margin: "0 0 10px",
 });
 
 export const hint = style({
-  fontSize: 20,
   color: colors.textDim,
   marginLeft: 8,
 });
@@ -124,6 +120,6 @@ export const hint = style({
 export const emptyLevels = style({
   color: colors.textFaint,
   fontStyle: "italic",
-  fontSize: 20,
+
   padding: "4px 0",
 });

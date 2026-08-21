@@ -17,5 +17,7 @@ export const inputBase = {
   border: `4px solid ${term.dim}`,
   borderRadius: 0,
   padding: "3px 6px",
-  selectors: { "&:focus": { outline: "none", borderColor: term.accent } },
+  selectors: {
+    "&:focus-visible": { outline: "none", borderColor: term.accent },
+  },
 } as const;

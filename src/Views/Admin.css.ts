@@ -1,12 +1,6 @@
 import { style } from '@vanilla-extract/css'
 import { colors } from '../theme.css'
 
-export const sectionTitle = style({
-  fontSize: 20,
-  color: colors.textBright,
-  margin: "24px 0 12px",
-});
-
 export const row = style({
   display: "flex",
   alignItems: "center",
@@ -33,7 +27,7 @@ export const titleBox = style({ flex: 1, minWidth: 0 })
 export const titleLink = style({
   color: colors.text,
   textDecoration: "none",
-  fontSize: 20,
+
   fontWeight: "bold",
   ":hover": { color: colors.textBright },
 });
@@ -43,7 +37,6 @@ export const sub = style({ color: colors.textDim, fontSize: 11 })
 export const controls = style({ display: 'flex', alignItems: 'center', gap: 10 })
 
 export const ctrlLabel = style({
-  fontSize: 20,
   color: colors.text,
   display: "flex",
   alignItems: "center",

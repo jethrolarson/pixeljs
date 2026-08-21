@@ -1,6 +1,6 @@
 import { Component, h } from '@fun-land/fun-web'
 import { PackData } from '../pack'
-import { btn } from '../theme.css'
+import { btn, btnSecondary } from "../theme.css";
 import { renderPixelIcon } from './PixelIcon'
 import { upvoteButton, UpvoteConfig } from './UpvoteButton'
 import * as styles from './PackCard.css'
@@ -19,14 +19,26 @@ export const PackCard: Component<PackCardProps> = (signal, { pack, showEdit, upv
 
   const actionEls: Element[] = []
   if (upvote) actionEls.push(upvoteButton(signal, { ...upvote, initialCount: pack.upvotes }))
-  if (showEdit) actionEls.push(h('a', { href: `/pack-edit.html?id=${pack.id}`, className: btn }, ['Edit']))
+  if (showEdit)
+    actionEls.push(
+      h(
+        "a",
+        {
+          href: `/pack-edit.html?id=${pack.id}`,
+          className: [btn, btnSecondary].join(" "),
+        },
+        ["Edit"],
+      ),
+    );
 
-  return h('div', { className: styles.card }, [
+  return h("div", { className: styles.card }, [
     coverEl,
-    h('div', { className: styles.info }, [
-      h('a', { href, className: styles.titleLink }, [pack.title]),
-      h('div', { className: styles.meta }, [`${levels} level${levels !== 1 ? 's' : ''} · ${pack.ownerName}`]),
-      h('div', { className: styles.cardActions }, actionEls),
+    h("div", { className: styles.info }, [
+      h("a", { href }, [pack.title]),
+      h("div", { className: styles.meta }, [
+        `${levels} level${levels !== 1 ? "s" : ""} · ${pack.ownerName}`,
+      ]),
+      h("div", { className: styles.cardActions }, actionEls),
     ]),
-  ])
+  ]);
 }

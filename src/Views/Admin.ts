@@ -6,7 +6,7 @@ import { getUser } from '../services/getUser'
 import { getModerator } from '../services/getModerator'
 import { Header } from '../components/Header'
 import { renderPixelIcon } from '../components/PixelIcon'
-import { empty, page } from '../theme.css'
+import { empty, page, pageBody } from '../theme.css'
 import * as styles from './Admin.css'
 
 type Apply = (id: string, featured: boolean, order: number) => Promise<void>
@@ -51,12 +51,12 @@ const adminLists = (signal: AbortSignal, packs: FunState<PackData[]>, apply: App
     list.length ? h('div', {}, list.map((p) => row(s, p, apply))) : h('p', { className: empty }, ['No published packs.']),
   )
 
-  return h('div', {}, [
-    h('h2', { className: styles.sectionTitle }, ['Featured']),
+  return h("div", {}, [
+    h("h2", {}, ["Featured"]),
     featuredList,
-    h('h2', { className: styles.sectionTitle }, ['All published packs']),
+    h("h2", {}, ["All published packs"]),
     publishedList,
-  ])
+  ]);
 }
 
 const adminGate = (signal: AbortSignal, uid: string): Element => {
@@ -109,5 +109,5 @@ export const Admin: Component = (signal) => {
     u ? adminGate(s, u.uid) : h('p', { className: empty }, ['Sign in with a moderator account.']),
   )
 
-  return h('div', { className: page }, [Header(signal, { user, isMod }), content])
+  return h('div', { className: page }, [Header(signal, { user, isMod }), h('div', { className: pageBody }, [content])])
 }

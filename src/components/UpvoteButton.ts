@@ -1,6 +1,6 @@
 import { funState, FunState, mapRead } from '@fun-land/fun-state'
 import { hx, enhance, bindClass } from '@fun-land/fun-web'
-import { btn } from '../theme.css'
+import { btn, btnSecondary } from "../theme.css";
 import { voted as votedClass } from './PackCard.css'
 
 export interface UpvoteConfig {
@@ -34,14 +34,14 @@ export const upvoteButton = (signal: AbortSignal, cfg: UpvoteConfig): Element =>
   }
 
   const button = hx(
-    'button',
+    "button",
     {
       signal,
-      props: { className: btn },
-      bind: { textContent: mapRead(count, (c) => `▲ ${c}`) },
+      props: { className: [btn, btnSecondary].join(" ") },
+      bind: { textContent: mapRead(count, (c) => `+${c}`) },
       on: { click: onClick },
     },
     [],
-  )
+  );
   return enhance(button, bindClass(votedClass, cfg.voted, signal))
 }

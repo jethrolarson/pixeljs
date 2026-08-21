@@ -12,7 +12,7 @@ import { Header } from '../components/Header'
 import { renderPixelIcon } from '../components/PixelIcon'
 import { upvoteButton } from '../components/UpvoteButton'
 import { Loadable, loading, loadInto, bindLoadable } from '../components/Async'
-import { btn, empty, page } from '../theme.css'
+import { btn, empty, page, pageBody } from '../theme.css'
 import * as cardStyles from '../components/PackCard.css'
 import * as styles from './Pack.css'
 
@@ -112,5 +112,5 @@ export const Pack: Component = (signal) => {
     { errorMsg: 'Failed to load pack.' },
   )
 
-  return h('div', { className: page }, [Header(signal, { user, isMod }), content])
+  return h('div', { className: page }, [Header(signal, { user, isMod }), h('div', { className: pageBody }, [content])])
 }

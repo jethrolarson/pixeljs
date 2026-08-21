@@ -13,7 +13,7 @@ import { PackCard } from '../components/PackCard'
 import { IconEditor } from "../components/IconEditor";
 import { Header } from '../components/Header'
 import { hidden } from '../components/Header.css'
-import { btn, btnDanger, btnPrimary, empty, page } from '../theme.css'
+import { btn, btnDanger, btnPrimary, empty, page, pageBody } from '../theme.css'
 import * as styles from './PackEdit.css'
 
 interface PackForm {
@@ -386,5 +386,5 @@ export const PackEdit: Component = (signal) => {
     }
   })
 
-  return h('div', { className: page }, [Header(signal, { user, isMod }), slot])
+  return h('div', { className: page }, [Header(signal, { user, isMod }), h('div', { className: pageBody }, [slot])])
 }
