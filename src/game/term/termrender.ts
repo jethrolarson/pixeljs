@@ -62,8 +62,12 @@ function drawCell(ctx: CanvasRenderingContext2D, cell: Cell, x: number, y: numbe
   // 0–6) so letters in a word share a baseline instead of bouncing.
   const n = g.length
   const cw = cellW / n
-  const dw = cw * 0.8
-  const dh = cellH * 0.8
+  // Square glyph box, capped by whichever axis is tighter — when a multi-char
+  // glyph (e.g. a two-digit clue) is squeezed into one cell, cw shrinks below
+  // cellH and both dims must shrink together or the glyph stretches vertically.
+  const size = Math.min(cw, cellH) * 0.8
+  const dw = size
+  const dh = size
   const vRef = 3.5 // cap/digit band center, in 0..8 glyph coords
   for (let k = 0; k < n; k++) {
     const ch = g[k]
