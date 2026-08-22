@@ -15,7 +15,7 @@ export const scale = createGlobalTheme(":root", {
 
 globalStyle(":root", {
   "@media": {
-    "screen and (max-width: 999px)": {
+    "screen and (max-width: 599px)": {
       vars: assignVars(scale, { fontSize: "12px", borderWidth: "2px" }),
     },
   },

@@ -1,6 +1,7 @@
 import { Component, h, hx } from '@fun-land/fun-web'
 import { ArtAuthoring } from '../game/artAuthoring'
-import { termBtn, field } from '../Views/canvasPage.css'
+import { field } from "../Views/canvasPage.css";
+import { btnSecondary } from "../theme.css";
 
 export interface ArtControlsProps {
   art: ArtAuthoring
@@ -15,19 +16,39 @@ export interface ArtControlsProps {
  */
 export const ArtControls: Component<ArtControlsProps> = (signal, { art, onChange }) => {
   const targetBtn = hx(
-    'button',
-    { signal, props: { type: 'button', className: termBtn }, on: { click: () => { art.target = art.target === 'puzzle' ? 'art' : 'puzzle'; update(); onChange() } } },
-    ['Edit: Puzzle'],
-  )
+    "button",
+    {
+      signal,
+      props: { type: "button", className: btnSecondary },
+      on: {
+        click: () => {
+          art.target = art.target === "puzzle" ? "art" : "puzzle";
+          update();
+          onChange();
+        },
+      },
+    },
+    ["Edit: Puzzle"],
+  );
   const scaleBtn = hx(
-    'button',
-    { signal, props: { type: 'button', className: termBtn }, on: { click: () => { art.setScale((art.scale % 4) + 1); update(); if (art.target === 'art') onChange() } } },
-    ['Art 1×'],
-  )
+    "button",
+    {
+      signal,
+      props: { type: "button", className: btnSecondary },
+      on: {
+        click: () => {
+          art.setScale((art.scale % 4) + 1);
+          update();
+          if (art.target === "art") onChange();
+        },
+      },
+    },
+    ["Art 1×"],
+  );
 
   const update = (): void => {
-    targetBtn.textContent = `Edit: ${art.target === 'art' ? 'Art' : 'Puzzle'}`
-    scaleBtn.textContent = `Art ${art.scale}×`
+    targetBtn.textContent = `${art.target === "art" ? "Art" : "Puzzle"}`;
+    scaleBtn.textContent = `×${art.scale}`;
     // Scale only matters once you're looking at the art grid — hide it while
     // editing the puzzle so it doesn't read as a puzzle setting.
     scaleBtn.style.display = art.target === 'art' ? '' : 'none'

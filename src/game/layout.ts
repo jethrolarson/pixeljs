@@ -105,15 +105,15 @@ function maxLen(groups: HintGroup[][]): number {
 }
 
 /** Pure: derive the char-grid structure and its pixel placement.
- * `leftInset` reserves screen space (e.g. edit mode's DOM menu overlay,
- * which the canvas itself has no notion of) so the centered board is never
- * placed underneath it. */
+ * `topInset` reserves screen space (edit mode's DOM menu bar, which the
+ * canvas itself has no notion of) so the centered board is never placed
+ * underneath it. */
 export function computeLayout(
   level: Level,
   mode: GameMode,
   hints: Hints,
   viewport: Viewport,
-  leftInset = 0,
+  topInset = 0,
   hasPrev = false,
   hasNext = false,
 ): Layout {
@@ -150,8 +150,8 @@ export function computeLayout(
 
   // Snap to a multiple of GRID_PX so the glyph+clearance unit scales by an
   // integer zoom factor (clean, even pixels at any cell size).
-  const usableW = viewport.w - leftInset
-  const raw = Math.min(Math.floor(usableW / cols), Math.floor(viewport.h / rows))
+  const usableH = viewport.h - topInset
+  const raw = Math.min(Math.floor(viewport.w / cols), Math.floor(usableH / rows))
   const cell = Math.min(MAX_CELL, Math.max(MIN_CELL, Math.floor(raw / GRID_PX) * GRID_PX))
   const usedW = cols * cell
   const usedH = rows * cell
@@ -159,8 +159,8 @@ export function computeLayout(
   return {
     cellW: cell,
     cellH: cell,
-    originX: leftInset + Math.floor((usableW - usedW) / 2),
-    originY: Math.floor((viewport.h - usedH) / 2),
+    originX: Math.floor((viewport.w - usedW) / 2),
+    originY: topInset + Math.floor((usableH - usedH) / 2),
     cols,
     rows,
     chromeCol: FRAME,

@@ -12,7 +12,7 @@ import { Header } from '../components/Header'
 import { renderPixelIcon } from '../components/PixelIcon'
 import { upvoteButton } from '../components/UpvoteButton'
 import { Loadable, loading, loadInto, bindLoadable } from '../components/Async'
-import { btn, empty, page, pageBody } from '../theme.css'
+import { btn, btnSecondary, empty, page, pageBody } from "../theme.css";
 import * as cardStyles from '../components/PackCard.css'
 import * as styles from './Pack.css'
 
@@ -43,7 +43,17 @@ const hero = (signal: AbortSignal, pack: PackData, user: User | null): Element =
       requireSignIn: () => void signIn(),
     }),
   ]
-  if (isOwner) actions.push(h('a', { href: `/pack-edit.html?id=${pack.id}`, className: btn }, ['Edit']))
+  if (isOwner)
+    actions.push(
+      h(
+        "a",
+        {
+          href: `/pack-edit.html?id=${pack.id}`,
+          className: `${btn} ${btnSecondary}`,
+        },
+        ["Edit"],
+      ),
+    );
 
   const cover = h('div', { className: styles.heroCover }, [renderPixelIcon(pack.icon, 120)])
 

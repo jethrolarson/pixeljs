@@ -48,11 +48,3 @@ export const tabActive = style({
   background: colors.panel,
   borderBottomColor: colors.textDim,
 });
-
-export const tagline = style({
-  "@media": {
-    "screen and (max-width: 999px)": {
-      display: "none",
-    },
-  },
-});

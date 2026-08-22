@@ -13,7 +13,15 @@ import { PackCard } from '../components/PackCard'
 import { IconEditor } from "../components/IconEditor";
 import { Header } from '../components/Header'
 import { hidden } from '../components/Header.css'
-import { btn, btnDanger, btnPrimary, empty, page, pageBody } from '../theme.css'
+import {
+  btn,
+  btnDanger,
+  btnPrimary,
+  btnSecondary,
+  empty,
+  page,
+  pageBody,
+} from "../theme.css";
 import * as styles from './PackEdit.css'
 
 interface PackForm {
@@ -172,7 +180,7 @@ const editor = (signal: AbortSignal, user: User): Element => {
                   "button",
                   {
                     signal: s,
-                    props: { className: styles.editBtn },
+                    props: { className: `${btn} ${btnSecondary}` },
                     // Levels only ever save with a pack id, so an unsaved pack
                     // must persist first before edit.html can link back to it.
                     on: {

@@ -59,10 +59,6 @@ export const Header: Component<HeaderProps> = (signal, { user, isMod }) => {
         },
         ["PP • WF"],
       ),
-      enhance(
-        h("span", { className: "deem" }, " - Your art, your puzzles"),
-        addClass("deem", styles.tagline),
-      ),
     ]),
     h("div", { className: styles.actions }, [
       tab("/browse.html", "Browse"),

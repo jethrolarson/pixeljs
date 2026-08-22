@@ -12,9 +12,9 @@ import { ArtControls } from "../components/ArtControls";
 import { NumField } from "../components/NumField";
 import { ToastHost } from "../components/ToastHost";
 import { showToast } from "../toast";
-import { termBtn } from "./canvasPage.css";
 import * as styles from "./canvasPage.css";
 import * as edit from "./Edit.css";
+import { btn } from "../theme.css";
 
 const defaultLevel: LevelData = {
   title: "New Level",
@@ -90,6 +90,7 @@ export const Edit: Component = (signal) => {
         getPalette: () => activeUi.get().palette,
         assets,
         underlay: onArt ? { level, scale: art.scale } : undefined,
+        menuEl: menuSlot,
         signal: s,
       }).start();
       paletteSlot.replaceChildren(
@@ -196,7 +197,7 @@ export const Edit: Component = (signal) => {
       "button",
       {
         signal,
-        props: { type: "button", className: termBtn },
+        props: { type: "button", className: btn },
         on: { click: onSave },
       },
       ["Save"],
@@ -222,7 +223,7 @@ export const Edit: Component = (signal) => {
     const backHref = returnPackId
       ? `/pack-edit.html?id=${returnPackId}`
       : "/workshop.html";
-    const backLabel = returnPackId ? "← Back to pack" : "← Workshop";
+    const backLabel = "<";
 
     menuSlot.replaceChildren(
       h("a", { href: backHref, className: styles.backLink }, [backLabel]),

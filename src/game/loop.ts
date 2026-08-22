@@ -18,10 +18,9 @@ export interface Assets {
   win: SoundGroup
 }
 
-// Right edge of edit mode's fixed DOM menu overlay (canvasPage.css `menu`:
-// left 8 + width 176 + border 4*2) plus a breathing-room gap, so the board
-// never centers underneath it.
-const EDIT_MENU_INSET = 208
+// Breathing room below edit mode's DOM menu bar, so the board never centers
+// right up against it.
+const EDIT_MENU_GAP = 12
 
 export const createAssets = (): Assets => ({
   boom: new SoundGroup('boom.wav'),
@@ -44,6 +43,10 @@ export interface GameLoopConfig {
   scoreMode?: ScoreMode
   /** Edit mode: faint puzzle guide behind the art grid (solved-art authoring). */
   underlay?: Underlay
+  /** Edit mode: the DOM menu bar element, measured live each frame so the
+   * board's top inset always matches its actual rendered height — no magic
+   * number to fall out of sync with the CSS. */
+  menuEl?: Element
   getActiveColor: () => number
   setActiveColor?: (index: number) => void
   getMute: () => boolean
@@ -300,8 +303,9 @@ export function createGameLoop(cfg: GameLoopConfig): GameLoop {
     }
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
 
+    const topInset = mode === 'edit' && cfg.menuEl ? Math.ceil(cfg.menuEl.getBoundingClientRect().bottom) + EDIT_MENU_GAP : 0
     const hints = computeHints(level)
-    const layout = computeLayout(level, mode, hints, { w, h }, mode === 'edit' ? EDIT_MENU_INSET : 0, !!cfg.onPrev, !!cfg.onNext)
+    const layout = computeLayout(level, mode, hints, { w, h }, topInset, !!cfg.onPrev, !!cfg.onNext)
     const ptr = pointer.read()
     const pos = pixelToGrid(layout, ptr.x, ptr.y)
     const within = inGrid(level, pos)
