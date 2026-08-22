@@ -28,10 +28,11 @@ export interface PointerSource {
 export function createPointer(canvas: HTMLCanvasElement, signal: AbortSignal): PointerSource {
   const state: Pointer = { x: 0, y: 0, pressed: false, button: 'left', newlyPressed: false }
   const opts = { signal }
-  // Pointer events unify mouse and touch. touch-action: none keeps the browser
-  // from claiming touch drags for pan/zoom, so they arrive as pointermove and
-  // paint cells instead of scrolling the page.
-  canvas.style.touchAction = 'none'
+  // Pointer events unify mouse and touch. touch-action: pinch-zoom blocks
+  // single-finger pan (so a drag arrives as pointermove and paints instead of
+  // scrolling the page) while still letting the browser handle two-finger
+  // pinch natively as a real OS-level viewport zoom.
+  canvas.style.touchAction = 'pinch-zoom'
   canvas.addEventListener('pointermove', (e) => { state.x = e.clientX; state.y = e.clientY }, opts)
   canvas.addEventListener('pointerdown', (e) => {
     // Touch has no hover: the press itself must establish the position.
