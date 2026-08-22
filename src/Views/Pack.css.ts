@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css'
-import { colors } from '../theme.css'
+import { colors, scale } from '../theme.css'
 
 export const hero = style({
   display: 'flex',
@@ -12,7 +12,7 @@ export const heroCover = style({
   width: 120,
   height: 120,
   background: colors.bg,
-  border: `4px solid ${colors.border}`,
+  border: `${scale.borderWidth} solid ${colors.border}`,
   display: "flex",
   alignItems: "center",
   justifyContent: "center",

@@ -1,10 +1,10 @@
 import { Level } from '../level'
 import { SoundGroup } from '../sound'
 import { GameMode, GridPos, ScoreMode } from './types'
-import { computeLayout, pixelToGrid, inGrid } from './layout'
+import { computeLayout, pixelToGrid, inGrid, MENU_HELP_COL, MENU_BACK_COL, MENU_PREV_COL, MENU_NEXT_COL } from './layout'
 import { Sound, createPointer, createInteraction, applyPointer } from './input'
 import { computeScore, golfScore, formatTime, computeHints, clueSatisfaction } from './score'
-import { projectPuzzle, projectSolvedArt, Underlay, MENU_HELP_COL, MENU_BACK_COL, MENU_PREV_COL, MENU_NEXT_COL } from './term/project'
+import { projectPuzzle, projectSolvedArt, Underlay } from './term/project'
 import { projectHelp } from './term/help'
 import { projectPackMenu, PackMenuItem } from './term/packmenu'
 import { drawBuffer, drawStipple, TermMetrics } from './term/termrender'
@@ -283,13 +283,25 @@ export function createGameLoop(cfg: GameLoopConfig): GameLoop {
 
     const w = window.innerWidth
     const h = window.innerHeight
-    if (canvas.width !== w || canvas.height !== h) {
-      canvas.width = w
-      canvas.height = h
+    // Canvas backing store must match real device pixels, not CSS pixels — a
+    // 1x-resolution bitmap stretched to CSS size gets smoothed by the browser
+    // during compositing regardless of imageSmoothingEnabled, which only
+    // governs drawImage calls *inside* the canvas. All layout/draw math below
+    // stays in CSS-pixel units; the transform (reset whenever width/height
+    // change) maps it onto the higher-res backing store.
+    const dpr = window.devicePixelRatio || 1
+    const pxW = Math.round(w * dpr)
+    const pxH = Math.round(h * dpr)
+    if (canvas.width !== pxW || canvas.height !== pxH) {
+      canvas.width = pxW
+      canvas.height = pxH
+      canvas.style.width = `${w}px`
+      canvas.style.height = `${h}px`
     }
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
 
     const hints = computeHints(level)
-    const layout = computeLayout(level, mode, hints, { w, h }, mode === 'edit' ? EDIT_MENU_INSET : 0)
+    const layout = computeLayout(level, mode, hints, { w, h }, mode === 'edit' ? EDIT_MENU_INSET : 0, !!cfg.onPrev, !!cfg.onNext)
     const ptr = pointer.read()
     const pos = pixelToGrid(layout, ptr.x, ptr.y)
     const within = inGrid(level, pos)
@@ -333,10 +345,10 @@ export function createGameLoop(cfg: GameLoopConfig): GameLoop {
         if (cfg.packMenu) openPicker()
         else cfg.onBack?.()
         suppressPaintUntilRelease = true
-      } else if (charRow === layout.menuRow && inSlot(charCol, layout.menuCol + MENU_PREV_COL) && cfg.onPrev) {
+      } else if (charRow === layout.menuRow2 && inSlot(charCol, layout.menuCol + MENU_PREV_COL) && cfg.onPrev) {
         cfg.onPrev()
         suppressPaintUntilRelease = true
-      } else if (charRow === layout.menuRow && inSlot(charCol, layout.menuCol + MENU_NEXT_COL) && cfg.onNext) {
+      } else if (charRow === layout.menuRow2 && inSlot(charCol, layout.menuCol + MENU_NEXT_COL) && cfg.onNext) {
         cfg.onNext()
         suppressPaintUntilRelease = true
       } else if (charRow === layout.paletteRow && i >= 0 && i < palette.length) {

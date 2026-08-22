@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css'
-import { colors } from "../theme.css";
+import { colors, scale } from "../theme.css";
 
 // Deliberately not importing from canvasPage.css: that module's global
 // overflow:hidden (meant for fullscreen canvas game pages) would leak onto
@@ -7,7 +7,7 @@ import { colors } from "../theme.css";
 export const layers = style({
   padding: 6,
   background: colors.panel,
-  border: `4px solid ${colors.borderInput}`,
+  border: `${scale.borderWidth} solid ${colors.borderInput}`,
   whiteSpace: "nowrap",
 });
 
@@ -18,7 +18,7 @@ export const swatch = style({
   display: "inline-block",
   textDecoration: "none",
   cursor: "pointer",
-  border: `4px solid ${colors.borderInput}`,
+  border: `${scale.borderWidth} solid ${colors.borderInput}`,
   position: "relative",
   overflow: "visible",
   verticalAlign: "top",
@@ -71,7 +71,7 @@ export const addButton = style({
   fontFamily: "inherit",
   background: colors.bg,
   color: colors.green,
-  border: `4px solid ${colors.green}`,
+  border: `${scale.borderWidth} solid ${colors.green}`,
   borderRadius: 0,
   cursor: "pointer",
 });

@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css'
-import { colors } from '../theme.css'
+import { colors, scale } from '../theme.css'
 
 export const layout = style({ display: 'flex', gap: 32, alignItems: 'flex-start' })
 export const form = style({ flex: 1, maxWidth: 480 })
@@ -20,7 +20,7 @@ export const input = style({ width: '100%' })
 export const textarea = style({ width: '100%', minHeight: 80, resize: 'vertical' })
 
 export const levelResults = style({
-  border: `4px solid ${colors.border}`,
+  border: `${scale.borderWidth} solid ${colors.border}`,
   borderRadius: 0,
   maxHeight: 200,
   overflowY: "auto",
@@ -46,7 +46,7 @@ export const packLevels = style({
 
 export const packLevelItem = style({
   background: colors.panel,
-  border: `4px solid ${colors.border}`,
+  border: `${scale.borderWidth} solid ${colors.border}`,
   padding: "6px 10px",
   display: "flex",
   alignItems: "center",

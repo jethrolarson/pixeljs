@@ -1,5 +1,5 @@
 import { style } from "@vanilla-extract/css";
-import { colors } from "../theme.css";
+import { colors, scale } from "../theme.css";
 
 export const wrap = style({
   display: "flex",
@@ -9,7 +9,7 @@ export const wrap = style({
 });
 
 export const canvas = style({
-  border: `4px solid ${colors.borderInput}`,
+  border: `${scale.borderWidth} solid ${colors.borderInput}`,
   imageRendering: "pixelated",
   cursor: "crosshair",
 });

@@ -2,6 +2,7 @@ import { CellBuffer, Cell } from './cellbuffer'
 import { FULL, TL, TR, BL, BR, H, V, DH, DV, DTL, DTR, DBL, DBR, GEOMETRIC } from './glyphs'
 import { tintedGlyph, glyphInk, GLYPH_PX } from './glyphatlas'
 import { compactDigitChar } from './digitsCompact'
+import { GRID_PX, CLEARANCE } from '../layout'
 
 /** Where the character grid lands on the canvas. */
 export interface TermMetrics {
@@ -57,47 +58,56 @@ function drawCell(ctx: CanvasRenderingContext2D, cell: Cell, x: number, y: numbe
     drawGeometric(ctx, g, x, y, cellW, cellH)
     return
   }
-  const n = g.length
-  const vRef = 3.5 // cap/digit band center, in 0..8 glyph coords
+  // One cell is always GRID_PX = GLYPH_PX + 2*CLEARANCE grid pixels (see
+  // layout.ts) — layout snaps cell size to whole multiples of GRID_PX, so
+  // zoom (device px per grid px) is always an exact integer here. Glyph and
+  // clearance both scale by `zoom` together, so their 8:2:2 proportion is
+  // identical at every cell size instead of being derived independently.
+  const zoom = cellH / GRID_PX
 
-  // A multi-digit clue count (e.g. "12") gets its own narrower glyph set
-  // (see digitsCompact.ts) so both digits draw at full single-glyph height,
-  // packed edge-to-edge by ink width, instead of being squeezed to fit one
-  // 8px-wide cell and stretched vertically to compensate.
-  if (n > 1 && /^[0-9]+$/.test(g)) {
-    const dh = cellH * 0.8
-    const scale = dh / GLYPH_PX
-    const gap = scale // 1 source px of spacing between digits
+  // Every cell holds exactly one glyph, except a multi-digit clue count
+  // (e.g. "12" — the only producer of a multi-char glyph string). 2+ digits
+  // physically can't fit one cell's width at the same per-pixel zoom as a
+  // single digit, so they get their own narrower glyph set (digitsCompact.ts)
+  // and are the one case allowed to shrink below `zoom`, only as far as
+  // fitting requires.
+  if (g.length > 1 && /^[0-9]+$/.test(g)) {
     const chars = [...g].map(compactDigitChar)
     const inks = chars.map(glyphInk)
-    const totalW = inks.reduce((sum, ink) => sum + (ink.x1 - ink.x0 + 1) * scale, 0) + gap * (chars.length - 1)
+    const widthAt = (s: number): number =>
+      inks.reduce((sum, ink) => sum + (ink.x1 - ink.x0 + 1) * s, 0) + s * (chars.length - 1)
+    let packZoom = zoom
+    while (packZoom > 1 && widthAt(packZoom) > cellW) packZoom--
+    const dh = packZoom * GLYPH_PX
+    const totalW = widthAt(packZoom)
     let cx = x + (cellW - totalW) / 2
-    const dy = y + cellH / 2 - (vRef / GLYPH_PX) * dh
+    // Round the final destination coords, not the running accumulators — a
+    // half-pixel offset here isn't a smaller glyph, it's a misaligned one:
+    // nearest-neighbor samples it across a device-pixel boundary, so some
+    // source rows/cols render 1px taller than others. `cx` stays exact so
+    // per-glyph spacing doesn't drift.
+    const dy = Math.round(y + (cellH - dh) / 2)
     for (let k = 0; k < chars.length; k++) {
       const ink = inks[k]
-      const dx = cx - ink.x0 * scale
-      ctx.drawImage(tintedGlyph(chars[k], cell.fg), 0, 0, GLYPH_PX, GLYPH_PX, dx, dy, GLYPH_PX * scale, dh)
-      cx += (ink.x1 - ink.x0 + 1) * scale + gap
+      const dx = Math.round(cx - ink.x0 * packZoom)
+      ctx.drawImage(tintedGlyph(chars[k], cell.fg), 0, 0, GLYPH_PX, GLYPH_PX, dx, dy, GLYPH_PX * packZoom, dh)
+      cx += (ink.x1 - ink.x0 + 1) * packZoom + packZoom
     }
     return
   }
 
-  // Text: blit one bitmap glyph per char at ~80% cell size. Glyph ink widths
-  // vary (e.g. "0" is 7px, "5" is 6px), so center each by its ink box for true
-  // horizontal centering; keep a fixed vertical reference (the cap band, rows
-  // 0–6) so letters in a word share a baseline instead of bouncing.
-  const cw = cellW / n
-  const size = Math.min(cw, cellH) * 0.8
-  const dw = size
-  const dh = size
-  for (let k = 0; k < n; k++) {
-    const ch = g[k]
-    const ink = glyphInk(ch)
-    const inkCx = (ink.x0 + ink.x1 + 1) / 2
-    const dx = x + k * cw + cw / 2 - (inkCx / GLYPH_PX) * dw
-    const dy = y + cellH / 2 - (vRef / GLYPH_PX) * dh
-    ctx.drawImage(tintedGlyph(ch, cell.fg), 0, 0, GLYPH_PX, GLYPH_PX, dx, dy, dw, dh)
-  }
+  // One glyph, centered in a fixed CLEARANCE*zoom-margined box. The box
+  // itself is symmetric, but the ROM font's ink isn't always centered within
+  // its own 8-column glyph (e.g. "1" sits off-center) — shift within the box
+  // by ink bounds so the visible character looks centered, without changing
+  // the box's size or position (zoom/proportions untouched).
+  const ink = glyphInk(g)
+  const inkCx = (ink.x0 + ink.x1 + 1) / 2
+  const dw = GLYPH_PX * zoom
+  const dh = GLYPH_PX * zoom
+  const dx = Math.round(x + CLEARANCE * zoom + (GLYPH_PX / 2 - inkCx) * zoom)
+  const dy = Math.round(y + CLEARANCE * zoom)
+  ctx.drawImage(tintedGlyph(g, cell.fg), 0, 0, GLYPH_PX, GLYPH_PX, dx, dy, dw, dh)
 }
 
 /**

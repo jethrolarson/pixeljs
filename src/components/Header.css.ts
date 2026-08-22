@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css'
-import { colors } from '../theme.css'
+import { colors, scale } from '../theme.css'
 
 export const headerBar = style({
   display: "flex",
@@ -16,7 +16,7 @@ export const title = style({
 
 export const logoLink = style({
   display: "block",
-  borderBottom: "4px solid transparent",
+  borderBottom: `${scale.borderWidth} solid transparent`,
 });
 
 export const logoLinkActive = style({
@@ -36,7 +36,7 @@ export const hidden = style({
 export const tab = style({
   padding: "4px 8px 0px",
   color: colors.textDim,
-  borderBottom: "4px solid transparent",
+  borderBottom: `${scale.borderWidth} solid transparent`,
   textDecoration: "none",
   borderRadius: 0,
 

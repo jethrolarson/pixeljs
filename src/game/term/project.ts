@@ -3,7 +3,7 @@ import { FULL, MARK, WRONG, H, chrome } from './glyphs'
 import { Level, SolvedArt } from '../../level'
 import { hexToRGB, rgbToCSS } from '../../color'
 import { GameMode, GridPos } from '../types'
-import { Layout } from '../layout'
+import { Layout, MENU_HELP_COL, MENU_BACK_COL, MENU_PREV_COL, MENU_NEXT_COL } from '../layout'
 import { Hints, ClueSat } from '../score'
 
 /** Faint puzzle-solution tracing guide drawn behind solved-art editing. */
@@ -20,14 +20,6 @@ const BRAND: ReadonlyArray<readonly [string, string]> = [
   ['w', chrome.green],
   ['f', '#FF8000'],
 ]
-
-/** Hotkey footer slots (columns) on `layout.menuRow`, styled like the dialog
- * footers. Each slot is `key␠label` (6 chars); slots are 7 apart so they never
- * touch. Positions are shared with the loop's click hit-testing. */
-export const MENU_HELP_COL = 0
-export const MENU_BACK_COL = 7
-export const MENU_PREV_COL = 14
-export const MENU_NEXT_COL = 21
 
 /** CSS color for a 1-based palette index (0 → dim fallback). */
 function paletteColor(palette: string[], index: number): string {
@@ -89,15 +81,15 @@ export function projectPuzzle(o: ProjectOpts): CellBuffer {
     // Divider rule on the blank row above the footer, inside the frame.
     for (let c = layout.chromeCol; c < layout.cols - layout.chromeCol; c++)
       buf.set(c, layout.menuRow - 1, { glyph: H, fg: chrome.dim })
-    const slot = (offset: number, key: string, label: string): void => {
+    const slot = (row: number, offset: number, key: string, label: string): void => {
       const col = layout.menuCol + offset
-      buf.set(col, layout.menuRow, { glyph: key, fg: chrome.name })
-      buf.text(col + 2, layout.menuRow, label, chrome.dim)
+      buf.set(col, row, { glyph: key, fg: chrome.name })
+      buf.text(col + 2, row, label, chrome.dim)
     }
-    slot(MENU_HELP_COL, '?', 'help')
-    slot(MENU_BACK_COL, '~', o.hasPack ? 'pack' : 'back')
-    if (o.hasPrev) slot(MENU_PREV_COL, '<', 'prev')
-    if (o.hasNext) slot(MENU_NEXT_COL, '>', 'next')
+    slot(layout.menuRow, MENU_HELP_COL, '?', 'help')
+    slot(layout.menuRow, MENU_BACK_COL, '~', o.hasPack ? 'pack' : 'back')
+    if (o.hasPrev) slot(layout.menuRow2, MENU_PREV_COL, '<', 'prev')
+    if (o.hasNext) slot(layout.menuRow2, MENU_NEXT_COL, '>', 'next')
   }
 
   // Palette selector (play mode): a swatch strip with a caret under the active.

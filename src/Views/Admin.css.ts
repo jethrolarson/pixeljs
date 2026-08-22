@@ -1,12 +1,12 @@
 import { style } from '@vanilla-extract/css'
-import { colors } from '../theme.css'
+import { colors, scale } from '../theme.css'
 
 export const row = style({
   display: "flex",
   alignItems: "center",
   gap: 12,
   background: colors.panel,
-  border: `4px solid ${colors.border}`,
+  border: `${scale.borderWidth} solid ${colors.border}`,
   padding: "8px 12px",
   marginBottom: 6,
 });
@@ -15,7 +15,7 @@ export const cover = style({
   width: 40,
   height: 40,
   background: colors.bg,
-  border: `4px solid ${colors.border}`,
+  border: `${scale.borderWidth} solid ${colors.border}`,
   flexShrink: 0,
   display: "flex",
   alignItems: "center",

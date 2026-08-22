@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css'
-import { colors } from '../theme.css'
+import { colors, scale } from '../theme.css'
 
 export const sections = style({
   display: 'flex',
@@ -21,7 +21,7 @@ export const thumbLink = style({
   height: 160,
   borderRadius: 0,
   overflow: "hidden",
-  border: `4px solid ${colors.border}`,
+  border: `${scale.borderWidth} solid ${colors.border}`,
   background: colors.panel,
 });
 

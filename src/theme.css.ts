@@ -1,4 +1,25 @@
-import { globalStyle, style } from '@vanilla-extract/css'
+import {
+  globalStyle,
+  style,
+  createGlobalTheme,
+  assignVars,
+} from "@vanilla-extract/css";
+
+// The two levers for mobile scaling: shrink both together under the
+// breakpoint so border weight stays proportional to text size instead of
+// looking chunky next to smaller type.
+export const scale = createGlobalTheme(":root", {
+  fontSize: "24px",
+  borderWidth: "4px",
+});
+
+globalStyle(":root", {
+  "@media": {
+    "screen and (max-width: 999px)": {
+      vars: assignVars(scale, { fontSize: "12px", borderWidth: "2px" }),
+    },
+  },
+});
 
 // Terminal/ANSI palette — sampled from the canvas `chrome` (game/term/glyphs.ts)
 // so the DOM website reads as the same high-contrast character-grid surface as
@@ -28,11 +49,7 @@ export const fonts = {
   // TODO add contensed
 };
 
-export const fontSize = {
-  default: 24,
-};
-
-globalStyle('*, *::before, *::after', { boxSizing: 'border-box' })
+globalStyle("*, *::before, *::after", { boxSizing: "border-box" });
 
 globalStyle("*::selection", {
   background: colors.linkHover,
@@ -46,7 +63,7 @@ globalStyle("html", {
 
 globalStyle("body", {
   margin: 0,
-  fontSize: fontSize.default,
+  fontSize: scale.fontSize,
   lineHeight: 1.4,
   color: colors.text,
   fontFamily: fonts.default,
@@ -57,18 +74,18 @@ globalStyle("body", {
 globalStyle("a", { color: colors.link, textDecoration: "none" });
 globalStyle("a:hover", { color: colors.linkHover });
 globalStyle("a:focus-visible", {
-  outline: `4px solid ${colors.linkHover}`,
+  outline: `${scale.borderWidth} solid ${colors.linkHover}`,
   outlineOffset: 4,
 });
 
-globalStyle('button, input, select, textarea', {
-  fontFamily: 'inherit',
-  fontSize: '100%',
-})
+globalStyle("button, input, select, textarea", {
+  fontFamily: "inherit",
+  fontSize: "100%",
+});
 
 globalStyle('input[type="text"], input[type="number"], textarea, select', {
   borderRadius: 0,
-  border: `4px solid ${colors.borderInput}`,
+  border: `${scale.borderWidth} solid ${colors.borderInput}`,
   padding: "0 4px",
   background: colors.bg,
   color: colors.textBright,
@@ -96,7 +113,7 @@ globalStyle("button:disabled", { opacity: 0.5, cursor: "default" });
 globalStyle(
   "input:focus-visible, textarea:focus-visible, select:focus-visible, button:focus-visible",
   {
-    outline: `4px solid ${colors.linkHover}`,
+    outline: `${scale.borderWidth} solid ${colors.linkHover}`,
     outlineOffset: 4,
   },
 );
@@ -152,7 +169,7 @@ export const btnDanger = style({
 
 export const btnSecondary = style({
   background: colors.bg,
-  border: `4px solid #2a5b59`,
+  border: `${scale.borderWidth} solid #2a5b59`,
   color: "#389f9b",
   ":hover": {
     background: colors.bg,
@@ -163,8 +180,8 @@ export const btnSecondary = style({
 
 export const empty = style({
   color: colors.textFaint,
-  fontStyle: 'italic',
-})
+  fontStyle: "italic",
+});
 
 export const page = style({
   padding: "0",
@@ -173,8 +190,6 @@ export const page = style({
 export const pageBody = style({
   padding: "24px",
 });
-
-
 
 globalStyle(".display_contents", {
   display: "contents",
