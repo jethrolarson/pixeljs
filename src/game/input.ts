@@ -93,6 +93,11 @@ export function createPointer(canvas: HTMLCanvasElement, signal: AbortSignal): P
     pendingButton = button
     pendingTimer = setTimeout(() => {
       pendingTimer = null
+      // Must clear before commit: pendingId still set is what tells
+      // pointerup "this one never committed, flush it as a tap" — leaving it
+      // set here made a real pointerup arriving after this timer re-commit
+      // (and re-trigger newlyPressed) at the release position.
+      pendingId = null
       if (activePointers.size === 1 && activePointers.has(e.pointerId)) commit(e.pointerId, pendingButton)
     }, TOUCH_HOLD_MS)
   }, opts)
