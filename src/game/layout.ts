@@ -103,7 +103,7 @@ const MIN_CELL = GRID_PX
  * 2+), so a half-step still lands glyph/clearance pixels on an integer device
  * pixel; the finer step roughly halves the leftover margin on narrow viewports
  * where a whole `GRID_PX` of slack is a real chunk of the screen. */
-const ZOOM_STEP = GRID_PX / 2
+export const ZOOM_STEP = GRID_PX / 2
 
 function maxLen(groups: HintGroup[][]): number {
   let m = 0

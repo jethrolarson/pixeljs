@@ -170,20 +170,6 @@ export const Edit: Component = (signal) => {
     const xInput = NumField(signal, { min: 3, max: 32, value: { get: () => level.x, set: setCols } });
     const yInput = NumField(signal, { min: 3, max: 32, value: { get: () => level.y, set: setRows } });
 
-    const parField = h("div", { className: styles.field }, [
-      h("label", { className: edit.label }, ["Par "]),
-      NumField(signal, {
-        min: 1,
-        max: 10,
-        value: {
-          get: () => level.par,
-          set: (n) => {
-            level.par = n;
-          },
-        },
-      }),
-    ]);
-
     const muteField = h("label", { className: edit.muteRow }, [
       hx("input", {
         signal,
@@ -232,7 +218,6 @@ export const Edit: Component = (signal) => {
         h("label", { className: edit.label }, [xInput, " X "]),
         yInput,
       ]),
-      parField,
       muteField,
       ArtControls(signal, { art, onChange: mountLoop }),
       h("div", { className: styles.field }, [saveBtn, testBtn]),

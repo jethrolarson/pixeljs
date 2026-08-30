@@ -1,8 +1,7 @@
 import { CellBuffer } from './cellbuffer'
 import { chrome } from './glyphs'
 import { TermMetrics } from './termrender'
-import { GLYPH_PX } from './font8x8'
-import { Viewport } from '../layout'
+import { GRID_PX, ZOOM_STEP, Viewport } from '../layout'
 
 export interface PackMenuItem {
   title: string
@@ -19,8 +18,11 @@ export interface PackMenuOpts {
   viewport: Viewport
 }
 
-const FOOTER = 'enter open    q leave    esc back'
-const MAX_TITLE = 30
+const FOOTER = 'q leave  esc close'
+// Kept narrow so the panel fits phone portrait without shrinking the cell —
+// item rows and the footer drive the width; the pack title (opts.title) is
+// truncated to whatever that produces instead of being allowed to widen it.
+const MAX_TITLE = 20
 
 /**
  * The in-session pack picker as a self-contained ANSI panel (its own opaque
@@ -30,13 +32,13 @@ const MAX_TITLE = 30
  */
 export function projectPackMenu(
   opts: PackMenuOpts,
-): { buffer: CellBuffer; metrics: TermMetrics; itemRows: number[]; footerRow: number } {
+): { buffer: CellBuffer; metrics: TermMetrics; itemRows: number[]; footerRow: number; footerCloseCol: number } {
   // `*` marks solved; a 2-wide number column keeps titles aligned to 20.
   const rowStr = (it: PackMenuItem, i: number): string =>
     `${it.solved ? '*' : ' '} ${String(i + 1).padStart(2, ' ')} ${it.title.slice(0, MAX_TITLE)}`
   const itemStrs = opts.items.map(rowStr)
 
-  const innerW = Math.max(opts.title.length, FOOTER.length, ...itemStrs.map((s) => s.length))
+  const innerW = Math.max(FOOTER.length, ...itemStrs.map((s) => s.length))
   const cols = innerW + 4 // border + 1 pad on each side
   const firstItemRow = 3 // border, title, blank, then items
   const rows = itemStrs.length + 6 // +title +2 blanks +footer +2 borders
@@ -61,10 +63,20 @@ export function projectPackMenu(
 
   const footerRow = rows - 2
   buf.text(2, footerRow, FOOTER, chrome.dim, chrome.bg)
+  // Re-paint the key tokens over the dim base so 'q' and 'esc' pop in the
+  // same highlight color as the selected-row background (chrome.name).
+  for (const key of ['q', 'esc']) {
+    const at = FOOTER.indexOf(key)
+    if (at >= 0) buf.text(2 + at, footerRow, key, chrome.name, chrome.bg)
+  }
+  // Column where the "esc close" segment starts — the loop uses this to tell
+  // a click on "close" (dismiss the picker only) apart from "q leave" (leave
+  // the puzzle), instead of treating the whole footer row as one action.
+  const footerCloseCol = 2 + FOOTER.indexOf('esc')
 
   let cell = Math.floor(Math.min((opts.viewport.w * 0.92) / cols, (opts.viewport.h * 0.92) / rows))
-  cell = Math.max(GLYPH_PX, Math.floor(cell / GLYPH_PX) * GLYPH_PX)
-  cell = Math.min(cell, GLYPH_PX * 3)
+  cell = Math.max(GRID_PX, Math.floor(cell / ZOOM_STEP) * ZOOM_STEP)
+  cell = Math.min(cell, GRID_PX * 3)
 
   return {
     buffer: buf,
@@ -76,5 +88,6 @@ export function projectPackMenu(
     },
     itemRows,
     footerRow,
+    footerCloseCol,
   }
 }

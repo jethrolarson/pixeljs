@@ -349,7 +349,7 @@ const editor = (signal: AbortSignal, user: User): Element => {
         }),
       ),
       group("Description", descField),
-      group("Icon (paint the pack cover)", iconEditor),
+      group("Icon", iconEditor),
       h("div", { className: styles.formGroup }, [
         h("div", { className: styles.publishRow }, [
           publishCheck,

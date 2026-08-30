@@ -125,7 +125,14 @@ export function createGameLoop(cfg: GameLoopConfig): GameLoop {
   // for click hit-testing. Modal like the help guide.
   let pickerOpen = false
   let pickerSel = 0
-  let pickerGeom: { metrics: TermMetrics; itemRows: number[]; footerRow: number; cols: number; rows: number } | null = null
+  let pickerGeom: {
+    metrics: TermMetrics
+    itemRows: number[]
+    footerRow: number
+    footerCloseCol: number
+    cols: number
+    rows: number
+  } | null = null
   const openPicker = (): void => {
     if (!cfg.packMenu) return
     pickerSel = cfg.packMenu.current
@@ -157,6 +164,7 @@ export function createGameLoop(cfg: GameLoopConfig): GameLoop {
     const paintCursor = (): void => {
       const c = ensure()
       if (isDone()) return
+      if (level.mark.getAt(c.x, c.y) === '1') return
       const prev = level.paint.getAt(c.x, c.y)
       const v = String(cfg.getActiveColor())
       level.paint.setAt(c.x, c.y, v)
@@ -178,7 +186,10 @@ export function createGameLoop(cfg: GameLoopConfig): GameLoop {
       const c = ensure()
       if (isDone()) return
       if (fresh) markErasing = level.mark.getAt(c.x, c.y) === '1'
-      level.mark.setAt(c.x, c.y, markErasing ? '0' : '1')
+      const newMark = markErasing ? '0' : '1'
+      level.mark.setAt(c.x, c.y, newMark)
+      // Marked-empty and painted are mutually exclusive — a cell can't be both.
+      if (newMark === '1') level.paint.setAt(c.x, c.y, '0')
     }
     // While a paint/erase/mark key is held, moving the cursor applies it to each
     // cell it enters — keyboard drag.
@@ -330,7 +341,11 @@ export function createGameLoop(cfg: GameLoopConfig): GameLoop {
           if (idx >= 0) {
             pickerSel = idx
             pickSelected()
-          } else if (pr === g.footerRow && pc >= 0 && pc < g.cols) {
+          } else if (pr === g.footerRow && pc >= g.footerCloseCol && pc < g.cols) {
+            // "esc close" segment — dismiss the picker, stay in the puzzle.
+            pickerOpen = false
+          } else if (pr === g.footerRow && pc >= 0 && pc < g.footerCloseCol) {
+            // "q leave" segment — leave the puzzle entirely.
             pickerOpen = false
             cfg.onExit?.()
           } else if (pc < 0 || pc >= g.cols || pr < 0 || pr >= g.rows) {
@@ -449,17 +464,19 @@ export function createGameLoop(cfg: GameLoopConfig): GameLoop {
       drawStipple(ctx, cx, cy, layout.cellW, layout.cellH, color)
     }
 
-    // Help guide: dim the puzzle and draw the ANSI panel over it.
+    // Help guide: clear to the terminal background and draw the ANSI panel
+    // over it — an opaque screen swap, not a translucent web-style dim, to
+    // stay in character as a terminal rather than a DOM modal over a page.
     if (helpOpen && mode === 'play') {
-      ctx.fillStyle = 'rgba(13,13,13,0.82)'
+      ctx.fillStyle = chrome.bg
       ctx.fillRect(0, 0, w, h)
       const help = projectHelp({ w, h })
       drawBuffer(ctx, help.buffer, help.metrics)
     }
 
-    // Pack picker: dim the puzzle and draw the selectable list over it.
+    // Pack picker: same opaque screen swap as the help guide.
     if (pickerOpen && mode === 'play' && cfg.packMenu) {
-      ctx.fillStyle = 'rgba(13,13,13,0.82)'
+      ctx.fillStyle = chrome.bg
       ctx.fillRect(0, 0, w, h)
       const pm = projectPackMenu({
         title: cfg.packMenu.title,
@@ -469,7 +486,14 @@ export function createGameLoop(cfg: GameLoopConfig): GameLoop {
         viewport: { w, h },
       })
       drawBuffer(ctx, pm.buffer, pm.metrics)
-      pickerGeom = { metrics: pm.metrics, itemRows: pm.itemRows, footerRow: pm.footerRow, cols: pm.buffer.cols, rows: pm.buffer.rows }
+      pickerGeom = {
+        metrics: pm.metrics,
+        itemRows: pm.itemRows,
+        footerRow: pm.footerRow,
+        footerCloseCol: pm.footerCloseCol,
+        cols: pm.buffer.cols,
+        rows: pm.buffer.rows,
+      }
     } else {
       pickerGeom = null
     }

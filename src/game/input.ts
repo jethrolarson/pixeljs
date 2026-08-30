@@ -72,7 +72,10 @@ export function applyPointer(
   if (mode === 'play') {
     if (pointer.button === 'right') {
       if (pointer.newlyPressed) it.isErasing = level.mark.getAt(x, y) === '1'
-      level.mark.setAt(x, y, it.isErasing ? '0' : '1')
+      const newMark = it.isErasing ? '0' : '1'
+      level.mark.setAt(x, y, newMark)
+      // Marked-empty and painted are mutually exclusive — a cell can't be both.
+      if (newMark === '1') level.paint.setAt(x, y, '0')
       return null
     }
     if (pointer.newlyPressed) it.isErasing = level.paint.getAt(x, y) === String(activeColorIndex)
