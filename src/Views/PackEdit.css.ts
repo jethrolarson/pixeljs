@@ -1,7 +1,12 @@
 import { style } from '@vanilla-extract/css'
 import { colors, scale } from '../theme.css'
 
-export const layout = style({ display: 'flex', gap: 32, alignItems: 'flex-start' })
+export const layout = style({
+  display: "flex",
+  gap: 32,
+  alignItems: "flex-start",
+  flexWrap: "wrap",
+});
 export const form = style({ flex: 1, maxWidth: 480 })
 export const previewCol = style({ width: 200 })
 

@@ -21,9 +21,24 @@ export const IconEditor: Component<IconEditorProps> = (signal, { level, ui, onCh
     signal,
     props: { width: level.x, height: level.y, className: styles.canvas },
   })
-  canvas.style.aspectRatio = `${level.x} / ${level.y}`
   const canvasWrap = h('div', { className: styles.canvasWrap }, [canvas])
   const ctx = canvas.getContext('2d')!
+
+  // Sizes the canvas to the largest box matching level's aspect ratio that
+  // fits canvasWrap. Done in JS rather than CSS aspect-ratio: that measured
+  // the wrap as non-square on first paint on mobile (viewport/flex layout not
+  // settled yet), stretching the drawing until a reflow happened to fix it.
+  const resize = (): void => {
+    const { clientWidth: w, clientHeight: h } = canvasWrap
+    const side = Math.floor(Math.min(w, (h * level.x) / level.y))
+    if (side > 0) {
+      canvas.style.width = `${side}px`
+      canvas.style.height = `${(side * level.y) / level.x}px`
+    }
+  }
+  const observer = new ResizeObserver(resize)
+  observer.observe(canvasWrap)
+  signal.addEventListener('abort', () => observer.disconnect())
 
   const redraw = (): void => {
     ctx.clearRect(0, 0, level.x, level.y)
