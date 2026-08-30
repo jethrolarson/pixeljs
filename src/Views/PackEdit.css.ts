@@ -117,6 +117,45 @@ export const hint = style({
   marginLeft: 8,
 });
 
+export const iconTrigger = style({
+  background: "none",
+  border: `${scale.borderWidth} solid ${colors.borderInput}`,
+  padding: 4,
+  cursor: "pointer",
+  lineHeight: 0,
+  ":hover": { borderColor: colors.link },
+});
+
+// Opaque full-screen swap rather than a translucent dim, to match the
+// terminal-style modals elsewhere (help/pack menus) — and so the small icon
+// canvas gets the whole viewport to draw in instead of competing with page
+// scroll for touch gestures.
+export const iconModal = style({
+  position: "fixed",
+  inset: 0,
+  zIndex: 100,
+  background: colors.bg,
+  display: "flex",
+  flexDirection: "column",
+  padding: 12,
+});
+
+export const iconModalHidden = style({ display: "none" });
+
+export const iconModalHeader = style({
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  marginBottom: 8,
+  flex: "0 0 auto",
+});
+
+export const iconModalBody = style({
+  flex: "1 1 auto",
+  minHeight: 0,
+  display: "flex",
+});
+
 export const emptyLevels = style({
   color: colors.textFaint,
   fontStyle: "italic",

@@ -71,6 +71,19 @@ export const Palette: Component<PaletteProps> = (signal, { ui, mode, onRemoveCol
     )
   }
 
+  // Edit mode only: activeColorIndex 0 means "erase" (level.grid's own empty
+  // value), so this is just another swatch to select — no separate erase
+  // state, and it shares the same selected-indicator style as a color swatch.
+  const eraseSwatch: Component<Record<string, never>> = (regionSignal) =>
+    enhance(
+      hx(
+        'button',
+        { signal: regionSignal, props: { type: 'button', className: styles.swatch }, on: { click: () => ui.prop('activeColorIndex').set(0) } },
+        ['×'],
+      ),
+      bindClass(styles.on, isActive(0), regionSignal),
+    )
+
   // Re-render the swatch row only when the palette length changes (add color),
   // not on every color edit — otherwise an open native picker would be torn down.
   return bindView(signal, mapRead(ui, (u) => u.palette.length), (regionSignal, len) => {
@@ -84,6 +97,7 @@ export const Palette: Component<PaletteProps> = (signal, { ui, mode, onRemoveCol
         ['+'],
       )
       : null
-    return h('div', { className: styles.layers }, addBtn ? [...swatches, addBtn] : swatches)
+    const leading = mode === 'edit' ? [eraseSwatch(regionSignal, {})] : []
+    return h('div', { className: styles.layers }, addBtn ? [...leading, ...swatches, addBtn] : [...leading, ...swatches])
   })
 }

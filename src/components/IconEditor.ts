@@ -8,20 +8,21 @@ import * as styles from './IconEditor.css'
 export interface IconEditorProps {
   level: Level
   ui: FunState<Ui>
-  cellPx?: number
   onChange?: () => void
 }
 
 /** Not the terminal game-loop renderer — that's built for a full puzzle page
- * (chrome, hint gutters, hotkey footer), wrong shape for a small inline
- * widget with no puzzle semantics. */
-export const IconEditor: Component<IconEditorProps> = (signal, { level, ui, cellPx = 16, onChange }) => {
+ * (chrome, hint gutters, hotkey footer), wrong shape for a small widget with
+ * no puzzle semantics. Canvas fills whatever box it's given (see PackEdit's
+ * full-screen modal) rather than a fixed pixel size, since drawing and page
+ * scroll compete for the same gesture on a small inline canvas on mobile. */
+export const IconEditor: Component<IconEditorProps> = (signal, { level, ui, onChange }) => {
   const canvas = hx('canvas', {
     signal,
     props: { width: level.x, height: level.y, className: styles.canvas },
   })
-  canvas.style.width = `${level.x * cellPx}px`
-  canvas.style.height = `${level.y * cellPx}px`
+  canvas.style.aspectRatio = `${level.x} / ${level.y}`
+  const canvasWrap = h('div', { className: styles.canvasWrap }, [canvas])
   const ctx = canvas.getContext('2d')!
 
   const redraw = (): void => {
@@ -50,7 +51,11 @@ export const IconEditor: Component<IconEditorProps> = (signal, { level, ui, cell
   let painting = false
   const paintAt = (e: PointerEvent): void => {
     const [x, y] = cellAt(e)
-    const erase = (e.buttons & 2) !== 0
+    // Right-click erases (desktop, no touch equivalent); activeColorIndex 0
+    // is the touch-friendly equivalent — Palette's erase swatch sets it, same
+    // as picking a color swatch sets an actual index, so both erase paths
+    // agree on one flag instead of needing separate "erasing" state.
+    const erase = (e.buttons & 2) !== 0 || ui.get().activeColorIndex === 0
     level.grid.setAt(x, y, erase ? '0' : String(ui.get().activeColorIndex))
     redraw()
   }
@@ -66,5 +71,5 @@ export const IconEditor: Component<IconEditorProps> = (signal, { level, ui, cell
     onRemoveColor: (i) => { level.removeColor(i); redraw(); onChange?.() },
   })
 
-  return h('div', { className: styles.wrap }, [canvas, palette])
+  return h('div', { className: styles.wrap }, [canvasWrap, palette])
 }

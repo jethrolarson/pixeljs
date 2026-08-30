@@ -11,6 +11,7 @@ import { getUser } from '../services/getUser'
 import { getModerator } from '../services/getModerator'
 import { PackCard } from '../components/PackCard'
 import { IconEditor } from "../components/IconEditor";
+import { renderPixelIcon } from "../components/PixelIcon";
 import { Header } from '../components/Header'
 import { hidden } from '../components/Header.css'
 import {
@@ -277,6 +278,11 @@ const editor = (signal: AbortSignal, user: User): Element => {
   );
 
   // --- Icon editor ---
+  // Full-screen modal, not inline: on a phone, drawing on a small canvas and
+  // scrolling the form both start from a single-finger drag, so an inline
+  // canvas fights the page for that gesture. Owning the whole screen while
+  // open removes the conflict.
+  const iconModalOpen = funState(false);
   // The preview only watches `form`, so a no-op `mod` forces it to re-render
   // with the icon's latest painted state after each stroke/palette edit.
   const iconEditor = IconEditor(signal, {
@@ -284,6 +290,33 @@ const editor = (signal: AbortSignal, user: User): Element => {
     ui: iconUi,
     onChange: () => form.mod((f) => ({ ...f })),
   });
+  const iconTrigger = hx(
+    "button",
+    {
+      signal,
+      props: { className: styles.iconTrigger, type: "button" },
+      on: { click: () => iconModalOpen.set(true) },
+    },
+    [bindView(signal, form, () => renderPixelIcon(buildPack().icon, 48))],
+  );
+  const iconModal = enhance(
+    h("div", { className: styles.iconModal }, [
+      h("div", { className: styles.iconModalHeader }, [
+        h("span", { className: styles.label }, ["Icon"]),
+        hx(
+          "button",
+          { signal, props: { type: "button" }, on: { click: () => iconModalOpen.set(false) } },
+          ["Done"],
+        ),
+      ]),
+      h("div", { className: styles.iconModalBody }, [iconEditor]),
+    ]),
+    bindClass(
+      styles.iconModalHidden,
+      mapRead(iconModalOpen, (v) => !v),
+      signal,
+    ),
+  );
 
   // --- Preview ---
   const preview = bindView(signal, form, (s) =>
@@ -349,7 +382,7 @@ const editor = (signal: AbortSignal, user: User): Element => {
         }),
       ),
       group("Description", descField),
-      group("Icon", iconEditor),
+      group("Icon", iconTrigger),
       h("div", { className: styles.formGroup }, [
         h("div", { className: styles.publishRow }, [
           publishCheck,
@@ -375,6 +408,7 @@ const editor = (signal: AbortSignal, user: User): Element => {
       h("div", { className: styles.previewLabel }, ["Preview"]),
       preview,
     ]),
+    iconModal,
   ]);
 };
 
