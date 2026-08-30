@@ -3,7 +3,7 @@ import { FULL, MARK, WRONG, H, chrome } from './glyphs'
 import { Level, SolvedArt } from '../../level'
 import { hexToRGB, rgbToCSS } from '../../color'
 import { GameMode, GridPos } from '../types'
-import { Layout, MENU_HELP_COL, MENU_BACK_COL, MENU_PREV_COL, MENU_NEXT_COL } from '../layout'
+import { Layout, MENU_HELP_COL, MENU_BACK_COL, MENU_PREV_COL, MENU_NEXT_COL, FRAME } from '../layout'
 import { Hints, ClueSat } from '../score'
 
 /** Faint puzzle-solution tracing guide drawn behind solved-art editing. */
@@ -105,8 +105,14 @@ export function projectPuzzle(o: ProjectOpts): CellBuffer {
     buf.set(markCol, layout.paletteRow, { glyph: MARK, fg: o.markTool ? chrome.text : chrome.dim })
     if (o.markTool) buf.set(markCol, layout.paletteRow + 1, { glyph: '^', fg: chrome.text })
   }
-  // Puzzle title under the grid; golf result replaces it once solved.
-  buf.text(layout.boxLeft, layout.nameRow, o.solved && o.golf ? o.golf : level.title, o.solved ? chrome.solved : chrome.name)
+  // Puzzle title under the grid; golf result replaces it once solved. Spans
+  // the full board row (not just from the grid's left edge) since nothing else
+  // shares this row, and truncated to that width — a long title never grows
+  // the board itself (layout.ts).
+  const nameCol = FRAME
+  const maxTitleWidth = layout.cols - 2 * FRAME
+  const nameText = (o.solved && o.golf ? o.golf : level.title).slice(0, maxTitleWidth)
+  buf.text(nameCol, layout.nameRow, nameText, o.solved ? chrome.solved : chrome.name)
 
   // Grid box; border color signals solved state.
   buf.box(layout.boxLeft, layout.boxTop, level.x + 2, level.y + 2, o.solved ? chrome.solved : chrome.dim)

@@ -59,7 +59,7 @@ export interface Layout {
 export const CHROME = 7
 
 /** One-cell margin reserved for the outer double-line game frame. */
-const FRAME = 1
+export const FRAME = 1
 
 /** Hotkey footer slots (columns) on `layout.menuRow`, styled like the dialog
  * footers. Each slot is `key␠label` (6 chars); slots are 7 apart so they never
@@ -97,6 +97,13 @@ const MAX_CELL = GRID_PX * 4
  * exceed what `raw` actually allows, or the canvas (sized to the viewport)
  * clips whatever doesn't fit instead of shrinking to it. */
 const MIN_CELL = GRID_PX
+
+/** Granularity cell size snaps to, above `MIN_CELL`. Half a grid unit (zoom
+ * steps of 0.5) rather than a whole one — most phones are HDPI (devicePixelRatio
+ * 2+), so a half-step still lands glyph/clearance pixels on an integer device
+ * pixel; the finer step roughly halves the leftover margin on narrow viewports
+ * where a whole `GRID_PX` of slack is a real chunk of the screen. */
+const ZOOM_STEP = GRID_PX / 2
 
 function maxLen(groups: HintGroup[][]): number {
   let m = 0
@@ -139,20 +146,19 @@ export function computeLayout(
   const menuRow = showClues ? nameRow + 2 : nameRow
   const menuRow2 = menuRow + 1
 
-  const inner = Math.max(
-    boxRight + 1,
-    boxLeft + level.title.length + 1,
-    showClues ? FRAME + menuCols : 0,
-    FRAME + CHROME,
-  )
+  // Title is NOT included here — it's drawn on one line under the grid and
+  // truncated to whatever width the grid already produced (see project.ts),
+  // rather than forcing the whole board to grow (and every cell to shrink)
+  // just to fit a long puzzle name.
+  const inner = Math.max(boxRight + 1, showClues ? FRAME + menuCols : 0, FRAME + CHROME)
   const cols = inner + FRAME // right frame column
   const rows = (showClues ? (hasMenuRow2 ? menuRow2 : menuRow) : nameRow) + 1 + FRAME // bottom frame row
 
-  // Snap to a multiple of GRID_PX so the glyph+clearance unit scales by an
-  // integer zoom factor (clean, even pixels at any cell size).
+  // Snap to a multiple of ZOOM_STEP so the glyph+clearance unit scales by a
+  // clean (possibly half-integer) zoom factor.
   const usableH = viewport.h - topInset
   const raw = Math.min(Math.floor(viewport.w / cols), Math.floor(usableH / rows))
-  const cell = Math.min(MAX_CELL, Math.max(MIN_CELL, Math.floor(raw / GRID_PX) * GRID_PX))
+  const cell = Math.min(MAX_CELL, Math.max(MIN_CELL, Math.floor(raw / ZOOM_STEP) * ZOOM_STEP))
   const usedW = cols * cell
   const usedH = rows * cell
 

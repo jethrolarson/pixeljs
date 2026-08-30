@@ -59,10 +59,12 @@ function drawCell(ctx: CanvasRenderingContext2D, cell: Cell, x: number, y: numbe
     return
   }
   // One cell is always GRID_PX = GLYPH_PX + 2*CLEARANCE grid pixels (see
-  // layout.ts) — layout snaps cell size to whole multiples of GRID_PX, so
-  // zoom (device px per grid px) is always an exact integer here. Glyph and
-  // clearance both scale by `zoom` together, so their 8:2:2 proportion is
-  // identical at every cell size instead of being derived independently.
+  // layout.ts) — layout snaps cell size to multiples of half a GRID_PX, so
+  // zoom (cell px per grid px) can be a half-integer (1.5, 2.5, ...). Dest
+  // coords still get Math.round'd below, so glyphs land on whole CSS pixels.
+  // Glyph and clearance both scale by `zoom` together, so their 8:2:2
+  // proportion is identical at every cell size instead of being derived
+  // independently.
   const zoom = cellH / GRID_PX
 
   // Every cell holds exactly one glyph, except a multi-digit clue count
