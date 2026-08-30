@@ -25,27 +25,98 @@ export interface PointerSource {
   afterFrame(): void
 }
 
+// A genuine two-finger touch lands with real, human-scale stagger between
+// fingers — tens of ms, not one animation frame — so committing a touch's
+// paint immediately on pointerdown draws a real stroke with the first finger
+// before the second is ever seen. Holding off this long is enough to see the
+// second finger in the near-simultaneous case a scroll/zoom gesture produces,
+// while staying well under normal tap-and-release timing.
+const TOUCH_HOLD_MS = 60
+
 export function createPointer(canvas: HTMLCanvasElement, signal: AbortSignal): PointerSource {
   const state: Pointer = { x: 0, y: 0, pressed: false, button: 'left', newlyPressed: false }
   const opts = { signal }
   // Pointer events unify mouse and touch. touch-action: pinch-zoom blocks
   // single-finger pan (so a drag arrives as pointermove and paints instead of
   // scrolling the page) while still letting the browser handle two-finger
-  // pinch natively as a real OS-level viewport zoom.
+  // pinch natively as a real OS-level viewport zoom. But a two-finger pan
+  // (fingers moving together, not apart) isn't recognized as a pinch, so the
+  // browser doesn't take it over — both touches arrive here as ordinary
+  // pointer events and would otherwise paint. `activePointers` tracks
+  // concurrent touches so a second one cancels the paint instead.
   canvas.style.touchAction = 'pinch-zoom'
-  canvas.addEventListener('pointermove', (e) => { state.x = e.clientX; state.y = e.clientY }, opts)
+  const activePointers = new Set<number>()
+
+  // A touch pointerdown doesn't commit to painting immediately — see
+  // TOUCH_HOLD_MS — so there's a window where we know a finger is down but
+  // haven't started painting yet. `pendingId` is that finger's pointerId.
+  let pendingTimer: ReturnType<typeof setTimeout> | null = null
+  let pendingId: number | null = null
+  let pendingButton: Pointer['button'] = 'left'
+
+  const clearPending = (): void => {
+    if (pendingTimer !== null) clearTimeout(pendingTimer)
+    pendingTimer = null
+    pendingId = null
+  }
+
+  const commit = (id: number, button: Pointer['button']): void => {
+    state.pressed = true
+    state.button = button
+    state.newlyPressed = true
+    canvas.setPointerCapture(id)
+  }
+
+  canvas.addEventListener('pointermove', (e) => {
+    if (activePointers.size > 1) return
+    state.x = e.clientX
+    state.y = e.clientY
+  }, opts)
   canvas.addEventListener('pointerdown', (e) => {
+    activePointers.add(e.pointerId)
+    if (activePointers.size > 1) {
+      // Second finger down mid-gesture: this is a pan/zoom, not a paint —
+      // drop whatever the first finger started (or was about to).
+      clearPending()
+      state.pressed = false
+      return
+    }
     // Touch has no hover: the press itself must establish the position.
     state.x = e.clientX
     state.y = e.clientY
-    state.pressed = true
-    state.button = e.button === 2 ? 'right' : 'left'
-    state.newlyPressed = true
-    canvas.setPointerCapture(e.pointerId)
+    const button = e.button === 2 ? 'right' : 'left'
+    if (e.pointerType !== 'touch') {
+      commit(e.pointerId, button)
+      return
+    }
+    pendingId = e.pointerId
+    pendingButton = button
+    pendingTimer = setTimeout(() => {
+      pendingTimer = null
+      if (activePointers.size === 1 && activePointers.has(e.pointerId)) commit(e.pointerId, pendingButton)
+    }, TOUCH_HOLD_MS)
   }, opts)
-  const release = (): void => { state.pressed = false }
-  canvas.addEventListener('pointerup', release, opts)
-  canvas.addEventListener('pointercancel', release, opts)
+  canvas.addEventListener('pointerup', (e) => {
+    activePointers.delete(e.pointerId)
+    if (pendingId === e.pointerId) {
+      // Lifted before the hold elapsed with no second finger ever showing up
+      // — a real, deliberate tap, quicker than TOUCH_HOLD_MS. Commit so it
+      // still paints, but let it read as pressed for one frame before
+      // releasing rather than flipping pressed true-then-false within this
+      // same synchronous handler, which the game loop (driven by
+      // requestAnimationFrame) would never observe.
+      clearPending()
+      commit(e.pointerId, pendingButton)
+      requestAnimationFrame(() => { state.pressed = false })
+      return
+    }
+    state.pressed = false
+  }, opts)
+  canvas.addEventListener('pointercancel', (e) => {
+    activePointers.delete(e.pointerId)
+    if (pendingId === e.pointerId) clearPending()
+    state.pressed = false
+  }, opts)
   canvas.addEventListener('contextmenu', (e) => e.preventDefault(), opts)
 
   return {
