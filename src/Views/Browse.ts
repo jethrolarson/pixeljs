@@ -1,6 +1,7 @@
 import { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore'
 import { funState, mapRead } from '@fun-land/fun-state'
 import { Component, h, hx, bindView } from '@fun-land/fun-web'
+import { votingEnabled } from '../features'
 import { PackData } from '../pack'
 import { getCommunityPacks } from '../packStore'
 import { getUser } from '../services/getUser'
@@ -46,7 +47,7 @@ export const Browse: Component = (signal) => {
     mapRead(user, (u) => u?.uid ?? null),
   )
 
-  const sort = funState<Sort>('upvotes')
+  const sort = funState<Sort>(votingEnabled ? 'upvotes' : 'createdAt')
   const community = funState<CommunityState>({ packs: [], lastDoc: null, loading: false, error: false })
 
   // Sort-change and "load more" can both be in flight at once; a stale response
@@ -70,19 +71,24 @@ export const Browse: Component = (signal) => {
     }
   }
 
-  const sortSelect = hx(
-    'select',
-    {
-      signal,
-      on: {
-        change: (e) => {
-          sort.set(e.currentTarget.value as Sort)
-          void loadCommunity(true)
-        },
-      },
-    },
-    [h('option', { value: 'upvotes' }, ['Most voted']), h('option', { value: 'createdAt' }, ['Newest'])],
-  )
+  const sortControl = votingEnabled
+    ? h('label', { className: [styles.sortBar, 'deem'].join(' ') }, [
+        'Sort by:',
+        hx(
+          'select',
+          {
+            signal,
+            on: {
+              change: (e) => {
+                sort.set(e.currentTarget.value as Sort)
+                void loadCommunity(true)
+              },
+            },
+          },
+          [h('option', { value: 'upvotes' }, ['Most voted']), h('option', { value: 'createdAt' }, ['Newest'])],
+        ),
+      ])
+    : null
 
   const body = bindView(signal, community, (s, st) => {
     if (st.loading && st.packs.length === 0) return h('p', { className: empty }, ['Loading…'])
@@ -105,12 +111,9 @@ export const Browse: Component = (signal) => {
   return h("div", { className: page }, [
     Header(signal, { user, isMod }),
     h("div", { className: pageBody }, [
-      h("div", { className: sectionHeader }, [
-        h("h2", {}, ["Community Packs"]),
-        h("label", { className: [styles.sortBar, "deem"].join(" ") }, [
-          "Sort by:",
-          sortSelect,
-        ]),
+      h('div', { className: sectionHeader }, [
+        h('h2', {}, ['Community Packs']),
+        ...(sortControl ? [sortControl] : []),
       ]),
       body,
     ]),

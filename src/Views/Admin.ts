@@ -1,5 +1,6 @@
 import { funState, FunState, mapRead } from '@fun-land/fun-state'
 import { Component, h, hx, bindView } from '@fun-land/fun-web'
+import { votingEnabled } from '../features'
 import { PackData } from '../pack'
 import { getPublishedPacks, setPackFeatured, isModerator } from '../packStore'
 import { getUser } from '../services/getUser'
@@ -30,7 +31,7 @@ const row = (signal: AbortSignal, pack: PackData, apply: Apply): Element => {
     cover,
     h('div', { className: styles.titleBox }, [
       h('a', { href: `/pack.html?id=${pack.id}`, className: styles.titleLink }, [pack.title]),
-      h('div', { className: styles.sub }, [`${pack.ownerName} · ▲ ${pack.upvotes}`]),
+      h('div', { className: styles.sub }, [votingEnabled ? `${pack.ownerName} · ▲ ${pack.upvotes}` : pack.ownerName]),
     ]),
     h('div', { className: styles.controls }, [
       h('label', { className: styles.ctrlLabel }, ['Order', orderInput]),

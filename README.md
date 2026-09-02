@@ -36,10 +36,23 @@ firebase deploy
 
 ## Firestore rules
 
-Rules are in `firestore.rules`. Deploy separately with:
+Rules are in `firestore.rules`. Run the focused rules suite with JDK 21 or newer:
+
+```bash
+npm run test:rules
+```
+
+Deploy the containment rules before deploying the UI:
 
 ```bash
 firebase deploy --only firestore:rules
+npm run build
+firebase deploy --only hosting
 ```
 
-Levels are publicly readable. Creating requires auth. Updating/deleting requires ownership.
+Pack voting UI and vote reads are disabled by default. A build made with
+`VITE_ENABLE_VOTING=true` exposes the existing voting UI, but direct Firestore vote
+writes remain intentionally denied until a trusted backend owns vote and aggregate
+updates. Pack creation must assign ownership to the authenticated user. Owners retain
+content editing and deletion; moderators retain featuring and deletion, while ownership,
+featured state, vote totals, IDs, and creation timestamps are protected from owner edits.

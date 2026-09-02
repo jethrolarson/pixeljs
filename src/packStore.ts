@@ -1,7 +1,7 @@
 import {
   collection, doc, getDoc, getDocs, setDoc, deleteDoc, updateDoc,
   query, orderBy, where, limit, startAfter, serverTimestamp,
-  increment, QueryDocumentSnapshot, DocumentData
+  QueryDocumentSnapshot, DocumentData
 } from 'firebase/firestore'
 import { db } from './firebase'
 import { PackData, MAX_PACK_LEVELS } from './pack'
@@ -55,14 +55,30 @@ export async function savePack(data: PackData): Promise<PackData> {
   }
   const id = data.id ?? doc(col).id
   const ref = doc(col, id)
-  const payload = stripUndefined({
-    ...data,
-    id,
+  const ownerFields = stripUndefined({
+    title: data.title,
+    description: data.description,
+    levelIds: data.levelIds,
+    icon: data.icon,
+    published: data.published,
     updatedAt: serverTimestamp(),
-    ...(!data.id ? { createdAt: serverTimestamp() } : {}),
   })
-  await setDoc(ref, payload, { merge: true })
-  return { ...data, id }
+
+  if (data.id) {
+    await updateDoc(ref, ownerFields)
+    return { ...data, id }
+  }
+
+  await setDoc(ref, {
+    ...ownerFields,
+    id,
+    ownerId: data.ownerId,
+    ownerName: data.ownerName,
+    featured: false,
+    upvotes: 0,
+    createdAt: serverTimestamp(),
+  })
+  return { ...data, id, featured: false, featuredOrder: undefined, upvotes: 0 }
 }
 
 export async function deletePack(id: string): Promise<void> {
@@ -72,13 +88,8 @@ export async function deletePack(id: string): Promise<void> {
 export async function upvotePack(packId: string, userId: string): Promise<void> {
   const voteRef = doc(db, 'packs', packId, 'upvotes', userId)
   const existing = await getDoc(voteRef)
-  if (existing.exists()) {
-    await deleteDoc(voteRef)
-    await updateDoc(doc(col, packId), { upvotes: increment(-1) })
-  } else {
-    await setDoc(voteRef, { at: serverTimestamp() })
-    await updateDoc(doc(col, packId), { upvotes: increment(1) })
-  }
+  if (existing.exists()) await deleteDoc(voteRef)
+  else await setDoc(voteRef, { at: serverTimestamp() })
 }
 
 export async function hasUpvoted(packId: string, userId: string): Promise<boolean> {
