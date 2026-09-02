@@ -2,6 +2,7 @@ import { FunState, mapRead } from '@fun-land/fun-state'
 import { Component, h, hx, enhance, attr, on, bindClass, bindView } from '@fun-land/fun-web'
 import { Ui } from '../game/uiState'
 import { GameMode } from '../game/types'
+import { MAX_PALETTE_COLORS } from '../level'
 import * as styles from './Palette.css'
 
 export interface PaletteProps {
@@ -90,11 +91,25 @@ export const Palette: Component<PaletteProps> = (signal, { ui, mode, onRemoveCol
     const swatches = Array.from({ length: len }, (_, i) =>
       mode === 'play' ? playSwatch(regionSignal, { i }) : editSwatch(regionSignal, { i, canRemove: len > 1 }),
     )
+    const atColorLimit = len >= MAX_PALETTE_COLORS
     const addBtn = mode === 'edit'
       ? hx(
         'button',
-        { signal: regionSignal, props: { type: 'button', className: styles.addButton }, on: { click: () => ui.mod((u) => ({ ...u, palette: [...u.palette, '#888888'] })) } },
-        ['+'],
+        {
+          signal: regionSignal,
+          props: {
+            type: 'button',
+            className: styles.addButton,
+            disabled: atColorLimit,
+            title: atColorLimit ? `Maximum of ${MAX_PALETTE_COLORS} colors reached` : 'Add color',
+          },
+          on: {
+            click: () => ui.mod((u) => u.palette.length >= MAX_PALETTE_COLORS
+              ? u
+              : { ...u, palette: [...u.palette, '#888888'] }),
+          },
+        },
+        [atColorLimit ? `${len}/${MAX_PALETTE_COLORS}` : '+'],
       )
       : null
     const leading = mode === 'edit' ? [eraseSwatch(regionSignal, {})] : []

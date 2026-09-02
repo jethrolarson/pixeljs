@@ -3,14 +3,16 @@ import {
   query, orderBy, serverTimestamp, Timestamp
 } from 'firebase/firestore'
 import { db } from './firebase'
-import { LevelData } from './level'
+import { LevelData, validateLevelData } from './level'
 
 const col = collection(db, 'levels')
 
 function docToLevel(id: string, data: Record<string, unknown>): LevelData {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { createdAt, updatedAt, ...rest } = data
-  return { ...rest, id } as LevelData
+  const level = { ...rest, id } as LevelData
+  validateLevelData(level)
+  return level
 }
 
 export async function getLevels(): Promise<LevelData[]> {
@@ -29,6 +31,7 @@ function stripUndefined(obj: Record<string, unknown>): Record<string, unknown> {
 }
 
 export async function saveLevel(data: LevelData, ownerId: string): Promise<LevelData> {
+  validateLevelData(data)
   const id = data.id ?? doc(col).id
   const ref = doc(col, id)
   const payload = stripUndefined({
