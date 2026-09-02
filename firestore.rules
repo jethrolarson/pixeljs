@@ -20,23 +20,57 @@ service cloud.firestore {
     }
 
     match /packs/{packId} {
+      function isValidCreatorPack() {
+        return request.auth != null
+          && request.resource.data.keys().hasAll([
+            'id', 'title', 'ownerId', 'ownerName', 'levelIds', 'icon',
+            'published', 'featured', 'upvotes', 'createdAt', 'updatedAt'
+          ])
+          && request.resource.data.keys().hasOnly([
+            'id', 'title', 'description', 'ownerId', 'ownerName', 'levelIds',
+            'icon', 'published', 'featured', 'upvotes', 'createdAt', 'updatedAt'
+          ])
+          && request.resource.data.id == packId
+          && request.resource.data.ownerId == request.auth.uid
+          && request.resource.data.featured == false
+          && request.resource.data.upvotes == 0
+          && request.resource.data.createdAt == request.time
+          && request.resource.data.updatedAt == request.time;
+      }
+
+      function hasCurrentUpdateTime() {
+        return request.resource.data.updatedAt == request.time;
+      }
+
+      function isOwnerEdit() {
+        return request.auth != null
+          && request.auth.uid == resource.data.ownerId
+          && hasCurrentUpdateTime()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'title', 'description', 'levelIds', 'icon', 'published', 'updatedAt'
+          ]);
+      }
+
+      function isModeratorEdit() {
+        return isModerator()
+          && hasCurrentUpdateTime()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'featured', 'featuredOrder', 'updatedAt'
+          ]);
+      }
+
       allow read: if resource.data.published == true
                   || (request.auth != null && request.auth.uid == resource.data.ownerId)
                   || isModerator();
-      allow create: if request.auth != null;
-      allow update: if request.auth != null && (
-        request.auth.uid == resource.data.ownerId ||
-        // moderators can set featured/featuredOrder only
-        (isModerator() && request.resource.data.diff(resource.data).affectedKeys()
-          .hasOnly(['featured', 'featuredOrder', 'updatedAt']))
-      );
+      allow create: if isValidCreatorPack();
+      allow update: if isOwnerEdit() || isModeratorEdit();
       allow delete: if request.auth != null && (
         request.auth.uid == resource.data.ownerId || isModerator()
       );
 
       match /upvotes/{userId} {
         allow read: if true;
-        allow write: if request.auth != null && request.auth.uid == userId;
+        allow create, update, delete: if false;
       }
     }
 

@@ -1,6 +1,7 @@
 import { User } from 'firebase/auth'
 import { funState, mapRead } from '@fun-land/fun-state'
 import { Component, h, bindView } from '@fun-land/fun-web'
+import { votingEnabled } from '../features'
 import { PackData, PackIcon } from '../pack'
 import { LevelData } from '../level'
 import { getPackById, upvotePack, hasUpvoted } from '../packStore'
@@ -32,17 +33,19 @@ const hero = (signal: AbortSignal, pack: PackData, user: User | null): Element =
   const isOwner = user?.uid === pack.ownerId
 
   const voted = funState(false)
-  if (user) hasUpvoted(pack.id!, user.uid).then(voted.set).catch(console.error)
+  if (votingEnabled && user) hasUpvoted(pack.id!, user.uid).then(voted.set).catch(console.error)
 
-  const actions: Element[] = [
-    upvoteButton(signal, {
-      initialCount: pack.upvotes,
-      voted,
-      signedIn: !!user,
-      toggle: () => upvotePack(pack.id!, user!.uid),
-      requireSignIn: () => void signIn(),
-    }),
-  ]
+  const actions: Element[] = votingEnabled
+    ? [
+        upvoteButton(signal, {
+          initialCount: pack.upvotes,
+          voted,
+          signedIn: !!user,
+          toggle: () => upvotePack(pack.id!, user!.uid),
+          requireSignIn: () => void signIn(),
+        }),
+      ]
+    : []
   if (isOwner)
     actions.push(
       h(

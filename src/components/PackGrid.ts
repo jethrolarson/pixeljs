@@ -1,5 +1,6 @@
 import { funState } from '@fun-land/fun-state'
 import { h } from '@fun-land/fun-web'
+import { votingEnabled } from '../features'
 import { PackData } from '../pack'
 import { upvotePack, hasUpvoted } from '../packStore'
 import { signIn } from '../auth'
@@ -22,16 +23,18 @@ export const packGrid = (
     packs.map((p) => {
       const voted = funState(false)
       const u = getUid()
-      if (u) hasUpvoted(p.id!, u).then(voted.set).catch(console.error)
+      if (votingEnabled && u) hasUpvoted(p.id!, u).then(voted.set).catch(console.error)
       return PackCard(signal, {
         pack: p,
         showEdit,
-        upvote: {
-          voted,
-          signedIn: !!u,
-          toggle: () => upvotePack(p.id!, getUid()!),
-          requireSignIn: () => void signIn(),
-        },
+        upvote: votingEnabled
+          ? {
+              voted,
+              signedIn: !!u,
+              toggle: () => upvotePack(p.id!, getUid()!),
+              requireSignIn: () => void signIn(),
+            }
+          : undefined,
       })
     }),
   )
