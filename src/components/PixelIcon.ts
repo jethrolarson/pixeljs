@@ -6,8 +6,9 @@ export const renderPixelIcon = (icon: PackIcon | null, sizePx: number): HTMLCanv
   const y = icon?.y ?? 1
   canvas.width = x
   canvas.height = y
-  canvas.style.width = `${sizePx}px`
-  canvas.style.height = `${sizePx}px`
+  const scale = sizePx / Math.max(x, y)
+  canvas.style.width = `${x * scale}px`
+  canvas.style.height = `${y * scale}px`
   canvas.style.imageRendering = 'pixelated'
   if (!icon) return canvas
 
