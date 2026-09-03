@@ -21,8 +21,23 @@ service cloud.firestore {
           || (paletteSize == 9 && data.matches('^[0-9]*$'));
       }
 
+      function isValidColor(color) {
+        return color is string && color.matches('^#[0-9a-fA-F]{6}$');
+      }
+
       function hasValidPalette(palette) {
-        return palette is list && palette.size() >= 1 && palette.size() <= 9;
+        return palette is list
+          && palette.size() >= 1
+          && palette.size() <= 9
+          && isValidColor(palette[0])
+          && (palette.size() < 2 || isValidColor(palette[1]))
+          && (palette.size() < 3 || isValidColor(palette[2]))
+          && (palette.size() < 4 || isValidColor(palette[3]))
+          && (palette.size() < 5 || isValidColor(palette[4]))
+          && (palette.size() < 6 || isValidColor(palette[5]))
+          && (palette.size() < 7 || isValidColor(palette[6]))
+          && (palette.size() < 8 || isValidColor(palette[7]))
+          && (palette.size() < 9 || isValidColor(palette[8]));
       }
 
       function hasValidGrid(data, width, height, palette) {
