@@ -4,9 +4,7 @@ A handoff for the agent building this out. Context and design decisions are sett
 
 ## What it is
 
-A **color nonogram** (picross) game with a terminal/ANSI aesthetic. Originally written in CoffeeScript a decade ago, now being rewritten in **TypeScript**. Rendering is **canvas-based** (not tied to it, but canvas is the current and preferred approach). The goal is the _look_ of a terminal — colored glyph grid, box-drawing chrome — **not** an actual terminal interface. No xterm.js, no escape codes; draw a character grid directly to canvas with a bitmap/CP437 font.
-
-A playable prototype already exists with placeholder art. The remaining work is dressing it in the ANSI aesthetic and wiring the visual feedback.
+A **color nonogram** (picross) game with a terminal/ANSI aesthetic. Originally written in CoffeeScript a decade ago, now being rewritten in **TypeScript**. Rendering is **canvas-based**. The goal is the _look_ of a terminal — colored glyph grid, box-drawing chrome — **not** an actual terminal interface. No xterm.js, no escape codes; draw a character grid directly to canvas with a bitmap/CP437 font.
 
 ## Core mechanic — what makes it a _color_ nonogram
 

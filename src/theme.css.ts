@@ -13,6 +13,10 @@ export const scale = createGlobalTheme(":root", {
   borderWidth: "4px",
 });
 
+export const sizes = {
+  maxWidth: "990px",
+};
+
 globalStyle(":root", {
   "@media": {
     "screen and (max-width: 599px)": {
@@ -189,6 +193,8 @@ export const page = style({
 
 export const pageBody = style({
   padding: "24px",
+  maxWidth: sizes.maxWidth,
+  margin: "0 auto",
 });
 
 globalStyle(".display_contents", {

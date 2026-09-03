@@ -1,12 +1,18 @@
 import { style } from '@vanilla-extract/css'
-import { colors, scale } from '../theme.css'
+import { colors, scale, sizes } from "../theme.css";
 
 export const headerBar = style({
+  backgroundColor: "#242424",
+  borderBottom: `solid ${scale.borderWidth} ${colors.border}`,
+});
+
+export const header = style({
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
   padding: "16px 24px",
-  backgroundColor: "#242424",
+  maxWidth: sizes.maxWidth,
+  margin: "0 auto",
 });
 
 export const title = style({

@@ -48,23 +48,25 @@ export const Header: Component<HeaderProps> = (signal, { user, isMod }) => {
   );
 
   return h("header", { className: styles.headerBar }, [
-    h("h1", { className: styles.title }, [
-      h(
-        "a",
-        {
-          href: "/",
-          className: isActive("/")
-            ? `${styles.logoLink} ${styles.logoLinkActive}`
-            : styles.logoLink,
-        },
-        ["PP • WF"],
-      ),
-    ]),
-    h("div", { className: styles.actions }, [
-      tab("/browse.html", "Browse"),
-      tab("/workshop.html", "Workshop", notSignedIn),
-      tab("/admin.html", "Admin", notMod),
-      authButton,
+    h("div", { className: styles.header }, [
+      h("h1", { className: styles.title }, [
+        h(
+          "a",
+          {
+            href: "/",
+            className: isActive("/")
+              ? `${styles.logoLink} ${styles.logoLinkActive}`
+              : styles.logoLink,
+          },
+          ["PP • WF"],
+        ),
+      ]),
+      h("div", { className: styles.actions }, [
+        tab("/browse.html", "Packs"),
+        tab("/workshop.html", "Create", notSignedIn),
+        tab("/admin.html", "Admin", notMod),
+        authButton,
+      ]),
     ]),
   ]);
 }
