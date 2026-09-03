@@ -14,7 +14,7 @@ export const scale = createGlobalTheme(":root", {
 });
 
 export const sizes = {
-  maxWidth: "990px",
+  maxWidth: "800px",
 };
 
 globalStyle(":root", {
