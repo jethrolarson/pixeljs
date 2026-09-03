@@ -31,6 +31,17 @@ const pack = (ownerId = 'owner') => ({
   updatedAt: serverTimestamp(),
 })
 
+const level = (overrides = {}) => ({
+  title: 'Level',
+  ownerId: 'owner',
+  x: 2,
+  y: 2,
+  game: '0120',
+  palette: ['#000000', '#ffffff'],
+  art: null,
+  ...overrides,
+})
+
 const dbFor = (uid) => uid
   ? testEnv.authenticatedContext(uid).firestore()
   : testEnv.unauthenticatedContext().firestore()
@@ -52,6 +63,57 @@ beforeEach(async () => {
 })
 
 after(async () => testEnv.cleanup())
+
+test('level encoding accepts palette indices 1–9 and valid mixed-case colors', async () => {
+  const palette = Array.from({ length: 9 }, (_, i) => `#00000${i}`)
+  palette[8] = '#Aa00Ff'
+  await assertSucceeds(setDoc(doc(dbFor('owner'), 'levels/valid'), level({ game: '0987', palette })))
+})
+
+test('level encoding rejects oversized puzzle and solved-art palettes', async () => {
+  const palette = Array.from({ length: 10 }, (_, i) => `#00000${i}`)
+  const ref = doc(dbFor('owner'), 'levels/invalid')
+
+  await assertFails(setDoc(ref, level({ palette })))
+  await assertFails(setDoc(ref, level({
+    art: { scale: 1, palette, data: '0000' },
+  })))
+})
+
+test('level encoding rejects malformed puzzle and solved-art colors', async () => {
+  const ref = doc(dbFor('owner'), 'levels/invalid')
+
+  await assertFails(setDoc(ref, level({ palette: ['not-a-color', '#ffffff'] })))
+  await assertFails(setDoc(ref, level({ palette: [42, '#ffffff'] })))
+  await assertFails(setDoc(ref, level({ palette: ['#12345g', '#ffffff'] })))
+  await assertFails(setDoc(ref, level({
+    art: { scale: 1, palette: [{}], data: '0000' },
+  })))
+  await assertFails(setDoc(ref, level({
+    art: { scale: 1, palette: ['red'], data: '0000' },
+  })))
+})
+
+test('level encoding rejects malformed dimensions and solved-art scales', async () => {
+  const ref = doc(dbFor('owner'), 'levels/invalid')
+
+  await assertFails(setDoc(ref, level({ x: 0 })))
+  await assertFails(setDoc(ref, level({ y: 1.5 })))
+  await assertFails(setDoc(ref, level({ x: '2' })))
+  await assertFails(setDoc(ref, level({ art: { scale: 0, palette: ['#000000'], data: '0000' } })))
+  await assertFails(setDoc(ref, level({ art: { scale: 5, palette: ['#000000'], data: '0'.repeat(400) } })))
+  await assertFails(setDoc(ref, level({ art: { scale: 1.5, palette: ['#000000'], data: '0'.repeat(9) } })))
+})
+
+test('level encoding rejects malformed grid lengths and palette indices', async () => {
+  const ref = doc(dbFor('owner'), 'levels/invalid')
+
+  await assertFails(setDoc(ref, level({ game: '010' })))
+  await assertFails(setDoc(ref, level({ game: '0130' })))
+  await assertFails(setDoc(ref, level({
+    art: { scale: 2, palette: ['#000000'], data: '0'.repeat(15) },
+  })))
+})
 
 test('pack creation requires authentication and request ownership', async () => {
   await assertFails(setDoc(doc(dbFor(), 'packs/pack-1'), pack()))

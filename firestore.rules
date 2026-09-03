@@ -9,9 +9,78 @@ service cloud.firestore {
     }
 
     match /levels/{levelId} {
+      function hasValidCells(data, paletteSize) {
+        return (paletteSize == 1 && data.matches('^[0-1]*$'))
+          || (paletteSize == 2 && data.matches('^[0-2]*$'))
+          || (paletteSize == 3 && data.matches('^[0-3]*$'))
+          || (paletteSize == 4 && data.matches('^[0-4]*$'))
+          || (paletteSize == 5 && data.matches('^[0-5]*$'))
+          || (paletteSize == 6 && data.matches('^[0-6]*$'))
+          || (paletteSize == 7 && data.matches('^[0-7]*$'))
+          || (paletteSize == 8 && data.matches('^[0-8]*$'))
+          || (paletteSize == 9 && data.matches('^[0-9]*$'));
+      }
+
+      function isValidColor(color) {
+        return color is string && color.matches('^#[0-9a-fA-F]{6}$');
+      }
+
+      function hasValidPalette(palette) {
+        return palette is list
+          && palette.size() >= 1
+          && palette.size() <= 9
+          && isValidColor(palette[0])
+          && (palette.size() < 2 || isValidColor(palette[1]))
+          && (palette.size() < 3 || isValidColor(palette[2]))
+          && (palette.size() < 4 || isValidColor(palette[3]))
+          && (palette.size() < 5 || isValidColor(palette[4]))
+          && (palette.size() < 6 || isValidColor(palette[5]))
+          && (palette.size() < 7 || isValidColor(palette[6]))
+          && (palette.size() < 8 || isValidColor(palette[7]))
+          && (palette.size() < 9 || isValidColor(palette[8]));
+      }
+
+      function hasValidGrid(data, width, height, palette) {
+        return data is string
+          && data.size() == width * height
+          && hasValidCells(data, palette.size());
+      }
+
+      function hasValidArt(level) {
+        return !('art' in level) || level.art == null || (
+          level.art is map
+          && level.art.keys().hasAll(['scale', 'palette', 'data'])
+          && level.art.scale is int
+          && level.art.scale >= 1
+          && level.art.scale <= 4
+          && hasValidPalette(level.art.palette)
+          && hasValidGrid(
+            level.art.data,
+            level.x * level.art.scale,
+            level.y * level.art.scale,
+            level.art.palette
+          )
+        );
+      }
+
+      function hasValidLevelEncoding() {
+        let level = request.resource.data;
+        return level.keys().hasAll(['x', 'y', 'game', 'palette'])
+          && level.x is int
+          && level.x >= 1
+          && level.y is int
+          && level.y >= 1
+          && hasValidPalette(level.palette)
+          && hasValidGrid(level.game, level.x, level.y, level.palette)
+          && hasValidArt(level);
+      }
+
       allow read: if true;
-      allow create: if request.auth != null;
-      allow update, delete: if request.auth != null && request.auth.uid == resource.data.ownerId;
+      allow create: if request.auth != null && hasValidLevelEncoding();
+      allow update: if request.auth != null
+        && request.auth.uid == resource.data.ownerId
+        && hasValidLevelEncoding();
+      allow delete: if request.auth != null && request.auth.uid == resource.data.ownerId;
 
       match /solves/{userId} {
         allow read: if true;

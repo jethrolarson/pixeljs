@@ -1,5 +1,7 @@
 import { Matrix } from './matrix'
 
+export const MAX_PALETTE_COLORS = 9
+
 export interface HintGroup {
   count: number
   colorIndex: number  // 1-based index into palette; 0 means empty row/col
@@ -27,6 +29,47 @@ export interface LevelData {
   art?: SolvedArt | null
 }
 
+const validatePalette = (palette: string[], name: string): void => {
+  if (!Array.isArray(palette) || palette.length < 1 || palette.length > MAX_PALETTE_COLORS) {
+    throw new Error(`${name} must contain between 1 and ${MAX_PALETTE_COLORS} colors.`)
+  }
+  if (palette.some((color) => typeof color !== 'string' || !/^#[0-9a-f]{6}$/i.test(color))) {
+    throw new Error(`${name} contains an invalid color.`)
+  }
+}
+
+const validateGrid = (data: string, width: number, height: number, paletteSize: number, name: string): void => {
+  if (typeof data !== 'string' || data.length !== width * height) {
+    throw new Error(`${name} must contain exactly ${width * height} cells.`)
+  }
+  if (![...data].every((cell) => /^[0-9]$/.test(cell) && Number(cell) <= paletteSize)) {
+    throw new Error(`${name} contains a color index outside its palette.`)
+  }
+}
+
+export const validateLevelData = (data: LevelData): void => {
+  const x = data.x ?? 10
+  const y = data.y ?? 10
+  if (!Number.isInteger(x) || x < 1 || !Number.isInteger(y) || y < 1) {
+    throw new Error('Level dimensions must be positive integers.')
+  }
+
+  const palette = data.palette ?? ['#0000ff']
+  validatePalette(palette, 'Puzzle palette')
+  validateGrid(data.game ?? '0'.repeat(x * y), x, y, palette.length, 'Puzzle grid')
+
+  if (data.art === null || data.art === undefined) return
+  if (typeof data.art !== 'object' || Array.isArray(data.art)) {
+    throw new Error('Solved art must be an object or null.')
+  }
+  const { scale, palette: artPalette, data: artData } = data.art
+  if (!Number.isInteger(scale) || scale < 1 || scale > 4) {
+    throw new Error('Solved art scale must be an integer from 1 to 4.')
+  }
+  validatePalette(artPalette, 'Solved-art palette')
+  validateGrid(artData, x * scale, y * scale, artPalette.length, 'Solved-art grid')
+}
+
 export class Level {
   title: string
   x: number
@@ -40,6 +83,7 @@ export class Level {
   art: SolvedArt | null  // optional reward art shown once solved
 
   constructor(data: LevelData = {}) {
+    validateLevelData(data)
     this.title = data.title ?? 'untitled'
     this.x = data.x ?? 10
     this.y = data.y ?? 10

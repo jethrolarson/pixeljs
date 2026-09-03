@@ -137,19 +137,32 @@ export const Edit: Component = (signal) => {
       return currentId;
     };
 
+    const reportSaveError = (error: unknown): void => {
+      const detail = error instanceof Error ? error.message : "Unknown error";
+      showToast(`Save failed: ${detail}`, "error", 5000);
+    };
+
     const onSave = async (): Promise<void> => {
-      const id = await persist();
-      if (!id) return;
-      showToast("Saved");
-      if (returnPackId)
-        location.href = `/pack-edit.html?id=${returnPackId}&add=${id}`;
+      try {
+        const id = await persist();
+        if (!id) return;
+        showToast("Saved");
+        if (returnPackId)
+          location.href = `/pack-edit.html?id=${returnPackId}&add=${id}`;
+      } catch (error) {
+        reportSaveError(error);
+      }
     };
 
     // Test plays the level you're editing — save first so nothing is lost and
     // play loads the current state by id.
     const onTest = async (): Promise<void> => {
-      const id = await persist();
-      if (id) location.href = `/play.html?id=${id}`;
+      try {
+        const id = await persist();
+        if (id) location.href = `/play.html?id=${id}`;
+      } catch (error) {
+        reportSaveError(error);
+      }
     };
 
     const titleInput = hx("input", {

@@ -74,4 +74,11 @@ export const addButton = style({
   border: `${scale.borderWidth} solid ${colors.green}`,
   borderRadius: 0,
   cursor: "pointer",
+  selectors: {
+    '&:disabled': {
+      color: colors.textDim,
+      borderColor: colors.borderInput,
+      cursor: 'not-allowed',
+    },
+  },
 });
