@@ -1,7 +1,7 @@
 import {
   collection, doc, getDoc, getDocs, setDoc, deleteDoc,
   query, orderBy, serverTimestamp, Timestamp
-} from 'firebase/firestore'
+} from 'firebase/firestore/lite'
 import { db } from './firebase'
 import { LevelData, validateLevelData } from './level'
 

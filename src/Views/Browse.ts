@@ -1,4 +1,4 @@
-import { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore'
+import { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore/lite'
 import { funState, mapRead } from '@fun-land/fun-state'
 import { Component, h, hx, bindView } from '@fun-land/fun-web'
 import { votingEnabled } from '../features'

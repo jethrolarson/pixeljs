@@ -2,7 +2,7 @@ import {
   collection, doc, getDoc, getDocs, setDoc, deleteDoc, updateDoc,
   query, orderBy, where, limit, startAfter, serverTimestamp,
   QueryDocumentSnapshot, DocumentData
-} from 'firebase/firestore'
+} from 'firebase/firestore/lite'
 import { db } from './firebase'
 import { PackData, MAX_PACK_LEVELS } from './pack'
 

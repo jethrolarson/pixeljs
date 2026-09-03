@@ -3,20 +3,20 @@ import { resolve } from 'path'
 import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin'
 
 export default defineConfig({
-  publicDir: 'public',
+  publicDir: "public",
   plugins: [vanillaExtractPlugin()],
   build: {
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'index.html'),
-        play: resolve(__dirname, 'play.html'),
-        edit: resolve(__dirname, 'edit.html'),
-        browse: resolve(__dirname, 'browse.html'),
-        workshop: resolve(__dirname, 'workshop.html'),
-        pack: resolve(__dirname, 'pack.html'),
-        packEdit: resolve(__dirname, 'pack-edit.html'),
-        admin: resolve(__dirname, 'admin.html'),
+        main: resolve(import.meta.dirname, "index.html"),
+        play: resolve(import.meta.dirname, "play.html"),
+        edit: resolve(import.meta.dirname, "edit.html"),
+        browse: resolve(import.meta.dirname, "browse.html"),
+        workshop: resolve(import.meta.dirname, "workshop.html"),
+        pack: resolve(import.meta.dirname, "pack.html"),
+        packEdit: resolve(import.meta.dirname, "pack-edit.html"),
+        admin: resolve(import.meta.dirname, "admin.html"),
       },
     },
   },
-})
+});
