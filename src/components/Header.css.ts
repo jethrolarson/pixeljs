@@ -10,7 +10,7 @@ export const header = style({
   display: "flex",
   alignItems: "center",
   justifyContent: "space-between",
-  padding: "16px 24px",
+  padding: "8px 24px",
   maxWidth: sizes.maxWidth,
   margin: "0 auto",
 });
@@ -18,6 +18,7 @@ export const header = style({
 export const title = style({
   color: colors.textBright,
   textAlign: "center",
+  lineHeight: 1,
 });
 
 export const logoLink = style({
@@ -30,10 +31,11 @@ export const logoLinkActive = style({
 });
 
 export const actions = style({
-  display: 'flex',
+  display: "flex",
   gap: 8,
-  alignItems: 'center',
-})
+  alignItems: "center",
+  minHeight: 28, // holds header height steady before identity resolves
+});
 
 export const hidden = style({
   display: 'none',
@@ -54,3 +56,4 @@ export const tabActive = style({
   background: colors.panel,
   borderBottomColor: colors.textDim,
 });
+

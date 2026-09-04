@@ -16,6 +16,7 @@ export default defineConfig({
         pack: resolve(import.meta.dirname, "pack.html"),
         packEdit: resolve(import.meta.dirname, "pack-edit.html"),
         admin: resolve(import.meta.dirname, "admin.html"),
+        profile: resolve(import.meta.dirname, "profile.html"),
       },
     },
   },

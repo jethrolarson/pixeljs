@@ -18,11 +18,10 @@ import { btn } from "../theme.css";
 
 const defaultLevel: LevelData = {
   title: "New Level",
-  x: 10,
-  y: 10,
-  game: "0".repeat(100),
+  x: 8,
+  y: 8,
+  game: "0".repeat(64),
   palette: ["#0000ff"],
-  par: 3,
 };
 
 const levelToData = (level: Level, ui: FunState<Ui>): LevelData => ({
@@ -31,7 +30,6 @@ const levelToData = (level: Level, ui: FunState<Ui>): LevelData => ({
   y: level.y,
   game: level.getGame(),
   palette: [...ui.get().palette],
-  par: level.par,
   levelSetName: level.levelSetName,
 });
 
@@ -172,6 +170,7 @@ export const Edit: Component = (signal) => {
         value: level.title,
         placeholder: "title",
         className: edit.titleInput,
+        maxLength: 16,
       },
       on: {
         input: (e) => {
@@ -180,8 +179,16 @@ export const Edit: Component = (signal) => {
         },
       },
     });
-    const xInput = NumField(signal, { min: 3, max: 32, value: { get: () => level.x, set: setCols } });
-    const yInput = NumField(signal, { min: 3, max: 32, value: { get: () => level.y, set: setRows } });
+    const xInput = NumField(signal, {
+      min: 3,
+      max: 16,
+      value: { get: () => level.x, set: setCols },
+    });
+    const yInput = NumField(signal, {
+      min: 3,
+      max: 16,
+      value: { get: () => level.y, set: setRows },
+    });
 
     const muteField = h("label", { className: edit.muteRow }, [
       hx("input", {

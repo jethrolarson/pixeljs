@@ -1,13 +1,12 @@
 import { User } from 'firebase/auth'
-import { funState, mapRead } from '@fun-land/fun-state'
+import { funState } from "@fun-land/fun-state";
 import { Component, h, bindView } from '@fun-land/fun-web'
 import { votingEnabled } from '../features'
 import { PackData, PackIcon } from '../pack'
 import { LevelData } from '../level'
 import { getPackById, upvotePack, hasUpvoted } from '../packStore'
 import { getLevelById, getSolvedLevelIds } from '../store'
-import { getUser } from '../services/getUser'
-import { getModerator } from '../services/getModerator'
+import { getUser } from "../services/getUser";
 import { signIn, currentUser } from '../auth'
 import { Header } from '../components/Header'
 import { renderPixelIcon } from '../components/PixelIcon'
@@ -61,9 +60,12 @@ const hero = (signal: AbortSignal, pack: PackData, user: User | null): Element =
   const cover = h('div', { className: styles.heroCover }, [renderPixelIcon(pack.icon, 120)])
 
   const infoChildren: Element[] = [
-    h('h2', { className: styles.heroTitle }, [pack.title]),
-    h('div', { className: styles.heroMeta }, [`by ${pack.ownerName} · ${pack.levelIds.length} levels`]),
-  ]
+    h("h2", { className: styles.heroTitle }, [pack.title]),
+    h("div", { className: styles.heroMeta }, [
+      `by ${pack.ownerName} · `,
+      h("span", { className: "no-wrap" }, `${pack.levelIds.length} puzzles`),
+    ]),
+  ];
   if (pack.description) infoChildren.push(h('div', { className: styles.description }, [pack.description]))
   infoChildren.push(h('div', { className: styles.heroActions }, actions))
 
@@ -74,12 +76,16 @@ const levelCard = (pack: PackData, level: LevelData | null, index: number, solve
   if (!level) return h('div', { className: cardStyles.card }, [h('div', { className: styles.itemMissing }, ['(deleted)'])])
   const href = `/play.html?id=${pack.levelIds[index]}&pack=${pack.id}`
   const solved = solvedIds.has(pack.levelIds[index])
-  return h('div', { className: cardStyles.card }, [
-    h('a', { href, className: cardStyles.cover }, [renderPixelIcon(levelThumb(level, solved), 160)]),
-    h('div', { className: cardStyles.info }, [
-      h('a', { href, className: cardStyles.titleLink }, [`${index + 1}. ${level.title ?? 'Untitled'}`]),
+  return h("div", { className: cardStyles.card }, [
+    h("a", { href, className: cardStyles.cover }, [
+      renderPixelIcon(levelThumb(level, solved), 128),
     ]),
-  ])
+    h("div", { className: cardStyles.info }, [
+      h("a", { href, className: cardStyles.titleLink }, [
+        `${index + 1}. ${level.title ?? "Untitled"}`,
+      ]),
+    ]),
+  ]);
 }
 
 const levelList = (pack: PackData, levels: (LevelData | null)[], solvedIds: Set<string>): Element =>
@@ -88,9 +94,7 @@ const levelList = (pack: PackData, levels: (LevelData | null)[], solvedIds: Set<
     : h('div', { className: cardStyles.grid }, levels.map((level, i) => levelCard(pack, level, i, solvedIds)))
 
 export const Pack: Component = (signal) => {
-  const user = getUser(signal)
-  const uid = mapRead(user, (u) => u?.uid ?? null)
-  const isMod = getModerator(signal, uid)
+  const user = getUser(signal);
 
   const id = new URLSearchParams(location.search).get('id')
   const packState = funState<Loadable<PackData | null>>(loading())
@@ -102,7 +106,7 @@ export const Pack: Component = (signal) => {
     packState,
     (regionSignal, pack) => {
       if (!pack) return h('p', { className: empty }, ['Pack not found.'])
-      document.title = `${pack.title} · Pixel Puzzle`
+      document.title = `${pack.title} | PP•WF`;
 
       const levels = funState<Loadable<{ levels: (LevelData | null)[]; solvedIds: Set<string> }>>(loading())
       loadInto(
@@ -120,10 +124,17 @@ export const Pack: Component = (signal) => {
       const heroEl = bindView(regionSignal, user, (s, u) => hero(s, pack, u))
       const listEl = bindLoadable(regionSignal, levels, (_s, v) => levelList(pack, v.levels, v.solvedIds))
 
-      return h('div', {}, [heroEl, h('h3', { className: styles.listHeading }, ['Levels']), listEl])
+      return h("div", {}, [
+        heroEl,
+        h("h3", { className: styles.listHeading }, ["Puzzles"]),
+        listEl,
+      ]);
     },
     { errorMsg: 'Failed to load pack.' },
   )
 
-  return h('div', { className: page }, [Header(signal, { user, isMod }), h('div', { className: pageBody }, [content])])
+  return h("div", { className: page }, [
+    Header(signal, {}),
+    h("div", { className: pageBody }, [content]),
+  ]);
 }

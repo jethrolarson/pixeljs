@@ -1,7 +1,6 @@
 - Homepage needs to be a lot more compelling
 - need placeholder icon for unsolved puzzles
 - palates of colors for authoring instead of open-ended colors (like pack of crayons)
-  - characters as colors ascii style?
 - hint completion checking is bugged, incorrectly marking things done and not in some circumstances
 - Font size scaling on phones goes too small and is almost unreadable
 - Tutorial pack needs much longer ramp of simple puzzles to build up
@@ -9,4 +8,4 @@
 - Ability to move puzzles between packs
 - Back button from game doesn't go back to intuitive place
 - Palete options as large crayon/eraser icons
-- Collapse logout and admin into profile page or hamburger menu
+

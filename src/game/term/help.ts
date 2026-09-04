@@ -28,7 +28,7 @@ const LINES: Line[] = [
   { s: "", fg: chrome.text },
   { s: "MENU", fg: chrome.name },
   { s: "  ~  puzzle list", fg: chrome.text },
-  { s: "  <  previous level", fg: chrome.text },
+  { s: "  <  previous puzzle", fg: chrome.text },
   { s: "  >  next puzzle", fg: chrome.text },
   { s: "", fg: chrome.text },
   { s: "esc/? close", fg: chrome.dim },

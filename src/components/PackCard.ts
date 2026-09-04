@@ -15,7 +15,9 @@ export const PackCard: Component<PackCardProps> = (signal, { pack, showEdit, upv
   const levels = pack.levelIds.length
   const href = `/pack.html?id=${pack.id}`
 
-  const coverEl = h('a', { href, className: styles.cover }, [renderPixelIcon(pack.icon, 160)])
+  const coverEl = h("a", { href, className: styles.cover }, [
+    renderPixelIcon(pack.icon, 128),
+  ]);
 
   const actionEls: Element[] = []
   if (upvote) actionEls.push(upvoteButton(signal, { ...upvote, initialCount: pack.upvotes }))
@@ -36,7 +38,7 @@ export const PackCard: Component<PackCardProps> = (signal, { pack, showEdit, upv
     h("div", { className: styles.info }, [
       h("a", { href }, [pack.title]),
       h("div", { className: styles.meta }, [
-        `${levels} level${levels !== 1 ? "s" : ""} · ${pack.ownerName}`,
+        `${levels} puzzle${levels !== 1 ? "s" : ""} · ${pack.ownerName}`,
       ]),
       h("div", { className: styles.cardActions }, actionEls),
     ]),

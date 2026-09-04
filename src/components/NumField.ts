@@ -21,14 +21,11 @@ export interface NumFieldProps {
  * snaps the field back to `value.get()` — covers both invalid input and
  * whatever clamping `set` does internally.
  */
-export const NumField: Component<NumFieldProps> = (
-  signal,
-  { min, max, value },
-) =>
+export const NumField: Component<NumFieldProps> = (signal, { min, max, value }) =>
   hx("input", {
     signal,
     props: {
-      type: "number",
+      type: "numeric",
       min: String(min),
       max: String(max),
       value: String(value.get()),
@@ -36,7 +33,8 @@ export const NumField: Component<NumFieldProps> = (
     },
     on: {
       change: (e) => {
-        const n = parseInt(e.currentTarget.value, 10);
+        let n = parseInt(e.currentTarget.value, 10);
+        if (n > max) n = max;
         if (!Number.isNaN(n)) value.set(n);
         e.currentTarget.value = String(value.get());
       },

@@ -1,0 +1,6 @@
+.display_contents {
+  display: contents;
+}
+.no-wrap {
+  white-space: nowrap;
+}

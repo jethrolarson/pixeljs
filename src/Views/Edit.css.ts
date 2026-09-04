@@ -1,7 +1,7 @@
 import { style } from '@vanilla-extract/css'
 import { inputBase, term } from "../common/inputBase";
 
-export const titleInput = style({ ...inputBase, width: '100%' })
+export const titleInput = style({ ...inputBase, width: "197px" });
 
 export const label = style({
   fontFamily: "inherit",

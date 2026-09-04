@@ -143,6 +143,22 @@ service cloud.firestore {
       }
     }
 
+    match /users/{userId} {
+      function isValidProfile() {
+        let d = request.resource.data;
+        return d.keys().hasOnly(['displayName', 'icon', 'updatedAt'])
+          && d.displayName is string
+          && d.displayName.size() <= 40
+          && (d.icon == null || d.icon is map)
+          && d.updatedAt == request.time;
+      }
+
+      allow read: if true;
+      allow create, update: if request.auth != null
+        && request.auth.uid == userId
+        && isValidProfile();
+    }
+
     match /config/site {
       allow read: if true;
       allow write: if isModerator();

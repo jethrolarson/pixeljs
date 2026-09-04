@@ -4,8 +4,7 @@ import { Component, h, hx, bindView } from '@fun-land/fun-web'
 import { votingEnabled } from '../features'
 import { PackData } from '../pack'
 import { getCommunityPacks } from '../packStore'
-import { getUser } from '../services/getUser'
-import { getModerator } from '../services/getModerator'
+import { getUser } from "../services/getUser";
 import { Header } from '../components/Header'
 import { packGrid } from '../components/PackGrid'
 import { btn, empty, page, pageBody } from "../theme.css";
@@ -41,12 +40,7 @@ const applyLoadError = (st: CommunityState): CommunityState => ({ ...st, loading
 
 export const Browse: Component = (signal) => {
   const user = getUser(signal)
-  const getUid = () => user.get()?.uid ?? null
-  const isMod = getModerator(
-    signal,
-    mapRead(user, (u) => u?.uid ?? null),
-  )
-
+  const getUid = () => user.get()?.uid ?? null;
   const sort = funState<Sort>(votingEnabled ? 'upvotes' : 'createdAt')
   const community = funState<CommunityState>({ packs: [], lastDoc: null, loading: false, error: false })
 
@@ -109,10 +103,10 @@ export const Browse: Component = (signal) => {
   void loadCommunity(true)
 
   return h("div", { className: page }, [
-    Header(signal, { user, isMod }),
+    Header(signal, {}),
     h("div", { className: pageBody }, [
-      h('div', { className: sectionHeader }, [
-        h('h2', {}, ['Community Packs']),
+      h("div", { className: sectionHeader }, [
+        h("h2", {}, ["Community Packs"]),
         ...(sortControl ? [sortControl] : []),
       ]),
       body,

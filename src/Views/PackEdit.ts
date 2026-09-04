@@ -8,7 +8,8 @@ import { createUi } from "../game/uiState";
 import { getPackById, savePack, deletePack } from '../packStore'
 import { getLevels } from '../store'
 import { getUser } from '../services/getUser'
-import { getModerator } from '../services/getModerator'
+import { getIdentity } from "../services/getIdentity";
+import { getProfileState } from "../services/getProfileState";
 import { PackCard } from '../components/PackCard'
 import { IconEditor } from "../components/IconEditor";
 import { renderPixelIcon } from "../components/PixelIcon";
@@ -378,7 +379,7 @@ const editor = (signal: AbortSignal, user: User): Element => {
         "Title",
         inputField(signal, {
           state: form.prop("title"),
-          attrs: { placeholder: "My awesome pack", maxLength: 80 },
+          attrs: { placeholder: "My awesome pack", maxLength: 16 },
         }),
       ),
       group("Description", descField),
@@ -413,9 +414,7 @@ const editor = (signal: AbortSignal, user: User): Element => {
 };
 
 export const PackEdit: Component = (signal) => {
-  const user = getUser(signal)
-  const uid = mapRead(user, (u) => u?.uid ?? null)
-  const isMod = getModerator(signal, uid)
+  const user = getUser(signal);
 
   const slot = h('div', {})
   let started = false
@@ -428,5 +427,8 @@ export const PackEdit: Component = (signal) => {
     }
   })
 
-  return h('div', { className: page }, [Header(signal, { user, isMod }), h('div', { className: pageBody }, [slot])])
+  return h("div", { className: page }, [
+    Header(signal, {}),
+    h("div", { className: pageBody }, [slot]),
+  ]);
 }

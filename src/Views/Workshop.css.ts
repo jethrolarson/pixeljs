@@ -17,8 +17,8 @@ export const card = style({ width: 160 })
 
 export const thumbLink = style({
   display: "block",
-  width: 160,
-  height: 160,
+  width: 128,
+  height: 128,
   borderRadius: 0,
   overflow: "hidden",
   border: `${scale.borderWidth} solid ${colors.border}`,

@@ -16,17 +16,16 @@ export interface SolvedArt {
 }
 
 export interface LevelData {
-  id?: string
-  ownerId?: string
-  title?: string
-  x?: number
-  y?: number
-  game?: string       // column-major color indices: "012120..."
-  palette?: string[]  // hex colors for index 1..n
-  par?: number
-  levelSetName?: string
-  key?: string
-  art?: SolvedArt | null
+  id?: string;
+  ownerId?: string;
+  title?: string;
+  x?: number;
+  y?: number;
+  game?: string; // column-major color indices: "012120..."
+  palette?: string[]; // hex colors for index 1..n
+  levelSetName?: string;
+  key?: string;
+  art?: SolvedArt | null;
 }
 
 const validatePalette = (palette: string[], name: string): void => {

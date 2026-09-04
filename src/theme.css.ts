@@ -5,25 +5,10 @@ import {
   assignVars,
 } from "@vanilla-extract/css";
 
-// The two levers for mobile scaling: shrink both together under the
-// breakpoint so border weight stays proportional to text size instead of
-// looking chunky next to smaller type.
-export const scale = createGlobalTheme(":root", {
-  fontSize: "24px",
-  borderWidth: "4px",
-});
 
 export const sizes = {
   maxWidth: "800px",
 };
-
-globalStyle(":root", {
-  "@media": {
-    "screen and (max-width: 599px)": {
-      vars: assignVars(scale, { fontSize: "12px", borderWidth: "2px" }),
-    },
-  },
-});
 
 // Terminal/ANSI palette — sampled from the canvas `chrome` (game/term/glyphs.ts)
 // so the DOM website reads as the same high-contrast character-grid surface as
@@ -50,8 +35,32 @@ export const colors = {
 
 export const fonts = {
   default: '"Tiny5", sans-serif',
-  // TODO add contensed
+  // TODO add condensed like in game hints >= 10
 };
+
+export const type = {
+  neg1: {
+    fontSize: "15px",
+    lineHeight: "20px",
+  },
+  base: {
+    fontSize: "23px",
+    lineHeight: "28px",
+  },
+};
+
+export const scale = createGlobalTheme(":root", {
+  ...type.base,
+  borderWidth: "4px",
+});
+
+// globalStyle(":root", {
+//   "@media": {
+//     "screen and (max-width: 599px)": {
+//       vars: assignVars(scale, { ...type.neg1, borderWidth: "2px" }),
+//     },
+//   },
+// });
 
 globalStyle("*, *::before, *::after", { boxSizing: "border-box" });
 
@@ -68,7 +77,7 @@ globalStyle("html", {
 globalStyle("body", {
   margin: 0,
   fontSize: scale.fontSize,
-  lineHeight: 1.4,
+  lineHeight: scale.lineHeight,
   color: colors.text,
   fontFamily: fonts.default,
   fontWeight: 400,
@@ -195,8 +204,4 @@ export const pageBody = style({
   padding: "24px",
   maxWidth: sizes.maxWidth,
   margin: "0 auto",
-});
-
-globalStyle(".display_contents", {
-  display: "contents",
 });

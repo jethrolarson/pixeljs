@@ -2,8 +2,7 @@ import { funState, mapRead } from '@fun-land/fun-state'
 import { Component, h } from '@fun-land/fun-web'
 import { PackData } from '../pack'
 import { getFeaturedPacks } from '../packStore'
-import { getUser } from '../services/getUser'
-import { getModerator } from '../services/getModerator'
+import { getUser } from "../services/getUser";
 import { Header } from '../components/Header'
 import { packGrid } from '../components/PackGrid'
 import { Loadable, loading, loadInto, bindLoadable } from '../components/Async'
@@ -11,9 +10,7 @@ import { empty, page, pageBody } from "../theme.css";
 import { sectionHeader } from "./Home.css";
 
 export const Home: Component = (signal) => {
-  const user = getUser(signal)
-  const uid = mapRead(user, (u) => u?.uid ?? null)
-  const isMod = getModerator(signal, uid)
+  const user = getUser(signal);
 
   const featured = funState<Loadable<PackData[]>>(loading())
   loadInto(featured, getFeaturedPacks())
@@ -29,12 +26,9 @@ export const Home: Component = (signal) => {
   )
 
   return h("div", { className: page }, [
-    Header(signal, { user, isMod }),
+    Header(signal, {}),
     h("div", { className: pageBody }, [
-      h("div", { className: sectionHeader }, [
-        h("h2", {}, ["Featured Packs"]),
-        h("a", { href: "/browse.html" }, ["Browse community packs →"]),
-      ]),
+      h("div", { className: sectionHeader }, [h("h2", {}, ["Featured Packs"])]),
       gridEl,
     ]),
   ]);

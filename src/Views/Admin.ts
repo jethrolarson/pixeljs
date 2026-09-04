@@ -3,8 +3,7 @@ import { Component, h, hx, bindView } from '@fun-land/fun-web'
 import { votingEnabled } from '../features'
 import { PackData } from '../pack'
 import { getPublishedPacks, setPackFeatured, isModerator } from '../packStore'
-import { getUser } from '../services/getUser'
-import { getModerator } from '../services/getModerator'
+import { getUser } from "../services/getUser";
 import { Header } from '../components/Header'
 import { renderPixelIcon } from '../components/PixelIcon'
 import { empty, page, pageBody } from '../theme.css'
@@ -100,15 +99,14 @@ const adminGate = (signal: AbortSignal, uid: string): Element => {
 }
 
 export const Admin: Component = (signal) => {
-  const user = getUser(signal)
-  const isMod = getModerator(
-    signal,
-    mapRead(user, (u) => u?.uid ?? null),
-  )
+  const user = getUser(signal);
 
   const content = bindView(signal, user, (s, u) =>
     u ? adminGate(s, u.uid) : h('p', { className: empty }, ['Sign in with a moderator account.']),
   )
 
-  return h('div', { className: page }, [Header(signal, { user, isMod }), h('div', { className: pageBody }, [content])])
+  return h("div", { className: page }, [
+    Header(signal, {}),
+    h("div", { className: pageBody }, [content]),
+  ]);
 }
